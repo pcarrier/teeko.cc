@@ -174,78 +174,73 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const activePlayer = turn == Player.A ? "red" : "blue";
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="-.5 -.5 5 5"
-      className="board"
-    >
-      <g>
-        <text
-          x={2}
-          y={4.6}
-          text-anchor="middle"
-          dominant-baseline="middle"
-          font-size=".2"
-          style="user-select:none;"
-        >
-          {aWin
-            ? `red won`
-            : bWin
-            ? `blue won`
-            : dropping
-            ? `${activePlayer} drops…`
-            : selected === undefined
-            ? `${activePlayer} moves from…`
-            : `${activePlayer} moves to…`}
-        </text>
-        <line x1="0" y1="0" x2="0" y2="4" />
-        <line x1="1" y1="0" x2="1" y2="4" />
-        <line x1="2" y1="0" x2="2" y2="4" />
-        <line x1="3" y1="0" x2="3" y2="4" />
-        <line x1="4" y1="0" x2="4" y2="4" />
-        <line x1="0" y1="0" x2="4" y2="0" />
-        <line x1="0" y1="1" x2="4" y2="1" />
-        <line x1="0" y1="2" x2="4" y2="2" />
-        <line x1="0" y1="3" x2="4" y2="3" />
-        <line x1="0" y1="4" x2="4" y2="4" />
-        <line x1="0" y1="0" x2="4" y2="4" />
-        <line x1="0" y1="1" x2="3" y2="4" />
-        <line x1="0" y1="2" x2="2" y2="4" />
-        <line x1="0" y1="3" x2="1" y2="4" />
-        <line x1="1" y1="0" x2="4" y2="3" />
-        <line x1="2" y1="0" x2="4" y2="2" />
-        <line x1="3" y1="0" x2="4" y2="1" />
-        <line x1="0" y1="0" x2="4" y2="0" />
-        <line x1="1" y1="0" x2="4" y2="3" />
-        <line x1="2" y1="0" x2="4" y2="2" />
-        <line x1="3" y1="0" x2="4" y2="1" />
-        <line x1="0" y1="0" x2="4" y2="0" />
-        <line x1="1" y1="0" x2="0" y2="1" />
-        <line x1="2" y1="0" x2="0" y2="2" />
-        <line x1="3" y1="0" x2="0" y2="3" />
-        <line x1="4" y1="0" x2="0" y2="4" />
-        <line x1="4" y1="1" x2="1" y2="4" />
-        <line x1="4" y1="2" x2="2" y2="4" />
-        <line x1="4" y1="3" x2="3" y2="4" />
-        {POS_ARRAY.map((position) => {
-          const contains: InSlot = aPieces.has(position)
-            ? InSlot.A
-            : bPieces.has(position)
-            ? InSlot.B
-            : InSlot.NONE;
-          return (
-            <Slot
-              position={position}
-              contains={contains}
-              selected={selected === position}
-              selectable={validTargets.has(position)}
-              click={() => click(position)}
-              turn={turn}
-            />
-          );
-        })}
-      </g>
-    </svg>
+    <>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="-0.5 -0.5 5 5"
+        className="board"
+      >
+        <g>
+          <line x1="0" y1="0" x2="0" y2="4" />
+          <line x1="1" y1="0" x2="1" y2="4" />
+          <line x1="2" y1="0" x2="2" y2="4" />
+          <line x1="3" y1="0" x2="3" y2="4" />
+          <line x1="4" y1="0" x2="4" y2="4" />
+          <line x1="0" y1="0" x2="4" y2="0" />
+          <line x1="0" y1="1" x2="4" y2="1" />
+          <line x1="0" y1="2" x2="4" y2="2" />
+          <line x1="0" y1="3" x2="4" y2="3" />
+          <line x1="0" y1="4" x2="4" y2="4" />
+          <line x1="0" y1="0" x2="4" y2="4" />
+          <line x1="0" y1="1" x2="3" y2="4" />
+          <line x1="0" y1="2" x2="2" y2="4" />
+          <line x1="0" y1="3" x2="1" y2="4" />
+          <line x1="1" y1="0" x2="4" y2="3" />
+          <line x1="2" y1="0" x2="4" y2="2" />
+          <line x1="3" y1="0" x2="4" y2="1" />
+          <line x1="0" y1="0" x2="4" y2="0" />
+          <line x1="1" y1="0" x2="4" y2="3" />
+          <line x1="2" y1="0" x2="4" y2="2" />
+          <line x1="3" y1="0" x2="4" y2="1" />
+          <line x1="0" y1="0" x2="4" y2="0" />
+          <line x1="1" y1="0" x2="0" y2="1" />
+          <line x1="2" y1="0" x2="0" y2="2" />
+          <line x1="3" y1="0" x2="0" y2="3" />
+          <line x1="4" y1="0" x2="0" y2="4" />
+          <line x1="4" y1="1" x2="1" y2="4" />
+          <line x1="4" y1="2" x2="2" y2="4" />
+          <line x1="4" y1="3" x2="3" y2="4" />
+          {POS_ARRAY.map((position) => {
+            const contains: InSlot = aPieces.has(position)
+              ? InSlot.A
+              : bPieces.has(position)
+              ? InSlot.B
+              : InSlot.NONE;
+            return (
+              <Slot
+                position={position}
+                contains={contains}
+                selected={selected === position}
+                selectable={validTargets.has(position)}
+                click={() => click(position)}
+                turn={turn}
+              />
+            );
+          })}
+        </g>
+      </svg>
+      <p style="user-select:none;">
+        {aWin
+          ? `red won`
+          : bWin
+          ? `blue won`
+          : dropping
+          ? `${activePlayer} drops…`
+          : selected === undefined
+          ? `${activePlayer} moves from…`
+          : `${activePlayer} moves to…`}
+      </p>
+    </>
   );
 };
 
@@ -287,7 +282,6 @@ const Game: FunctionComponent = () => {
   return (
     <div style="text-align: center;">
       <BoardView board={board} drop={drop} move={move} />
-      <br />
       <button onClick={() => setBoard(InitialBoard)}>Reset</button>
     </div>
   );

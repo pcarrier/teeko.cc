@@ -1,5 +1,6 @@
-body {
+html, body {
   margin: 0;
+  padding: 1em;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
@@ -13,7 +14,7 @@ code {
 }
 
 .board {
-  width: min(min(100vh, 100vw), 200mm);
+  width: min(min(100%, 80vw), 200mm);
 }
 .board line {
   stroke: #808080;
