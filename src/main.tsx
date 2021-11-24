@@ -117,26 +117,26 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
   );
   const x = turn === Player.A ? a : b;
   const ourPieces = turn === Player.A ? aPieces : bPieces;
+  const ourPiecesWithEmptyNeighbors = new Set(
+    [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
+  );
   const dropping = ourPieces.size < 4; /* FIXME: 8 */
 
   const aWin = WINNING_POSITIONS.has(a);
   const bWin = WINNING_POSITIONS.has(b);
-  const win = aWin || bWin;
+  const win = false //aWin || bWin;
 
   const validTargets: Set<number> = win
     ? new Set()
     : dropping
     ? emptySlots
     : selected === undefined
-    ? new Set(
-        [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
-      )
+    ? ourPiecesWithEmptyNeighbors
     : new Set(
         [...pieces(NEIGHS_BY_POSITION[selected])].filter(
           (x) => !aPieces.has(x) && !bPieces.has(x)
         )
       );
-
   function drop(position: number) {
     console.log(position, "dropped");
   }
@@ -150,7 +150,7 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
     } else {
       if (dropping) drop(position);
       else {
-        if (ourPieces.has(position)) {
+        if (ourPiecesWithEmptyNeighbors.has(position)) {
           setSelected(position);
         } else {
           setSelected(undefined);
