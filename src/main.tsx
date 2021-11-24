@@ -119,7 +119,13 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
   const ourPieces = turn === Player.A ? aPieces : bPieces;
   const dropping = ourPieces.size < 4; /* FIXME: 8 */
 
-  const validTargets: Set<number> = dropping
+  const aWin = WINNING_POSITIONS.has(a);
+  const bWin = WINNING_POSITIONS.has(b);
+  const win = aWin || bWin;
+
+  const validTargets: Set<number> = win
+    ? new Set()
+    : dropping
     ? emptySlots
     : selected === undefined
     ? new Set(
@@ -170,7 +176,11 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
           font-size=".2"
           style="user-select:none;"
         >
-          {dropping
+          {aWin
+            ? `red won`
+            : bWin
+            ? `blue won`
+            : dropping
             ? `${activePlayer} drops…`
             : selected === undefined
             ? `${activePlayer} moves from…`
