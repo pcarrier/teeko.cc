@@ -82,7 +82,7 @@ const Slot: FunctionComponent<SlotAttrs> = ({
           r={CROWN_RADIUS}
           cx={x}
           cy={y}
-          fill={turn === Player.A ? "#ff808080" : "#8080ff80"}
+          fill={turn % 2 === 0 ? "#ff808080" : "#8080ff80"}
         />
       ) : null}
       <circle r={SLOT_RADIUS} cx={x} cy={y} fill="#808080" />
@@ -94,13 +94,15 @@ const Slot: FunctionComponent<SlotAttrs> = ({
 type Board = {
   a: number;
   b: number;
-  turn: Player;
+  turn: number;
+  playing: boolean;
 };
 
-const InitialBoard = {
+const InitialBoard: Board = {
   a: 0,
   b: 0,
-  turn: Player.A, // FIXME: number + playing: boolean
+  turn: Player.A,
+  playing: true,
 };
 
 function pieces(n: number): Set<number> {
@@ -125,13 +127,17 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
-  const { a, b, turn } = board;
+  const { a, b, turn, playing } = board;
   const aPieces = pieces(a);
   const bPieces = pieces(b);
   const emptySlots = new Set(
     POS_ARRAY.filter((x) => !aPieces.has(x) && !bPieces.has(x))
   );
-  const ourPieces = turn === Player.A ? aPieces : bPieces;
+  const ourPieces = !playing
+    ? new Set<number>()
+    : turn % 2 === 0
+    ? aPieces
+    : bPieces;
   const ourPiecesWithEmptyNeighbors = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
@@ -171,7 +177,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
   }
 
-  const activePlayer = turn == Player.A ? "red" : "blue";
+  const activePlayer = turn % 2 === 0 ? "red" : "blue";
 
   return (
     <>
@@ -229,7 +235,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           })}
         </g>
       </svg>
-      <p style="user-select:none;">
+      <p>
         {aWin
           ? `red won`
           : bWin
@@ -248,35 +254,28 @@ const Game: FunctionComponent = () => {
   const [board, setBoard] = useState(InitialBoard);
 
   function move(from: number, to: number) {
-    let { a, b, turn } = board;
-    const isA = turn === Player.A;
+    let { a, b, turn, playing } = board;
+    const isA = turn % 2 === 0;
 
     let target = isA ? a : b;
     const result = (target & ~(1 << from)) | (1 << to);
     if (isA) {
       a = result;
-      turn = Player.B;
     } else {
       b = result;
-      turn = Player.A;
     }
-    setBoard({ a, b, turn });
+    setBoard({ a, b, turn: turn + 1, playing });
   }
 
   function drop(pos: number) {
-    let { a, b, turn } = board;
-    const isA = turn === Player.A;
+    let { a, b, turn, playing } = board;
+    const isA = turn % 2 === 0;
 
     let target = isA ? a : b;
     const result = target | (1 << pos);
-    if (isA) {
-      a = result;
-      turn = Player.B;
-    } else {
-      b = result;
-      turn = Player.A;
-    }
-    setBoard({ a, b, turn });
+    if (isA) a = result;
+    else b = result;
+    setBoard({ a, b, turn: turn + 1, playing });
   }
 
   return (
@@ -288,7 +287,15 @@ const Game: FunctionComponent = () => {
 };
 
 const App: FunctionComponent = () => {
-  return <><Game /><p>Teeko by John Scarne; website by <a href="https://pcarrier.com">Pierre Carrier</a>.</p></>;
+  return (
+    <>
+      <Game />
+      <p>
+        Teeko by John Scarne; website by{" "}
+        <a href="https://pcarrier.com">Pierre Carrier</a>.
+      </p>
+    </>
+  );
 };
 
 render(<App />, document.body);
