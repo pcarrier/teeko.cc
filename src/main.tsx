@@ -58,10 +58,10 @@ const Slot: FunctionComponent<SlotAttrs> = ({
   let piece;
   switch (contains) {
     case InSlot.A:
-      piece = <circle r={PIECE_RADIUS} cx={x} cy={y} fill="#ff0000" />;
+      piece = <circle r={PIECE_RADIUS} cx={x} cy={y} fill="#0000ff" />;
       break;
     case InSlot.B:
-      piece = <circle r={PIECE_RADIUS} cx={x} cy={y} fill="#0000ff" />;
+      piece = <circle r={PIECE_RADIUS} cx={x} cy={y} fill="#ff0000" />;
       break;
     default:
       piece = <></>;
@@ -82,7 +82,7 @@ const Slot: FunctionComponent<SlotAttrs> = ({
           r={CROWN_RADIUS}
           cx={x}
           cy={y}
-          fill={turn % 2 === 0 ? "#ff808080" : "#8080ff80"}
+          fill={turn % 2 === 0 ? "#8080ff80" : "#ff808080"}
         />
       ) : null}
       <circle r={SLOT_RADIUS} cx={x} cy={y} fill="#808080" />
@@ -177,7 +177,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
   }
 
-  const activePlayer = turn % 2 === 0 ? "Red" : "Blue";
+  const activePlayer = turn % 2 === 0 ? "Blue" : "Red";
 
   return (
     <>
