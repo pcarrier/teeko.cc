@@ -284,7 +284,8 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   function reset() {
-    setBoard({ ...InitialBoard, turn: (board.turn + 2) % 2 });
+    if (board.a === 0 && board.b === 0) return;
+    setBoard({ ...InitialBoard, turn: board.turn + 2 - (board.turn % 2) });
   }
 
   return (
