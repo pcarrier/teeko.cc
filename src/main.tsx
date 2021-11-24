@@ -76,7 +76,7 @@ const Slot: FunctionComponent<SlotAttrs> = ({
       }
     >
       {selected ? (
-        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#000" />
+        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#40404080" />
       ) : selectable ? (
         <circle
           r={CROWN_RADIUS}
@@ -95,7 +95,12 @@ type Board = {
   a: number;
   b: number;
   turn: Player;
-  move: (from: number, to: number) => void;
+};
+
+const InitialBoard = {
+  a: 0,
+  b: 0,
+  turn: Player.A,
 };
 
 function pieces(n: number): Set<number> {
@@ -107,9 +112,20 @@ function pieces(n: number): Set<number> {
   return new Set(result);
 }
 
-const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
+type BoardViewAttrs = {
+  board: Board;
+  drop: (position: number) => void;
+  move: (from: number, to: number) => void;
+};
+
+const BoardView: FunctionComponent<BoardViewAttrs> = ({
+  board,
+  drop,
+  move,
+}) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
+  const { a, b, turn } = board;
   const aPieces = pieces(a);
   const bPieces = pieces(b);
   const emptySlots = new Set(
@@ -124,7 +140,7 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
 
   const aWin = WINNING_POSITIONS.has(a);
   const bWin = WINNING_POSITIONS.has(b);
-  const win = false //aWin || bWin;
+  const win = aWin || bWin;
 
   const validTargets: Set<number> = win
     ? new Set()
@@ -137,9 +153,6 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
           (x) => !aPieces.has(x) && !bPieces.has(x)
         )
       );
-  function drop(position: number) {
-    console.log(position, "dropped");
-  }
 
   function click(position: number) {
     if (selected === position) {
@@ -184,7 +197,7 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
             ? `${activePlayer} drops…`
             : selected === undefined
             ? `${activePlayer} moves from…`
-            : `${activePlayer} moves from ${selected + 1} to…`}
+            : `${activePlayer} moves to…`}
         </text>
         <line x1="0" y1="0" x2="0" y2="4" />
         <line x1="1" y1="0" x2="1" y2="4" />
@@ -237,19 +250,46 @@ const BoardView: FunctionComponent<Board> = ({ a, b, turn, move }) => {
   );
 };
 
+const Game: FunctionComponent = () => {
+  const [board, setBoard] = useState(InitialBoard);
+
+  function move(from: number, to: number) {
+    let { a, b, turn } = board;
+    const isA = turn === Player.A;
+
+    let target = isA ? a : b;
+    const result = (target & ~(1 << from)) | (1 << to);
+    if (isA) {
+      a = result;
+      turn = Player.B;
+    } else {
+      b = result;
+      turn = Player.A;
+    }
+    setBoard({ a, b, turn });
+  }
+
+  function drop(pos: number) {
+    let { a, b, turn } = board;
+    const isA = turn === Player.A;
+
+    let target = isA ? a : b;
+    const result = target | (1 << pos);
+    if (isA) {
+      a = result;
+      turn = Player.B;
+    } else {
+      b = result;
+      turn = Player.A;
+    }
+    setBoard({ a, b, turn });
+  }
+
+  return <BoardView board={board} drop={drop} move={move} />;
+};
+
 const App: FunctionComponent = () => {
-  return (
-    <>
-      {[...WINNING_POSITIONS].map((pos, idx) => (
-        <BoardView
-          a={idx % 2 === 0 ? pos : 0}
-          b={idx % 2 === 0 ? 0 : pos}
-          turn={idx % 3 === 0 ? Player.A : Player.B}
-          move={(from, to) => console.log("move", from, to)}
-        />
-      ))}
-    </>
-  );
+  return <Game />;
 };
 
 render(<App />, document.getElementById("app")!);
