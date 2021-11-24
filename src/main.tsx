@@ -182,10 +182,10 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     >
       <g>
         <text
-          x={-0.9}
-          y={-0.75}
-          text-anchor="start"
-          alignment-baseline="middle"
+          x={2}
+          y={4.8}
+          text-anchor="middle"
+          dominant-baseline="middle"
           font-size=".2"
           style="user-select:none;"
         >
@@ -285,7 +285,13 @@ const Game: FunctionComponent = () => {
     setBoard({ a, b, turn });
   }
 
-  return <BoardView board={board} drop={drop} move={move} />;
+  return (
+    <div style="text-align: center;">
+      <BoardView board={board} drop={drop} move={move} />
+      <br/>
+      <button onClick={() => setBoard(InitialBoard)}>Reset</button>
+    </div>
+  );
 };
 
 const App: FunctionComponent = () => {
