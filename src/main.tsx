@@ -76,16 +76,16 @@ const Slot: FunctionComponent<SlotAttrs> = ({
       }
     >
       {selected ? (
-        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#40404080" />
+        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#80808080" />
       ) : selectable ? (
         <circle
           r={CROWN_RADIUS}
           cx={x}
           cy={y}
-          fill={turn % 2 === 0 ? "#8080ff80" : "#ff808080"}
+          fill={turn % 2 === 0 ? "#0000ff80" : "#ff000080"}
         />
       ) : null}
-      <circle r={SLOT_RADIUS} cx={x} cy={y} fill="#808080" />
+      <circle r={SLOT_RADIUS} cx={x} cy={y} fill="#404040" />
       {piece}
     </g>
   );
@@ -237,9 +237,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       </svg>
       <p>
         {aWin
-          ? `red won`
+          ? `Blue won.`
           : bWin
-          ? `blue won`
+          ? `Red won.`
           : dropping
           ? `${activePlayer} drops…`
           : selected === undefined

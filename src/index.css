@@ -20,6 +20,6 @@ body {
 }
 
 .board line {
-    stroke: #808080;
+    stroke: #404040;
     stroke-width: .1;
 }
