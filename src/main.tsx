@@ -160,7 +160,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       move(selected, position);
       setSelected(undefined);
     } else {
-      if (dropping) drop(position);
+      if (dropping && emptySlots.has(position)) drop(position);
       else {
         if (!win && ourPiecesWithEmptyNeighbors.has(position)) {
           setSelected(position);
