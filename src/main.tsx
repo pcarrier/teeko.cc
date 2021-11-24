@@ -250,8 +250,13 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   );
 };
 
-const Game: FunctionComponent = () => {
-  const [board, setBoard] = useState(InitialBoard);
+const Game: FunctionComponent<{ initial: Board }> = ({
+  initial,
+}: {
+  initial: Board;
+}) => {
+  const [board, setBoard] = useState(initial);
+  location.replace(`#${board.a},${board.b},${board.turn}`);
 
   function move(from: number, to: number) {
     let { a, b, turn, playing } = board;
@@ -287,9 +292,20 @@ const Game: FunctionComponent = () => {
 };
 
 const App: FunctionComponent = () => {
+  const urlNumbers = location.hash
+    .substr(1)
+    .split(",")
+    .map((v) => Number(v));
+  const initialBoard = InitialBoard;
+  if (urlNumbers.length >= 3) {
+    initialBoard.a = urlNumbers[0];
+    initialBoard.b = urlNumbers[1];
+    initialBoard.turn = urlNumbers[2];
+  }
+
   return (
     <>
-      <Game />
+      <Game initial={initialBoard} />
       <p>
         Teeko by John Scarne; website by{" "}
         <a href="https://pcarrier.com">Pierre Carrier</a>.
