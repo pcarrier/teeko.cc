@@ -283,10 +283,14 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     setBoard({ a, b, turn: turn + 1, playing });
   }
 
+  function reset() {
+    setBoard({ ...InitialBoard, turn: (board.turn + 2) % 2 });
+  }
+
   return (
     <>
       <BoardView board={board} drop={drop} move={move} />
-      <button onClick={() => setBoard(InitialBoard)}>Reset</button>
+      <button onClick={reset}>Reset</button>
     </>
   );
 };
@@ -296,7 +300,7 @@ const App: FunctionComponent = () => {
     .substring(1)
     .split(",")
     .map((v) => Number(v));
-  const initialBoard = InitialBoard;
+  const initialBoard = { ...InitialBoard };
   if (urlNumbers.length >= 3) {
     initialBoard.a = urlNumbers[0];
     initialBoard.b = urlNumbers[1];
