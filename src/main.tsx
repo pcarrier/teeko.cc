@@ -100,7 +100,7 @@ type Board = {
 const InitialBoard = {
   a: 0,
   b: 0,
-  turn: Player.A,
+  turn: Player.A, // FIXME: number + playing: boolean
 };
 
 function pieces(n: number): Set<number> {
@@ -131,7 +131,6 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const emptySlots = new Set(
     POS_ARRAY.filter((x) => !aPieces.has(x) && !bPieces.has(x))
   );
-  const x = turn === Player.A ? a : b;
   const ourPieces = turn === Player.A ? aPieces : bPieces;
   const ourPiecesWithEmptyNeighbors = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
@@ -288,7 +287,7 @@ const Game: FunctionComponent = () => {
   return (
     <div style="text-align: center;">
       <BoardView board={board} drop={drop} move={move} />
-      <br/>
+      <br />
       <button onClick={() => setBoard(InitialBoard)}>Reset</button>
     </div>
   );
