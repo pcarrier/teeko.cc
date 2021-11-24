@@ -1,0 +1,90 @@
+body {
+    margin: 0;
+    padding: 1em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #eee;
+    background-color: #000;
+    text-align: center;
+    user-select: none;
+}
+
+.board {
+    width: min(min(100%, 100vw), 200mm);
+    touch-action: none;
+}
+
+.board line.bg {
+    stroke-width: .02;
+    stroke-dasharray: .025;
+}
+
+.board line.bg {
+    stroke: #505050;
+}
+
+.board circle.bg {
+    fill: #505050;
+}
+
+.board circle.bg.release.A {
+    fill: #0000ff;
+}
+
+.board circle.bg.release.B {
+    fill: #ff0000;
+}
+
+.board line.last {
+    stroke-width: .05;
+}
+
+.board line.last.A {
+    stroke: #800000;
+}
+
+.board line.last.B {
+    stroke: #000080;
+}
+
+.board circle.selected {
+    fill: #80808080;
+}
+
+.board circle.last.A {
+    fill: #800000;
+}
+
+.board circle.last.B {
+    fill: #000080;
+}
+
+.board circle.target.A {
+    fill: #0000ff80;
+}
+
+.board circle.target.B {
+    fill: #ff000080;
+}
+
+.board .piece.A {
+    fill: #0000ff;
+}
+
+.board .piece.B {
+    fill: #ff0000;
+}
+
+.board .piece.dummy {
+    pointer-events: none;
+}
+
+@media (pointer: coarse) {
+    button {
+        font-size: 150%;
+        padding: 0.5em;
+    }
+}
