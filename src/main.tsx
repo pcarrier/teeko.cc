@@ -293,7 +293,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
 
 const App: FunctionComponent = () => {
   const urlNumbers = location.hash
-    .substr(1)
+    .substring(1)
     .split(",")
     .map((v) => Number(v));
   const initialBoard = InitialBoard;
