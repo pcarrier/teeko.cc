@@ -135,11 +135,11 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const ourPiecesWithEmptyNeighbors = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
-  const dropping = ourPieces.size < 4; /* FIXME: 8 */
-
   const aWin = WINNING_POSITIONS.has(a);
   const bWin = WINNING_POSITIONS.has(b);
   const win = aWin || bWin;
+
+  const dropping = !win && ourPieces.size < 4;
 
   const validTargets: Set<number> = win
     ? new Set()
@@ -162,7 +162,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     } else {
       if (dropping) drop(position);
       else {
-        if (ourPiecesWithEmptyNeighbors.has(position)) {
+        if (!win && ourPiecesWithEmptyNeighbors.has(position)) {
           setSelected(position);
         } else {
           setSelected(undefined);
@@ -176,13 +176,13 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="-1 -1 6 6"
+      viewBox="-.5 -.5 5 5"
       className="board"
     >
       <g>
         <text
           x={2}
-          y={4.8}
+          y={4.6}
           text-anchor="middle"
           dominant-baseline="middle"
           font-size=".2"
