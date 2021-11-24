@@ -12,6 +12,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     color: #fff;
     background-color: #000;
+    text-align: center;
 }
 
 .board {

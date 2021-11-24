@@ -177,7 +177,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
   }
 
-  const activePlayer = turn % 2 === 0 ? "red" : "blue";
+  const activePlayer = turn % 2 === 0 ? "Red" : "Blue";
 
   return (
     <>
@@ -284,10 +284,10 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   return (
-    <div style="text-align: center;">
+    <>
       <BoardView board={board} drop={drop} move={move} />
       <button onClick={() => setBoard(InitialBoard)}>Reset</button>
-    </div>
+    </>
   );
 };
 
@@ -305,6 +305,7 @@ const App: FunctionComponent = () => {
 
   return (
     <>
+      <p>Make a unit square or a line in any direction.</p>
       <Game initial={initialBoard} />
       <p>
         Teeko by John Scarne; website by{" "}
