@@ -1,5 +1,5 @@
 import "./index.css";
-import { FunctionComponent, render } from "preact";
+import { FunctionComponent, h, render } from "preact";
 import { useState } from "preact/hooks";
 
 const SIZE = 5;
@@ -288,7 +288,7 @@ const Game: FunctionComponent = () => {
 };
 
 const App: FunctionComponent = () => {
-  return <Game />;
+  return <><Game /><p>Teeko by John Scarne; website by <a href="https://pcarrier.com">Pierre Carrier</a>.</p></>;
 };
 
-render(<App />, document.getElementById("app")!);
+render(<App />, document.body);
