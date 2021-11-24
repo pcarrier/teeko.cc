@@ -1,6 +1,6 @@
 import "./index.css";
 import { FunctionComponent, render } from "preact";
-import { useState } from "preact/compat";
+import { useState } from "preact/hooks";
 
 const SIZE = 5;
 const SLOTS = SIZE * SIZE;
