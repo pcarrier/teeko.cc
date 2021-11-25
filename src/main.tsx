@@ -102,17 +102,17 @@ const Slot: FunctionComponent<SlotAttrs> = ({
 type Board = {
   a: number;
   b: number;
-  turn: number;
-  playing: boolean;
-  lastAction: number | [number, number] | undefined;
+  t: number; // turn
+  p: boolean; // playing
+  l: number | [number, number] | undefined; // last action
 };
 
 const EmptyBoard: Board = {
   a: 0,
   b: 0,
-  turn: Player.A,
-  playing: true,
-  lastAction: undefined,
+  t: Player.A,
+  p: true,
+  l: undefined,
 };
 
 function pieces(n: number): Set<number> {
@@ -137,15 +137,15 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
-  const { a, b, turn, playing } = board;
+  const { a, b, t, p } = board;
   const aPieces = pieces(a);
   const bPieces = pieces(b);
   const emptySlots = new Set(
     POS_ARRAY.filter((x) => !aPieces.has(x) && !bPieces.has(x))
   );
-  const ourPieces = !playing
+  const ourPieces = !p
     ? new Set<number>()
-    : turn % 2 === 0
+    : t % 2 === 0
     ? aPieces
     : bPieces;
   const ourPiecesWithEmptyNeighbors = new Set(
@@ -170,7 +170,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       );
 
   function click(position: number) {
-    if (!playing) return;
+    if (!p) return;
     if (selected === position) {
       setSelected(undefined);
     } else if (selected !== undefined && validTargets.has(position)) {
@@ -188,8 +188,8 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
   }
 
-  const activePlayer = turn % 2 === 0 ? "Blue" : "Red";
-  const lastAction = board.lastAction;
+  const activePlayer = t % 2 === 0 ? "Blue" : "Red";
+  const lastAction = board.l;
 
   return (
     <>
@@ -206,7 +206,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             y1={y(lastAction[0])}
             x2={x(lastAction[1])}
             y2={y(lastAction[1])}
-            stroke={turn % 2 === 0 ? "#800000" : "#000080"}
+            stroke={t % 2 === 0 ? "#800000" : "#000080"}
             className="last"
           />
         ) : (
@@ -214,7 +214,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             r={CROWN_RADIUS}
             cx={lastAction % 5}
             cy={Math.floor(lastAction / 5)}
-            fill={turn % 2 === 0 ? "#800000" : "#000080"}
+            fill={t % 2 === 0 ? "#800000" : "#000080"}
           />
         )}
         <g>
@@ -262,7 +262,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 selected={selected === position}
                 selectable={validTargets.has(position)}
                 click={() => click(position)}
-                turn={turn}
+                turn={t}
               />
             );
           })}
@@ -296,8 +296,8 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   function move(from: number, to: number) {
-    let { a, b, turn, playing } = board;
-    const isA = turn % 2 === 0;
+    let { a, b, t, p } = board;
+    const isA = t % 2 === 0;
 
     let target = isA ? a : b;
     const result = (target & ~(1 << from)) | (1 << to);
@@ -306,18 +306,18 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     } else {
       b = result;
     }
-    moveToBoard({ a, b, turn: turn + 1, playing, lastAction: [from, to] });
+    moveToBoard({ a, b, t: t + 1, p: playing, l: [from, to] });
   }
 
   function drop(pos: number) {
-    let { a, b, turn, playing } = board;
-    const isA = turn % 2 === 0;
+    let { a, b, t, p } = board;
+    const isA = t % 2 === 0;
 
     let target = isA ? a : b;
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    moveToBoard({ a, b, turn: turn + 1, playing, lastAction: pos });
+    moveToBoard({ a, b, t: t + 1, p: playing, l: pos });
   }
 
   function reset() {
