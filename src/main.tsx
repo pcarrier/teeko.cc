@@ -84,7 +84,7 @@ const Slot: FunctionComponent<SlotAttrs> = ({
       }
     >
       {selected ? (
-        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#80808080" />
+        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#00000080" />
       ) : selectable ? (
         <circle
           r={CROWN_RADIUS}
@@ -333,7 +333,7 @@ const App: FunctionComponent = () => {
   let initial = { ...EmptyBoard };
   if (location.hash.length > 1) {
     try {
-      JSON.parse(decodeURI(location.hash.substring(1)));
+      initial = JSON.parse(decodeURI(location.hash.substring(1)));
     } catch (_) {
       console.log("Invalid URL parameters");
     }
