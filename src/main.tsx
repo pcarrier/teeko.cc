@@ -98,7 +98,7 @@ type Board = {
   playing: boolean;
 };
 
-const InitialBoard: Board = {
+const EmptyBoard: Board = {
   a: 0,
   b: 0,
   turn: Player.A,
@@ -285,7 +285,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
 
   function reset() {
     if (board.a === 0 && board.b === 0) return;
-    setBoard({ ...InitialBoard, turn: board.turn + 2 - (board.turn % 2) });
+    setBoard({ ...EmptyBoard, turn: board.turn + 2 - (board.turn % 2) });
   }
 
   return (
@@ -301,17 +301,17 @@ const App: FunctionComponent = () => {
     .substring(1)
     .split(",")
     .map((v) => Number(v));
-  const initialBoard = { ...InitialBoard };
+  const initial = { ...EmptyBoard };
   if (urlNumbers.length >= 3) {
-    initialBoard.a = urlNumbers[0];
-    initialBoard.b = urlNumbers[1];
-    initialBoard.turn = urlNumbers[2];
+    initial.a = urlNumbers[0];
+    initial.b = urlNumbers[1];
+    initial.turn = urlNumbers[2];
   }
 
   return (
     <>
       <p>Make a unit square or a line in any direction.</p>
-      <Game initial={initialBoard} />
+      <Game initial={initial} />
       <p>
         Teeko by John Scarne; website by{" "}
         <a href="https://pcarrier.com">Pierre Carrier</a>.
