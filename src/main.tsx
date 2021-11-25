@@ -170,6 +170,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       );
 
   function click(position: number) {
+    if (!playing) return;
     if (selected === position) {
       setSelected(undefined);
     } else if (selected !== undefined && validTargets.has(position)) {
