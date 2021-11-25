@@ -287,7 +287,9 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   const [board, setBoard] = useState(initial);
 
   function moveToBoard(board: Board) {
-    location.replace(`#${JSON.stringify(board)}`);
+    location.replace(
+      `#${JSON.stringify([board.a, board.b, board.t, board.l])}`
+    );
     setBoard(board);
   }
 
@@ -333,7 +335,11 @@ const App: FunctionComponent = () => {
   let initial = { ...EmptyBoard };
   if (location.hash.length > 1) {
     try {
-      initial = JSON.parse(decodeURI(location.hash.substring(1)));
+      const [a, b, t, l] = JSON.parse(decodeURI(location.hash.substring(1)));
+      initial.a = a;
+      initial.b = b;
+      initial.t = t;
+      initial.l = l;
     } catch (_) {
       console.log("Invalid URL parameters");
     }
