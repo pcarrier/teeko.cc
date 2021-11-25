@@ -336,10 +336,9 @@ const App: FunctionComponent = () => {
     <>
       <p>Make a unit square or a line in any direction.</p>
       <Game initial={initial} />
-      <p>
-        Teeko by John Scarne; website by{" "}
-        <a href="https://pcarrier.com">Pierre Carrier</a>.
-      </p>
+      <h1>
+        Teeko by John Scarne
+      </h1>
     </>
   );
 };
