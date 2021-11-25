@@ -22,7 +22,6 @@ const POS_ARRAY = Array.from(Array(SLOTS).keys());
 
 const SLOT_RADIUS = Math.sqrt(2) / 4;
 const PIECE_RADIUS = SLOT_RADIUS * 0.9;
-const LAST_RADIUS = SLOT_RADIUS * 1.1;
 const CROWN_RADIUS = SLOT_RADIUS * 1.1;
 
 enum InSlot {
@@ -44,6 +43,14 @@ type SlotAttrs = {
   selectable: boolean;
   turn: Player;
 };
+
+function x(pos: number) {
+  return pos % 5;
+}
+
+function y(pos: number) {
+  return Math.floor(pos / 5);
+}
 
 const Slot: FunctionComponent<SlotAttrs> = ({
   position,
@@ -181,28 +188,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   }
 
   const activePlayer = turn % 2 === 0 ? "Blue" : "Red";
-
-  const la = board.lastAction;
-  const lastAction =
-    la === undefined ? (
-      <></>
-    ) : Array.isArray(la) ? (
-      <line
-        x1={la[0] % 5}
-        y1={Math.floor(la[0] / 5)}
-        x2={la[1] % 5}
-        y2={Math.floor(la[1] / 5)}
-        stroke={turn % 2 === 0 ? "#800000" : "#000080"}
-        className="last"
-      />
-    ) : (
-      <circle
-        r={CROWN_RADIUS}
-        cx={la % 5}
-        cy={Math.floor(la / 5)}
-        fill={turn % 2 === 0 ? "#800000" : "#000080"}
-      />
-    );
+  const lastAction = board.lastAction;
 
   return (
     <>
@@ -211,7 +197,25 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
         viewBox="-0.5 -0.5 5 5"
         className="board"
       >
-        {lastAction}
+        {lastAction === undefined ? (
+          <></>
+        ) : Array.isArray(lastAction) ? (
+          <line
+            x1={x(lastAction[0])}
+            y1={y(lastAction[0])}
+            x2={x(lastAction[1])}
+            y2={y(lastAction[1])}
+            stroke={turn % 2 === 0 ? "#800000" : "#000080"}
+            className="last"
+          />
+        ) : (
+          <circle
+            r={CROWN_RADIUS}
+            cx={lastAction % 5}
+            cy={Math.floor(lastAction / 5)}
+            fill={turn % 2 === 0 ? "#800000" : "#000080"}
+          />
+        )}
         <g>
           <line x1="0" y1="0" x2="0" y2="4" stroke="#404040" />
           <line x1="1" y1="0" x2="1" y2="4" stroke="#404040" />
@@ -242,16 +246,18 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           <line x1="4" y1="1" x2="1" y2="4" stroke="#404040" />
           <line x1="4" y1="2" x2="2" y2="4" stroke="#404040" />
           <line x1="4" y1="3" x2="3" y2="4" stroke="#404040" />
+
           {POS_ARRAY.map((position) => {
-            const contains: InSlot = aPieces.has(position)
-              ? InSlot.A
-              : bPieces.has(position)
-              ? InSlot.B
-              : InSlot.NONE;
             return (
               <Slot
                 position={position}
-                contains={contains}
+                contains={
+                  aPieces.has(position)
+                    ? InSlot.A
+                    : bPieces.has(position)
+                    ? InSlot.B
+                    : InSlot.NONE
+                }
                 selected={selected === position}
                 selectable={validTargets.has(position)}
                 click={() => click(position)}
