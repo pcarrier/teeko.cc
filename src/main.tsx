@@ -143,11 +143,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const emptySlots = new Set(
     POS_ARRAY.filter((x) => !aPieces.has(x) && !bPieces.has(x))
   );
-  const ourPieces = !p
-    ? new Set<number>()
-    : t % 2 === 0
-    ? aPieces
-    : bPieces;
+  const ourPieces = !p ? new Set<number>() : t % 2 === 0 ? aPieces : bPieces;
   const ourPiecesWithEmptyNeighbors = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
@@ -306,7 +302,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     } else {
       b = result;
     }
-    moveToBoard({ a, b, t: t + 1, p: playing, l: [from, to] });
+    moveToBoard({ a, b, t: t + 1, p, l: [from, to] });
   }
 
   function drop(pos: number) {
@@ -317,7 +313,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    moveToBoard({ a, b, t: t + 1, p: playing, l: pos });
+    moveToBoard({ a, b, t: t + 1, p, l: pos });
   }
 
   function reset() {
