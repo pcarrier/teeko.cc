@@ -282,7 +282,11 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   initial: Board;
 }) => {
   const [board, setBoard] = useState(initial);
-  location.replace(`#${JSON.stringify(board)}`);
+
+  function moveToBoard(board: Board) {
+    location.replace(`#${JSON.stringify(board)}`);
+    setBoard(board);
+  }
 
   function move(from: number, to: number) {
     let { a, b, turn, playing } = board;
@@ -295,7 +299,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     } else {
       b = result;
     }
-    setBoard({ a, b, turn: turn + 1, playing, lastAction: [from, to] });
+    moveToBoard({ a, b, turn: turn + 1, playing, lastAction: [from, to] });
   }
 
   function drop(pos: number) {
@@ -306,12 +310,12 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    setBoard({ a, b, turn: turn + 1, playing, lastAction: pos });
+    moveToBoard({ a, b, turn: turn + 1, playing, lastAction: pos });
   }
 
   function reset() {
     if (board.a === 0 && board.b === 0) return;
-    setBoard({ ...EmptyBoard });
+    moveToBoard({ ...EmptyBoard });
   }
 
   return (
@@ -336,9 +340,7 @@ const App: FunctionComponent = () => {
     <>
       <p>Make a unit square or a line in any direction.</p>
       <Game initial={initial} />
-      <h1>
-        Teeko by John Scarne
-      </h1>
+      <h1>Teeko by John Scarne</h1>
     </>
   );
 };
