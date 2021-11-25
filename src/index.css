@@ -20,6 +20,9 @@ body {
 }
 
 .board line {
-    stroke: #404040;
     stroke-width: .1;
+}
+
+.board line.last {
+    stroke-width: .15;
 }

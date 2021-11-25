@@ -22,7 +22,8 @@ const POS_ARRAY = Array.from(Array(SLOTS).keys());
 
 const SLOT_RADIUS = Math.sqrt(2) / 4;
 const PIECE_RADIUS = SLOT_RADIUS * 0.9;
-const CROWN_RADIUS = SLOT_RADIUS * 1.25;
+const LAST_RADIUS = SLOT_RADIUS * 1.1;
+const CROWN_RADIUS = SLOT_RADIUS * 1.1;
 
 enum InSlot {
   NONE,
@@ -96,6 +97,7 @@ type Board = {
   b: number;
   turn: number;
   playing: boolean;
+  lastAction: number | [number, number] | undefined;
 };
 
 const EmptyBoard: Board = {
@@ -103,6 +105,7 @@ const EmptyBoard: Board = {
   b: 0,
   turn: Player.A,
   playing: true,
+  lastAction: undefined,
 };
 
 function pieces(n: number): Set<number> {
@@ -179,6 +182,28 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const activePlayer = turn % 2 === 0 ? "Blue" : "Red";
 
+  const la = board.lastAction;
+  const lastAction =
+    la === undefined ? (
+      <></>
+    ) : Array.isArray(la) ? (
+      <line
+        x1={la[0] % 5}
+        y1={Math.floor(la[0] / 5)}
+        x2={la[1] % 5}
+        y2={Math.floor(la[1] / 5)}
+        stroke={turn % 2 === 0 ? "#800000" : "#000080"}
+        className="last"
+      />
+    ) : (
+      <circle
+        r={CROWN_RADIUS}
+        cx={la % 5}
+        cy={Math.floor(la / 5)}
+        fill={turn % 2 === 0 ? "#800000" : "#000080"}
+      />
+    );
+
   return (
     <>
       <svg
@@ -186,36 +211,37 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
         viewBox="-0.5 -0.5 5 5"
         className="board"
       >
+        {lastAction}
         <g>
-          <line x1="0" y1="0" x2="0" y2="4" />
-          <line x1="1" y1="0" x2="1" y2="4" />
-          <line x1="2" y1="0" x2="2" y2="4" />
-          <line x1="3" y1="0" x2="3" y2="4" />
-          <line x1="4" y1="0" x2="4" y2="4" />
-          <line x1="0" y1="0" x2="4" y2="0" />
-          <line x1="0" y1="1" x2="4" y2="1" />
-          <line x1="0" y1="2" x2="4" y2="2" />
-          <line x1="0" y1="3" x2="4" y2="3" />
-          <line x1="0" y1="4" x2="4" y2="4" />
-          <line x1="0" y1="0" x2="4" y2="4" />
-          <line x1="0" y1="1" x2="3" y2="4" />
-          <line x1="0" y1="2" x2="2" y2="4" />
-          <line x1="0" y1="3" x2="1" y2="4" />
-          <line x1="1" y1="0" x2="4" y2="3" />
-          <line x1="2" y1="0" x2="4" y2="2" />
-          <line x1="3" y1="0" x2="4" y2="1" />
-          <line x1="0" y1="0" x2="4" y2="0" />
-          <line x1="1" y1="0" x2="4" y2="3" />
-          <line x1="2" y1="0" x2="4" y2="2" />
-          <line x1="3" y1="0" x2="4" y2="1" />
-          <line x1="0" y1="0" x2="4" y2="0" />
-          <line x1="1" y1="0" x2="0" y2="1" />
-          <line x1="2" y1="0" x2="0" y2="2" />
-          <line x1="3" y1="0" x2="0" y2="3" />
-          <line x1="4" y1="0" x2="0" y2="4" />
-          <line x1="4" y1="1" x2="1" y2="4" />
-          <line x1="4" y1="2" x2="2" y2="4" />
-          <line x1="4" y1="3" x2="3" y2="4" />
+          <line x1="0" y1="0" x2="0" y2="4" stroke="#404040" />
+          <line x1="1" y1="0" x2="1" y2="4" stroke="#404040" />
+          <line x1="2" y1="0" x2="2" y2="4" stroke="#404040" />
+          <line x1="3" y1="0" x2="3" y2="4" stroke="#404040" />
+          <line x1="4" y1="0" x2="4" y2="4" stroke="#404040" />
+          <line x1="0" y1="0" x2="4" y2="0" stroke="#404040" />
+          <line x1="0" y1="1" x2="4" y2="1" stroke="#404040" />
+          <line x1="0" y1="2" x2="4" y2="2" stroke="#404040" />
+          <line x1="0" y1="3" x2="4" y2="3" stroke="#404040" />
+          <line x1="0" y1="4" x2="4" y2="4" stroke="#404040" />
+          <line x1="0" y1="0" x2="4" y2="4" stroke="#404040" />
+          <line x1="0" y1="1" x2="3" y2="4" stroke="#404040" />
+          <line x1="0" y1="2" x2="2" y2="4" stroke="#404040" />
+          <line x1="0" y1="3" x2="1" y2="4" stroke="#404040" />
+          <line x1="1" y1="0" x2="4" y2="3" stroke="#404040" />
+          <line x1="2" y1="0" x2="4" y2="2" stroke="#404040" />
+          <line x1="3" y1="0" x2="4" y2="1" stroke="#404040" />
+          <line x1="0" y1="0" x2="4" y2="0" stroke="#404040" />
+          <line x1="1" y1="0" x2="4" y2="3" stroke="#404040" />
+          <line x1="2" y1="0" x2="4" y2="2" stroke="#404040" />
+          <line x1="3" y1="0" x2="4" y2="1" stroke="#404040" />
+          <line x1="0" y1="0" x2="4" y2="0" stroke="#404040" />
+          <line x1="1" y1="0" x2="0" y2="1" stroke="#404040" />
+          <line x1="2" y1="0" x2="0" y2="2" stroke="#404040" />
+          <line x1="3" y1="0" x2="0" y2="3" stroke="#404040" />
+          <line x1="4" y1="0" x2="0" y2="4" stroke="#404040" />
+          <line x1="4" y1="1" x2="1" y2="4" stroke="#404040" />
+          <line x1="4" y1="2" x2="2" y2="4" stroke="#404040" />
+          <line x1="4" y1="3" x2="3" y2="4" stroke="#404040" />
           {POS_ARRAY.map((position) => {
             const contains: InSlot = aPieces.has(position)
               ? InSlot.A
@@ -256,7 +282,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   initial: Board;
 }) => {
   const [board, setBoard] = useState(initial);
-  location.replace(`#${board.a},${board.b},${board.turn}`);
+  location.replace(`#${JSON.stringify(board)}`);
 
   function move(from: number, to: number) {
     let { a, b, turn, playing } = board;
@@ -269,7 +295,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     } else {
       b = result;
     }
-    setBoard({ a, b, turn: turn + 1, playing });
+    setBoard({ a, b, turn: turn + 1, playing, lastAction: [from, to] });
   }
 
   function drop(pos: number) {
@@ -280,12 +306,12 @@ const Game: FunctionComponent<{ initial: Board }> = ({
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    setBoard({ a, b, turn: turn + 1, playing });
+    setBoard({ a, b, turn: turn + 1, playing, lastAction: pos });
   }
 
   function reset() {
     if (board.a === 0 && board.b === 0) return;
-    setBoard({ ...EmptyBoard, turn: board.turn + 2 - (board.turn % 2) });
+    setBoard({ ...EmptyBoard });
   }
 
   return (
@@ -297,15 +323,13 @@ const Game: FunctionComponent<{ initial: Board }> = ({
 };
 
 const App: FunctionComponent = () => {
-  const urlNumbers = location.hash
-    .substring(1)
-    .split(",")
-    .map((v) => Number(v));
-  const initial = { ...EmptyBoard };
-  if (urlNumbers.length >= 3) {
-    initial.a = urlNumbers[0];
-    initial.b = urlNumbers[1];
-    initial.turn = urlNumbers[2];
+  let initial = { ...EmptyBoard };
+  if (location.hash.length > 1) {
+    try {
+      JSON.parse(decodeURI(location.hash.substring(1)));
+    } catch (_) {
+      console.log("Invalid URL parameters");
+    }
   }
 
   return (
