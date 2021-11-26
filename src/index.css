@@ -27,16 +27,18 @@ body {
     stroke-width: .15;
 }
 
-.board .piece.B {
-    fill: #f00;
-}
-
 .board .piece.A {
-    fill: #00f;
+    fill: #0000ff;
 }
 
-.board .piece.dragging {
-    stroke-width: 0.01;
-    stroke: white;
-    z-index: 1000;
+.board .piece.B {
+    fill: #ff0000;
+}
+
+.board .piece.A.dragging {
+    fill: #2020ff;
+}
+
+.board .piece.B.dragging {
+    fill: #ff2020;
 }

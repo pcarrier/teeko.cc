@@ -27,7 +27,6 @@ const PIECE_RADIUS = SLOT_RADIUS * 0.9;
 const CROWN_RADIUS = SLOT_RADIUS * 1.1;
 
 enum Color {
-  NONE,
   A,
   B,
 }
@@ -38,6 +37,7 @@ type PieceAttrs = {
   dragStart: () => void;
   dragEnd: (newPosition: number) => void;
   color: Color;
+  selected: boolean;
   selectable: boolean;
   aspect: Rect | null;
 };
@@ -49,6 +49,8 @@ const Piece: FunctionComponent<PieceAttrs> = ({
   dragStart,
   color,
   aspect,
+  selectable,
+  selected,
 }: PieceAttrs) => {
   const x = position % SIZE;
   const y = Math.floor(position / SIZE);
@@ -82,12 +84,14 @@ const Piece: FunctionComponent<PieceAttrs> = ({
         B: color === Color.B,
         dragging: state.isDragging,
       })}
-      {...{
-        onPointerDown,
-        onPointerMove,
-        onPointerUp,
-        onPointerCancel,
-      }}
+      {...(selectable || selected
+        ? {
+            onPointerDown,
+            onPointerMove,
+            onPointerUp,
+            onPointerCancel,
+          }
+        : {})}
     />
   );
 };
@@ -140,6 +144,14 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const ourPiecesWithEmptyNeighbors = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
+  const neighborsOfSelected =
+    selected === undefined
+      ? new Set<number>()
+      : new Set(
+          [...pieces(NEIGHS_BY_POSITION[selected])].filter(
+            (x) => !aPieces.has(x) && !bPieces.has(x)
+          )
+        );
   const aWin = WINNING_POSITIONS.has(a);
   const bWin = WINNING_POSITIONS.has(b);
   const win = aWin || bWin;
@@ -152,11 +164,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     ? emptySlots
     : selected === undefined
     ? ourPiecesWithEmptyNeighbors
-    : new Set(
-        [...pieces(NEIGHS_BY_POSITION[selected])].filter(
-          (x) => !aPieces.has(x) && !bPieces.has(x)
-        )
-      );
+    : neighborsOfSelected;
 
   function click(position: number) {
     if (!p) return;
@@ -285,9 +293,10 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 key={pos}
                 position={pos}
                 aspect={aspect}
-                dragStart={() => click(pos)}
+                dragStart={() => setSelected(pos)}
                 dragEnd={(position) => {
-                  click(position);
+                  if (neighborsOfSelected.has(position)) click(position);
+                  else setSelected(undefined);
                 }}
                 color={
                   aPieces.has(pos)
@@ -296,6 +305,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                     ? Color.B
                     : Color.NONE
                 }
+                selected={selected === pos}
                 selectable={validTargets.has(pos)}
                 click={() => click(pos)}
               />
