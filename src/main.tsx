@@ -83,15 +83,12 @@ const Slot: FunctionComponent<SlotAttrs> = ({
         const nx = Math.round(x + dx);
         const ny = Math.round(y + dy);
         const p = ny * SIZE + nx;
-        console.log(p, nx, ny);
         dragEnd?.(p);
       },
     });
 
   const dxNorm = state.isDragging && aspect ? state.dx / aspect.width : 0;
   const dyNorm = state.isDragging && aspect ? state.dy / aspect.height : 0;
-
-  if (state.isDragging) console.log({ dxNorm, dyNorm });
 
   const piece =
     contains != InSlot.NONE ? (
@@ -297,7 +294,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 position={position}
                 aspect={aspect}
                 dragStart={() => click(position)}
-                dragEnd={(position) => { click(position) }}
+                dragEnd={(position) => {
+                  click(position);
+                }}
                 contains={
                   aPieces.has(position)
                     ? InSlot.A
@@ -344,14 +343,9 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   function move(from: number, to: number) {
-<<<<<<< HEAD
-    let { a, b, t, p } = board;
-    const isA = t % 2 === 0;
-=======
     let { a, b } = board;
-    const { turn, playing } = board;
-    const isA = turn % 2 === 0;
->>>>>>> dragging
+    const { t, p } = board;
+    const isA = t % 2 === 0;
 
     const target = isA ? a : b;
     const result = (target & ~(1 << from)) | (1 << to);
@@ -364,14 +358,9 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   function drop(pos: number) {
-<<<<<<< HEAD
-    let { a, b, t, p } = board;
-    const isA = t % 2 === 0;
-=======
     let { a, b } = board;
-    const { turn, playing } = board;
-    const isA = turn % 2 === 0;
->>>>>>> dragging
+    const { t, p } = board;
+    const isA = t % 2 === 0;
 
     const target = isA ? a : b;
     const result = target | (1 << pos);
