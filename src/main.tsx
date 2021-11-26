@@ -1,6 +1,9 @@
 import "./index.css";
 import { FunctionComponent, h, render } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useRef } from "preact/hooks";
+import { useDraggable } from "./draggable/useDraggable";
+import classnames from "classnames";
+import { Rect, useRect } from "./draggable/useRect";
 
 const SIZE = 5;
 const SLOTS = SIZE * SIZE;
@@ -38,42 +41,77 @@ enum Player {
 type SlotAttrs = {
   position: number;
   click: () => void;
+  dragStart: () => void;
+  dragEnd: (newPosition: number) => void;
   contains: InSlot;
   selected: boolean;
   selectable: boolean;
   turn: Player;
+  aspect: Rect | null;
 };
 
 function x(pos: number) {
-  return pos % 5;
+  return pos % SIZE;
 }
 
 function y(pos: number) {
-  return Math.floor(pos / 5);
+  return Math.floor(pos / SIZE);
 }
 
 const Slot: FunctionComponent<SlotAttrs> = ({
   position,
   click,
+  dragEnd,
+  dragStart,
   contains,
   selected,
   selectable,
   turn,
+  aspect,
 }: SlotAttrs) => {
   const x = position % SIZE;
   const y = Math.floor(position / SIZE);
 
-  let piece;
-  switch (contains) {
-    case InSlot.A:
-      piece = <circle r={PIECE_RADIUS} cx={x} cy={y} fill="#0000ff" />;
-      break;
-    case InSlot.B:
-      piece = <circle r={PIECE_RADIUS} cx={x} cy={y} fill="#ff0000" />;
-      break;
-    default:
-      piece = <></>;
-  }
+  const { onPointerDown, onPointerMove, onPointerUp, onPointerCancel, state } =
+    useDraggable({
+      onDragStart() {
+        dragStart?.();
+      },
+      onDragEnd({ delta }) {
+        const dx = aspect ? delta.x / aspect.width : 0;
+        const dy = aspect ? delta.y / aspect.height : 0;
+        const nx = Math.round(x + dx);
+        const ny = Math.round(y + dy);
+        const p = ny * SIZE + nx;
+        console.log(p, nx, ny);
+        dragEnd?.(p);
+      },
+    });
+
+  const dxNorm = state.isDragging && aspect ? state.dx / aspect.width : 0;
+  const dyNorm = state.isDragging && aspect ? state.dy / aspect.height : 0;
+
+  if (state.isDragging) console.log({ dxNorm, dyNorm });
+
+  const piece =
+    contains != InSlot.NONE ? (
+      <circle
+        r={PIECE_RADIUS}
+        cx={x + dxNorm}
+        cy={y + dyNorm}
+        class={classnames("piece", {
+          A: contains == InSlot.A,
+          B: contains == InSlot.B,
+          dragging: state.isDragging,
+        })}
+        {...{
+          onPointerDown,
+          onPointerMove,
+          onPointerUp,
+          onPointerCancel,
+        }}
+      />
+    ) : null;
 
   return (
     <g
@@ -187,12 +225,21 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const activePlayer = t % 2 === 0 ? "Blue" : "Red";
   const lastAction = board.l;
 
+  const svgRef = useRef<SVGSVGElement>(null);
+  const svgRect = useRect(svgRef);
+  const aspect: Rect | null = svgRect && {
+    width: svgRect.width / SIZE,
+    height: svgRect.height / SIZE,
+    x: 0,
+    y: 0,
+  };
   return (
     <>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="-0.5 -0.5 5 5"
         className="board"
+        ref={svgRef}
       >
         {lastAction === undefined ? (
           <></>
@@ -248,6 +295,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             return (
               <Slot
                 position={position}
+                aspect={aspect}
+                dragStart={() => click(position)}
+                dragEnd={(position) => { click(position) }}
                 contains={
                   aPieces.has(position)
                     ? InSlot.A
@@ -294,10 +344,16 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   function move(from: number, to: number) {
+<<<<<<< HEAD
     let { a, b, t, p } = board;
     const isA = t % 2 === 0;
+=======
+    let { a, b } = board;
+    const { turn, playing } = board;
+    const isA = turn % 2 === 0;
+>>>>>>> dragging
 
-    let target = isA ? a : b;
+    const target = isA ? a : b;
     const result = (target & ~(1 << from)) | (1 << to);
     if (isA) {
       a = result;
@@ -308,10 +364,16 @@ const Game: FunctionComponent<{ initial: Board }> = ({
   }
 
   function drop(pos: number) {
+<<<<<<< HEAD
     let { a, b, t, p } = board;
     const isA = t % 2 === 0;
+=======
+    let { a, b } = board;
+    const { turn, playing } = board;
+    const isA = turn % 2 === 0;
+>>>>>>> dragging
 
-    let target = isA ? a : b;
+    const target = isA ? a : b;
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
@@ -332,7 +394,7 @@ const Game: FunctionComponent<{ initial: Board }> = ({
 };
 
 const App: FunctionComponent = () => {
-  let initial = { ...EmptyBoard };
+  const initial = { ...EmptyBoard };
   if (location.hash.length > 1) {
     try {
       const [a, b, t, l] = JSON.parse(decodeURI(location.hash.substring(1)));

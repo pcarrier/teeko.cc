@@ -26,3 +26,17 @@ body {
 .board line.last {
     stroke-width: .15;
 }
+
+.board .piece.B {
+    fill: #f00;
+}
+
+.board .piece.A {
+    fill: #00f;
+}
+
+.board .piece.dragging {
+    stroke-width: 0.01;
+    stroke: white;
+    z-index: 1000;
+}
