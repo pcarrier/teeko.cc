@@ -4,22 +4,13 @@ import { useRef, useState } from "preact/hooks";
 import { useDraggable } from "./draggable/useDraggable";
 import classnames from "classnames";
 import { Rect, useRect } from "./draggable/useRect";
-
-const SIZE = 5;
-const SLOTS = SIZE * SIZE;
-
-const NEIGHS_BY_POSITION = [
-  98, 229, 458, 916, 776, 3139, 7335, 14670, 29340, 24856, 100448, 234720,
-  469440, 938880, 795392, 3214336, 7511040, 15022080, 30044160, 25452544,
-  2195456, 5472256, 10944512, 21889024, 9175040,
-];
-const WINNING_POSITIONS = new Set([
-  99, 198, 396, 792, 3168, 6336, 12672, 25344, 101376, 202752, 405504, 811008,
-  3244032, 6488064, 12976128, 25952256, 15, 30, 480, 960, 15360, 30720, 491520,
-  983040, 15728640, 31457280, 33825, 67650, 135300, 270600, 541200, 1082400,
-  2164800, 4329600, 8659200, 17318400, 266305, 532610, 8521760, 17043520, 34952,
-  69904, 1118464, 2236928,
-]);
+import {
+  NEIGHS_BY_POSITION,
+  Player,
+  SIZE,
+  SLOTS,
+  WINNING_POSITIONS,
+} from "./logic";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
 
@@ -41,11 +32,6 @@ enum Color {
   B,
 }
 
-enum Player {
-  A,
-  B,
-}
-
 type PieceAttrs = {
   position: number;
   click: () => void;
@@ -54,7 +40,6 @@ type PieceAttrs = {
   color: Color;
   selected?: boolean;
   selectable: boolean;
-  turn: Player;
   aspect: Rect | null;
 };
 
@@ -72,7 +57,7 @@ const Piece: FunctionComponent<PieceAttrs> = ({
   const { onPointerDown, onPointerMove, onPointerUp, onPointerCancel, state } =
     useDraggable({
       onDragStart() {
-        dragStart?.();
+        dragStart();
       },
       onDragEnd({ delta }) {
         const dx = aspect ? delta.x / aspect.width : 0;
@@ -80,7 +65,7 @@ const Piece: FunctionComponent<PieceAttrs> = ({
         const nx = Math.round(x + dx);
         const ny = Math.round(y + dy);
         const p = ny * SIZE + nx;
-        dragEnd?.(p);
+        dragEnd(p);
       },
     });
 
@@ -182,8 +167,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       move(selected, position);
       setSelected(undefined);
     } else {
-      if (dropping && emptySlots.has(position)) drop(position);
-      else {
+      if (dropping) {
+        if (emptySlots.has(position)) drop(position);
+      } else {
         if (!win && ourPiecesWithEmptyNeighbors.has(position)) {
           setSelected(position);
         } else {
@@ -311,7 +297,6 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 selected={selected === pos}
                 selectable={validTargets.has(pos)}
                 click={() => click(pos)}
-                turn={t}
               />
             );
           })}
