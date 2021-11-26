@@ -186,7 +186,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const bWin = WINNING_POSITIONS.has(b);
   const win = aWin || bWin;
 
-  const dropping = !win && ourPieces.size < 4;
+  const dropping = p && !win && ourPieces.size < 4;
 
   const validTargets: Set<number> = win
     ? new Set()
