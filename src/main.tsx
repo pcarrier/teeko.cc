@@ -1,6 +1,6 @@
 import "./index.css";
 import { FunctionComponent, h, render } from "preact";
-import { useState, useRef } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { useDraggable } from "./draggable/useDraggable";
 import classnames from "classnames";
 import { Rect, useRect } from "./draggable/useRect";
@@ -23,11 +23,19 @@ const WINNING_POSITIONS = new Set([
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
 
+function x(pos: number) {
+  return pos % SIZE;
+}
+
+function y(pos: number) {
+  return Math.floor(pos / SIZE);
+}
+
 const SLOT_RADIUS = Math.sqrt(2) / 4;
 const PIECE_RADIUS = SLOT_RADIUS * 0.9;
 const CROWN_RADIUS = SLOT_RADIUS * 1.1;
 
-enum InSlot {
+enum Color {
   NONE,
   A,
   B,
@@ -38,37 +46,26 @@ enum Player {
   B,
 }
 
-type SlotAttrs = {
+type PieceAttrs = {
   position: number;
   click: () => void;
   dragStart: () => void;
   dragEnd: (newPosition: number) => void;
-  contains: InSlot;
+  color: Color;
   selected: boolean;
   selectable: boolean;
   turn: Player;
   aspect: Rect | null;
 };
 
-function x(pos: number) {
-  return pos % SIZE;
-}
-
-function y(pos: number) {
-  return Math.floor(pos / SIZE);
-}
-
-const Slot: FunctionComponent<SlotAttrs> = ({
+const Piece: FunctionComponent<PieceAttrs> = ({
   position,
   click,
   dragEnd,
   dragStart,
-  contains,
-  selected,
-  selectable,
-  turn,
+  color,
   aspect,
-}: SlotAttrs) => {
+}: PieceAttrs) => {
   const x = position % SIZE;
   const y = Math.floor(position / SIZE);
 
@@ -90,47 +87,24 @@ const Slot: FunctionComponent<SlotAttrs> = ({
   const dxNorm = state.isDragging && aspect ? state.dx / aspect.width : 0;
   const dyNorm = state.isDragging && aspect ? state.dy / aspect.height : 0;
 
-  const piece =
-    contains != InSlot.NONE ? (
-      <circle
-        r={PIECE_RADIUS}
-        cx={x + dxNorm}
-        cy={y + dyNorm}
-        class={classnames("piece", {
-          A: contains == InSlot.A,
-          B: contains == InSlot.B,
-          dragging: state.isDragging,
-        })}
-        {...{
-          onPointerDown,
-          onPointerMove,
-          onPointerUp,
-          onPointerCancel,
-        }}
-      />
-    ) : null;
-
   return (
-    <g
+    <circle
       onClick={click}
-      style={
-        "pointer-events: bounding-box; " +
-        (selectable ? "cursor: pointer;" : "")
-      }
-    >
-      {selected ? (
-        <circle r={CROWN_RADIUS} cx={x} cy={y} fill="#00000080" />
-      ) : selectable ? (
-        <circle
-          r={CROWN_RADIUS}
-          cx={x}
-          cy={y}
-          fill={turn % 2 === 0 ? "#0000ff80" : "#ff000080"}
-        />
-      ) : null}
-      <circle r={SLOT_RADIUS} cx={x} cy={y} fill="#404040" />
-      {piece}
-    </g>
+      r={PIECE_RADIUS}
+      cx={x + dxNorm}
+      cy={y + dyNorm}
+      class={classnames("piece", {
+        A: color === Color.A,
+        B: color === Color.B,
+        dragging: state.isDragging,
+      })}
+      {...{
+        onPointerDown,
+        onPointerMove,
+        onPointerUp,
+        onPointerCancel,
+      }}
+    />
   );
 };
 
@@ -288,21 +262,51 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           <line x1="4" y1="2" x2="2" y2="4" stroke="#404040" />
           <line x1="4" y1="3" x2="3" y2="4" stroke="#404040" />
 
-          {POS_ARRAY.map((position) => {
+          {[...validTargets].map((pos) => (
+            <circle
+              r={CROWN_RADIUS}
+              cx={x(pos)}
+              cy={y(pos)}
+              fill={t % 2 === 0 ? "#0000ff80" : "#ff000080"}
+            />
+          ))}
+
+          {selected ? (
+              <circle
+                  r={CROWN_RADIUS}
+                  cx={x(selected)}
+                  cy={y(selected)}
+                  fill="#00000080"
+              />
+          ) : (
+              <></>
+          )}
+
+          {POS_ARRAY.map((pos) => (
+            <circle
+              r={SLOT_RADIUS}
+              cx={x(pos)}
+              cy={y(pos)}
+              fill="#404040"
+              onClick={() => click(pos)}
+            />
+          ))}
+
+          {[...aPieces, ...bPieces].map((position) => {
             return (
-              <Slot
+              <Piece
                 position={position}
                 aspect={aspect}
                 dragStart={() => click(position)}
                 dragEnd={(position) => {
                   click(position);
                 }}
-                contains={
+                color={
                   aPieces.has(position)
-                    ? InSlot.A
+                    ? Color.A
                     : bPieces.has(position)
-                    ? InSlot.B
-                    : InSlot.NONE
+                    ? Color.B
+                    : Color.NONE
                 }
                 selected={selected === position}
                 selectable={validTargets.has(position)}
