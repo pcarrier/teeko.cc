@@ -1,10 +1,18 @@
 import "./index.css";
-import {FunctionComponent, h, render} from "preact";
-import {useRef, useState} from "preact/hooks";
-import {Rect, useRect} from "./draggable/useRect";
-import {NEIGHS_BY_POSITION, Player, SIZE, SLOTS, WINNING_POSITIONS, x, y,} from "./logic";
-import {CROWN_RADIUS, SLOT_RADIUS} from "./sizing";
-import {Color, Piece} from "./piece";
+import { FunctionComponent, h, render } from "preact";
+import { useRef, useState } from "preact/hooks";
+import { Rect, useRect } from "./draggable/useRect";
+import {
+  NEIGHS_BY_POSITION,
+  Player,
+  SIZE,
+  SLOTS,
+  WINNING_POSITIONS,
+  x,
+  y,
+} from "./logic";
+import { CROWN_RADIUS, SLOT_RADIUS } from "./sizing";
+import { Color, Piece } from "./piece";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
 
@@ -110,7 +118,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     y: 0,
   };
 
-  const [dragState, setDragState] = useState<{x: number, y: number} | undefined>(undefined);
+  const [dragState, setDragState] = useState<
+    { x: number; y: number } | undefined
+  >(undefined);
 
   return (
     <>
@@ -212,10 +222,10 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                   setSelected(pos);
                 }}
                 dragMove={({ x, y }) => {
-                  setDragState({x, y});
+                  setDragState({ x, y });
                 }}
                 dragEnd={(position) => {
-                  setDragState({x: 0, y: 0});
+                  setDragState({ x: 0, y: 0 });
                   if (neighborsOfSelected.has(position)) click(position);
                   else setSelected(undefined);
                 }}
