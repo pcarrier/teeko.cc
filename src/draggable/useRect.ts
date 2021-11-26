@@ -28,8 +28,8 @@ export const getRect = (element: Element): Rect | null => {
   const clientRect = element.getBoundingClientRect();
   const { width, height, top, left } = clientRect;
   return {
-    x: left + window.pageXOffset,
-    y: top + window.pageYOffset,
+    x: left + window.scrollX,
+    y: top + window.scrollY,
     width,
     height,
   };
@@ -57,7 +57,7 @@ export function useRect(
       if (!rectsEqual(rectRef.current, next)) {
         rectRef.current = next;
         const adjusted =
-          options?.adjust && !!rectRef.current
+          options?.adjust && rectRef.current
             ? options.adjust(rectRef.current, ref)
             : rectRef.current;
         options?.update
@@ -78,7 +78,7 @@ export function useRect(
     useEvent("scroll", useDebounced(update, 300));
   }
   // if (!options?.update)
-  return options?.adjust && !!rectRef.current
+  return options?.adjust && rectRef.current
     ? options.adjust(rectRef.current, ref)
     : rectRef.current;
 }
