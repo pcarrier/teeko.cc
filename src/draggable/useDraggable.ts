@@ -25,11 +25,6 @@ export interface DraggableOptions extends Partial<DragEvents> {
   onPointerLeave?: () => any;
 }
 
-export interface HandleState {
-  dragStart: Position | null;
-  isDragging: boolean;
-}
-
 export type DragState = {
   isDragging: boolean;
   isPointerDown: boolean;
@@ -53,32 +48,11 @@ export type Draggable = {
   };
 };
 
-// function auditEvents<T>(
-//   eventMap: T | (() => T),
-//   css: string = "color: #f55"
-// ): T {
-//   const r: T = {} as T;
-//   let evmp =
-//     typeof eventMap == "function" ? (eventMap as Function)() : eventMap;
-//   for (let i in evmp) {
-//     r[i] = (...args) => {
-//       console.log(`%c${i}`, css);
-//       evmp?.[i]?.(...args);
-//     };
-//   }
-//   return r as T;
-// }
-
 export function useDraggable(opts?: DraggableOptions): Draggable {
   const { minDragDistance, onDragStart, onDragMove, onDragEnd } = {
     minDragDistance: 4,
     ...opts,
   };
-
-  // const { onDragStart, onDragMove, onDragEnd } = auditEvents(() => {
-  //   const { onDragStart, onDragEnd, onDragMove } = { ...opts };
-  //   return { onDragStart, onDragEnd, onDragMove };
-  // }, "color: #5f5");
 
   const hasDragDistance = !!minDragDistance;
 
@@ -144,8 +118,8 @@ export function useDraggable(opts?: DraggableOptions): Draggable {
     setState((s) => ({ ...s, dx, dy, isDragging }));
   }
   function onPointerCancel(e: PointerEvent) {
-    const { target, pageX, pageY } = e;
-    (target as Element).releasePointerCapture(e.pointerId);
+    const { target, pointerId } = e;
+    (target as Element).releasePointerCapture(pointerId);
     const { isDragging: wasDragging, x0, y0 } = state?.current ?? {};
     if (wasDragging)
       onDragEnd?.({
