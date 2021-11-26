@@ -227,7 +227,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                   setDragState({ x, y });
                 }}
                 dragEnd={(position) => {
-                  setDragState({ x: 0, y: 0 });
+                  setDragState(undefined);
                   if (neighborsOfSelected.has(position)) click(position);
                   else setSelected(undefined);
                 }}
@@ -238,11 +238,11 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
               />
             );
           })}
-          {dragState && (
+          {dragState && (typeof selected != 'undefined') && (
             <Piece
               dummy
               color={t % 2 === 0 ? Color.A : Color.B}
-              position={selected!!}
+              position={selected}
               offset={{ x: dragState.x, y: dragState.y }}
             />
           )}
