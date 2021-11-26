@@ -19,3 +19,11 @@ export enum Player {
     A,
     B,
 }
+
+export function x(pos: number) {
+    return pos % SIZE;
+}
+
+export function y(pos: number) {
+    return Math.floor(pos / SIZE);
+}

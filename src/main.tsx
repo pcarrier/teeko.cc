@@ -1,100 +1,12 @@
 import "./index.css";
-import { FunctionComponent, h, render } from "preact";
-import { useRef, useState } from "preact/hooks";
-import { useDraggable } from "./draggable/useDraggable";
-import classnames from "classnames";
-import { Rect, useRect } from "./draggable/useRect";
-import {
-  NEIGHS_BY_POSITION,
-  Player,
-  SIZE,
-  SLOTS,
-  WINNING_POSITIONS,
-} from "./logic";
+import {FunctionComponent, h, render} from "preact";
+import {useRef, useState} from "preact/hooks";
+import {Rect, useRect} from "./draggable/useRect";
+import {NEIGHS_BY_POSITION, Player, SIZE, SLOTS, WINNING_POSITIONS, x, y,} from "./logic";
+import {CROWN_RADIUS, SLOT_RADIUS} from "./sizing";
+import {Color, Piece} from "./piece";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
-
-function x(pos: number) {
-  return pos % SIZE;
-}
-
-function y(pos: number) {
-  return Math.floor(pos / SIZE);
-}
-
-const SLOT_RADIUS = Math.sqrt(2) / 4;
-const PIECE_RADIUS = SLOT_RADIUS * 0.9;
-const CROWN_RADIUS = SLOT_RADIUS * 1.1;
-
-enum Color {
-  A,
-  B,
-}
-
-type PieceAttrs = {
-  position: number;
-  click: () => void;
-  dragStart: () => void;
-  dragEnd: (newPosition: number) => void;
-  color: Color;
-  selected: boolean;
-  selectable: boolean;
-  aspect: Rect | null;
-};
-
-const Piece: FunctionComponent<PieceAttrs> = ({
-  position,
-  click,
-  dragEnd,
-  dragStart,
-  color,
-  aspect,
-  selectable,
-  selected,
-}: PieceAttrs) => {
-  const x = position % SIZE;
-  const y = Math.floor(position / SIZE);
-
-  const { onPointerDown, onPointerMove, onPointerUp, onPointerCancel, state } =
-    useDraggable({
-      onDragStart() {
-        dragStart();
-      },
-      onDragEnd({ delta }) {
-        const dx = aspect ? delta.x / aspect.width : 0;
-        const dy = aspect ? delta.y / aspect.height : 0;
-        const nx = Math.round(x + dx);
-        const ny = Math.round(y + dy);
-        const p = ny * SIZE + nx;
-        dragEnd(p);
-      },
-    });
-
-  const dxNorm = state.isDragging && aspect ? state.dx / aspect.width : 0;
-  const dyNorm = state.isDragging && aspect ? state.dy / aspect.height : 0;
-
-  return (
-    <circle
-      onClick={click}
-      r={PIECE_RADIUS}
-      cx={x + dxNorm}
-      cy={y + dyNorm}
-      class={classnames("piece", {
-        A: color === Color.A,
-        B: color === Color.B,
-        dragging: state.isDragging,
-      })}
-      {...(selectable || selected
-        ? {
-            onPointerDown,
-            onPointerMove,
-            onPointerUp,
-            onPointerCancel,
-          }
-        : {})}
-    />
-  );
-};
 
 type Board = {
   a: number;
@@ -197,6 +109,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     x: 0,
     y: 0,
   };
+
+  const [dragState, setDragState] = useState<{x: number, y: number} | undefined>(undefined);
+
   return (
     <>
       <svg
@@ -293,24 +208,32 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 key={pos}
                 position={pos}
                 aspect={aspect}
-                dragStart={() => setSelected(pos)}
+                dragStart={() => {
+                  setSelected(pos);
+                }}
+                dragMove={({ x, y }) => {
+                  setDragState({x, y});
+                }}
                 dragEnd={(position) => {
+                  setDragState({x: 0, y: 0});
                   if (neighborsOfSelected.has(position)) click(position);
                   else setSelected(undefined);
                 }}
-                color={
-                  aPieces.has(pos)
-                    ? Color.A
-                    : bPieces.has(pos)
-                    ? Color.B
-                    : Color.NONE
-                }
+                color={aPieces.has(pos) ? Color.A : Color.B}
                 selected={selected === pos}
                 selectable={validTargets.has(pos)}
                 click={() => click(pos)}
               />
             );
           })}
+          {dragState && (
+            <Piece
+              dummy
+              color={t % 2 === 0 ? Color.A : Color.B}
+              position={selected!!}
+              offset={{ x: dragState.x, y: dragState.y }}
+            />
+          )}
         </g>
       </svg>
       <p>

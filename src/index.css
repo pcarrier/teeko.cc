@@ -42,3 +42,7 @@ body {
 .board .piece.B.dragging {
     fill: #ff2020;
 }
+
+.board .piece.dummy {
+    pointer-events: none;
+}
