@@ -60,8 +60,13 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const emptySlots = new Set(
     POS_ARRAY.filter((x) => !aPieces.has(x) && !bPieces.has(x))
   );
-  const ourPieces = !p ? new Set<number>() : t % 2 === 0 ? aPieces : bPieces;
-  const ourPiecesWithEmptyNeighbors = new Set(
+  const aWin = WINNING_POSITIONS.has(a);
+  const bWin = WINNING_POSITIONS.has(b);
+  const win = aWin || bWin;
+
+  const ourPieces =
+    !p || win ? new Set<number>() : t % 2 === 0 ? aPieces : bPieces;
+  const movable = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
   const neighborsOfSelected =
@@ -72,9 +77,6 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             (x) => !aPieces.has(x) && !bPieces.has(x)
           )
         );
-  const aWin = WINNING_POSITIONS.has(a);
-  const bWin = WINNING_POSITIONS.has(b);
-  const win = aWin || bWin;
 
   const dropping = p && !win && ourPieces.size < 4;
 
@@ -83,7 +85,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     : dropping
     ? emptySlots
     : selected === undefined
-    ? ourPiecesWithEmptyNeighbors
+    ? movable
     : neighborsOfSelected;
 
   function click(position: number) {
@@ -97,7 +99,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       if (dropping) {
         if (emptySlots.has(position)) drop(position);
       } else {
-        if (!win && ourPiecesWithEmptyNeighbors.has(position)) {
+        if (!win && movable.has(position)) {
           setSelected(position);
         } else {
           setSelected(undefined);
