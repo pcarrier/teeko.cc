@@ -52,7 +52,7 @@ type PieceAttrs = {
   dragStart: () => void;
   dragEnd: (newPosition: number) => void;
   color: Color;
-  selected: boolean;
+  selected?: boolean;
   selectable: boolean;
   turn: Player;
   aspect: Rect | null;
@@ -272,14 +272,14 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           ))}
 
           {selected ? (
-              <circle
-                  r={CROWN_RADIUS}
-                  cx={x(selected)}
-                  cy={y(selected)}
-                  fill="#00000080"
-              />
+            <circle
+              r={CROWN_RADIUS}
+              cx={x(selected)}
+              cy={y(selected)}
+              fill="#00000080"
+            />
           ) : (
-              <></>
+            <></>
           )}
 
           {POS_ARRAY.map((pos) => (
@@ -292,25 +292,25 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             />
           ))}
 
-          {[...aPieces, ...bPieces].map((position) => {
+          {[...aPieces, ...bPieces].map((pos) => {
             return (
               <Piece
-                position={position}
+                position={pos}
                 aspect={aspect}
-                dragStart={() => click(position)}
+                dragStart={() => click(pos)}
                 dragEnd={(position) => {
                   click(position);
                 }}
                 color={
-                  aPieces.has(position)
+                  aPieces.has(pos)
                     ? Color.A
-                    : bPieces.has(position)
+                    : bPieces.has(pos)
                     ? Color.B
                     : Color.NONE
                 }
-                selected={selected === position}
-                selectable={validTargets.has(position)}
-                click={() => click(position)}
+                selected={selected === pos}
+                selectable={validTargets.has(pos)}
+                click={() => click(pos)}
                 turn={t}
               />
             );
