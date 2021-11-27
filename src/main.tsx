@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.less";
 import { FunctionComponent, h, render } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { Rect, useRect } from "./draggable/useRect";
@@ -14,6 +14,7 @@ import {
 import {
   CROWN_RADIUS,
   LARGE_CROWN_RADIUS,
+  LAST_ACTION_RADIUS,
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
@@ -191,7 +192,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             />
           ) : (
             <circle
-              r={LARGE_CROWN_RADIUS}
+              r={LAST_ACTION_RADIUS}
               cx={lastAction % 5}
               cy={Math.floor(lastAction / 5)}
               class={classnames("last", t % 2 === 0 ? "A" : "B")}
