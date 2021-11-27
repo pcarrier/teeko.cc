@@ -50,7 +50,7 @@ export type Draggable = {
 
 export function useDraggable(opts?: DraggableOptions): Draggable {
   const { minDragDistance, onDragStart, onDragMove, onDragEnd } = {
-    minDragDistance: 4,
+    minDragDistance: 8,
     ...opts,
   };
 
