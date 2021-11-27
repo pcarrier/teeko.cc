@@ -1,3 +1,11 @@
+@aColor: #0000ff;
+@bColor: #ff0000;
+@boardColor: #505050;
+@selectionColor: #80808080;
+
+@aDark: darken(@aColor, 50%);
+@bDark: darken(@bColor, 50%);
+
 body {
     margin: 0;
     padding: 1em;
@@ -22,19 +30,19 @@ body {
 }
 
 .board line.bg {
-    stroke: #505050;
+    stroke: @boardColor;
 }
 
 .board circle.bg {
-    fill: #505050;
+    fill: @boardColor;
 }
 
 .board circle.bg.release.A {
-    fill: #0000ff;
+    fill: @aColor;
 }
 
 .board circle.bg.release.B {
-    fill: #ff0000;
+    fill: @bColor;
 }
 
 .board line.last {
@@ -42,39 +50,39 @@ body {
 }
 
 .board line.last.A {
-    stroke: #800000;
+    stroke: @aDark;
 }
 
 .board line.last.B {
-    stroke: #000080;
+    stroke: @bDark;
 }
 
 .board circle.selected {
-    fill: #80808080;
+    fill: @selectionColor;
 }
 
 .board circle.last.A {
-    fill: #800000;
+    fill: @aDark;
 }
 
 .board circle.last.B {
-    fill: #000080;
+    fill: @bDark;
 }
 
 .board circle.target.A {
-    fill: #0000ff80;
+    fill: fade(@aColor, 50%);
 }
 
 .board circle.target.B {
-    fill: #ff000080;
+    fill: fade(@bColor, 50%);
 }
 
 .board .piece.A {
-    fill: #0000ff;
+    fill: @aColor;
 }
 
 .board .piece.B {
-    fill: #ff0000;
+    fill: @bColor;
 }
 
 .board .piece.dummy {
