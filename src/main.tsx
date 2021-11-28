@@ -15,7 +15,8 @@ import {
   CROWN_RADIUS,
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
-  LINE_MARGIN, LINE_MARGIN_DIAGONAL,
+  LINE_MARGIN,
+  LINE_MARGIN_DIAGONAL,
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
@@ -195,11 +196,11 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 class="bg"
               />
               <line
-                  x1={4}
-                  y1={n + LINE_MARGIN}
-                  x2={4}
-                  y2={n + 1 - LINE_MARGIN}
-                  class="bg"
+                x1={4}
+                y1={n + LINE_MARGIN}
+                x2={4}
+                y2={n + 1 - LINE_MARGIN}
+                class="bg"
               />
             </>
           ))}
@@ -365,9 +366,31 @@ const Game: FunctionComponent<{
     moveToBoard({ ...EmptyBoard });
   }
 
+  function undo() {
+    let { a, b } = board;
+    const { t, p } = board;
+    const last = board.l;
+    if (last === null) return;
+    const wasA = board.t % 2 === 1;
+    const target = wasA ? a : b;
+    if (Array.isArray(last)) {
+      const [to, from] = last;
+      const result = (target & ~(1 << from)) | (1 << to);
+      if (wasA) a = result;
+      else b = result;
+      moveToBoard({ a, b, t: t - 1, p, l: null });
+    } else {
+      const result = target & ~(1 << last);
+      if (wasA) a = result;
+      else b = result;
+      moveToBoard({ a, b, t: t - 1, p, l: null });
+    }
+  }
+
   return (
     <>
       <BoardView board={board} drop={drop} move={move} />
+      {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
       <button onClick={reset}>Reset</button>
     </>
   );
@@ -401,4 +424,4 @@ const App: FunctionComponent = () => {
   );
 };
 
-render(<App/>, document.body);
+render(<App />, document.body);
