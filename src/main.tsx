@@ -243,25 +243,28 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
               cy={y(pos)}
               class={classnames(
                 "bg",
-                releasePos === pos ? "release" : undefined,
+                releasePos === pos
+                  ? "release"
+                  : (dropping || selected !== undefined) &&
+                    validTargets.has(pos)
+                  ? "target"
+                  : undefined,
                 t % 2 === 0 ? "A" : "B"
               )}
             />
           ))}
 
-          {[...validTargets].map((pos) => (
-            <circle
-              key={`target${pos}`}
-              r={
-                dropping || selected !== undefined
-                  ? SLOT_RADIUS
-                  : LARGE_CROWN_RADIUS
-              }
-              cx={x(pos)}
-              cy={y(pos)}
-              class={classnames("target", t % 2 === 0 ? "A" : "B")}
-            />
-          ))}
+          {!dropping &&
+            selected === undefined &&
+            [...validTargets].map((pos) => (
+              <circle
+                key={`target${pos}`}
+                r={LARGE_CROWN_RADIUS}
+                cx={x(pos)}
+                cy={y(pos)}
+                class={classnames("target", t % 2 === 0 ? "A" : "B")}
+              />
+            ))}
 
           {POS_ARRAY.map((pos) => (
             <circle
@@ -301,7 +304,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           {dragState && selected !== undefined && (
             <Piece
               dummy
-              key='dummy'
+              key="dummy"
               color={t % 2 === 0 ? Color.A : Color.B}
               position={selected}
               offset={{ x: dragState.x, y: dragState.y }}
