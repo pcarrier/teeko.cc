@@ -20,8 +20,18 @@ body {
 }
 
 .board {
-    width: min(min(100%, 100vw), 200mm);
+    width: min(min(100%, 100vw), 120mm);
     touch-action: none;
+}
+
+@media (pointer: coarse) {
+    .board {
+        width: min(min(100%, 100vw), 200mm);
+    }
+    button {
+        font-size: 150%;
+        padding: 0.5em;
+    }
 }
 
 .board line.bg {
@@ -87,11 +97,4 @@ body {
 
 .board .piece.dummy {
     pointer-events: none;
-}
-
-@media (pointer: coarse) {
-    button {
-        font-size: 150%;
-        padding: 0.5em;
-    }
 }
