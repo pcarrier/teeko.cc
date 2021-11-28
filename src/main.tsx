@@ -12,7 +12,6 @@ import {
   y,
 } from "./logic";
 import {
-  CROWN_RADIUS,
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
   LINE_MARGIN,
@@ -224,22 +223,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
             />
           )}
 
-          {[...validTargets].map((pos) => (
-            <circle
-              key={`target${pos}`}
-              r={
-                dropping || selected !== undefined
-                  ? CROWN_RADIUS
-                  : LARGE_CROWN_RADIUS
-              }
-              cx={x(pos)}
-              cy={y(pos)}
-              class={classnames("target", t % 2 === 0 ? "A" : "B")}
-            />
-          ))}
-
           {selected ? (
             <circle
+              key="selected"
               r={LARGE_CROWN_RADIUS}
               cx={x(selected)}
               cy={y(selected)}
@@ -250,27 +236,42 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           )}
 
           {POS_ARRAY.map((pos) => (
-            <>
-              <circle
-                key={`bg${pos}`}
-                r={SLOT_RADIUS}
-                cx={x(pos)}
-                cy={y(pos)}
-                class={classnames(
-                  "bg",
-                  releasePos === pos ? "release" : undefined,
-                  t % 2 === 0 ? "A" : "B"
-                )}
-              />
-              <circle
-                key={pos}
-                r={PIECE_RADIUS}
-                cx={x(pos)}
-                cy={y(pos)}
-                fill="#00000000" // invisible
-                onClick={() => click(pos)}
-              />
-            </>
+            <circle
+              key={`bg${pos}`}
+              r={SLOT_RADIUS}
+              cx={x(pos)}
+              cy={y(pos)}
+              class={classnames(
+                "bg",
+                releasePos === pos ? "release" : undefined,
+                t % 2 === 0 ? "A" : "B"
+              )}
+            />
+          ))}
+
+          {[...validTargets].map((pos) => (
+            <circle
+              key={`target${pos}`}
+              r={
+                dropping || selected !== undefined
+                  ? SLOT_RADIUS
+                  : LARGE_CROWN_RADIUS
+              }
+              cx={x(pos)}
+              cy={y(pos)}
+              class={classnames("target", t % 2 === 0 ? "A" : "B")}
+            />
+          ))}
+
+          {POS_ARRAY.map((pos) => (
+            <circle
+              key={pos}
+              r={PIECE_RADIUS}
+              cx={x(pos)}
+              cy={y(pos)}
+              fill="#00000000" // invisible
+              onClick={() => click(pos)}
+            />
           ))}
 
           {[...aPieces, ...bPieces].map((pos) => {
