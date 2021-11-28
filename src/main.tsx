@@ -15,6 +15,7 @@ import {
   CROWN_RADIUS,
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
+  LINE_MARGIN, LINE_MARGIN_DIAGONAL,
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
@@ -150,35 +151,58 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
         ref={svgRef}
       >
         <g>
-          <line x1="0" y1="0" x2="0" y2="4" class="bg" />
-          <line x1="1" y1="0" x2="1" y2="4" class="bg" />
-          <line x1="2" y1="0" x2="2" y2="4" class="bg" />
-          <line x1="3" y1="0" x2="3" y2="4" class="bg" />
-          <line x1="4" y1="0" x2="4" y2="4" class="bg" />
-          <line x1="0" y1="0" x2="4" y2="0" class="bg" />
-          <line x1="0" y1="1" x2="4" y2="1" class="bg" />
-          <line x1="0" y1="2" x2="4" y2="2" class="bg" />
-          <line x1="0" y1="3" x2="4" y2="3" class="bg" />
-          <line x1="0" y1="4" x2="4" y2="4" class="bg" />
-          <line x1="0" y1="0" x2="4" y2="4" class="bg" />
-          <line x1="0" y1="1" x2="3" y2="4" class="bg" />
-          <line x1="0" y1="2" x2="2" y2="4" class="bg" />
-          <line x1="0" y1="3" x2="1" y2="4" class="bg" />
-          <line x1="1" y1="0" x2="4" y2="3" class="bg" />
-          <line x1="2" y1="0" x2="4" y2="2" class="bg" />
-          <line x1="3" y1="0" x2="4" y2="1" class="bg" />
-          <line x1="0" y1="0" x2="4" y2="0" class="bg" />
-          <line x1="1" y1="0" x2="4" y2="3" class="bg" />
-          <line x1="2" y1="0" x2="4" y2="2" class="bg" />
-          <line x1="3" y1="0" x2="4" y2="1" class="bg" />
-          <line x1="0" y1="0" x2="4" y2="0" class="bg" />
-          <line x1="1" y1="0" x2="0" y2="1" class="bg" />
-          <line x1="2" y1="0" x2="0" y2="2" class="bg" />
-          <line x1="3" y1="0" x2="0" y2="3" class="bg" />
-          <line x1="4" y1="0" x2="0" y2="4" class="bg" />
-          <line x1="4" y1="1" x2="1" y2="4" class="bg" />
-          <line x1="4" y1="2" x2="2" y2="4" class="bg" />
-          <line x1="4" y1="3" x2="3" y2="4" class="bg" />
+          {[0, 1, 2, 3].map((x) =>
+            [0, 1, 2, 3].map((y) => (
+              <>
+                <line
+                  x1={x + LINE_MARGIN}
+                  y1={y}
+                  x2={x + 1 - LINE_MARGIN}
+                  y2={y}
+                  class="bg"
+                />
+                <line
+                  x1={x}
+                  y1={y + LINE_MARGIN}
+                  x2={x}
+                  y2={y + 1 - LINE_MARGIN}
+                  class="bg"
+                />
+                <line
+                  x1={x + LINE_MARGIN_DIAGONAL}
+                  y1={y + LINE_MARGIN_DIAGONAL}
+                  x2={x + 1 - LINE_MARGIN_DIAGONAL}
+                  y2={y + 1 - LINE_MARGIN_DIAGONAL}
+                  class="bg"
+                />
+                <line
+                  x1={x + LINE_MARGIN_DIAGONAL}
+                  y1={y + 1 - LINE_MARGIN_DIAGONAL}
+                  x2={x + 1 - LINE_MARGIN_DIAGONAL}
+                  y2={y + LINE_MARGIN_DIAGONAL}
+                  class="bg"
+                />
+              </>
+            ))
+          )}
+          {[0, 1, 2, 3].map((n) => (
+            <>
+              <line
+                x1={n + LINE_MARGIN}
+                y1={4}
+                x2={n + 1 - LINE_MARGIN}
+                y2={4}
+                class="bg"
+              />
+              <line
+                  x1={4}
+                  y1={n + LINE_MARGIN}
+                  x2={4}
+                  y2={n + 1 - LINE_MARGIN}
+                  class="bg"
+              />
+            </>
+          ))}
 
           {lastAction === null ? (
             <></>
@@ -297,11 +321,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   );
 };
 
-const Game: FunctionComponent<{ initial: Board }> = ({
-  initial,
-}: {
+const Game: FunctionComponent<{
   initial: Board;
-}) => {
+}> = ({ initial }: { initial: Board }) => {
   const [board, setBoard] = useState(initial);
 
   function moveToBoard(board: Board) {

@@ -3,3 +3,5 @@ export const LAST_ACTION_RADIUS = LARGE_CROWN_RADIUS - 0.02;
 export const PIECE_RADIUS = LARGE_CROWN_RADIUS - 0.05;
 export const SLOT_RADIUS = 0.1;
 export const CROWN_RADIUS = 0.15;
+export const LINE_MARGIN = 0.2;
+export const LINE_MARGIN_DIAGONAL = LINE_MARGIN / Math.sqrt(2);
