@@ -188,14 +188,14 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
               y1={y(lastAction[0])}
               x2={x(lastAction[1])}
               y2={y(lastAction[1])}
-              class={classnames("last", t % 2 === 0 ? "A" : "B")}
+              class={classnames("last", t % 2 === 0 ? "B" : "A")}
             />
           ) : (
             <circle
               r={LAST_ACTION_RADIUS}
               cx={lastAction % 5}
               cy={Math.floor(lastAction / 5)}
-              class={classnames("last", t % 2 === 0 ? "A" : "B")}
+              class={classnames("last", t % 2 === 0 ? "B" : "A")}
             />
           )}
 
