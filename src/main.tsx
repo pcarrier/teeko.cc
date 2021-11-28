@@ -277,7 +277,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           {[...aPieces, ...bPieces].map((pos) => {
             return (
               <Piece
-                key={pos}
+                key={`piece${pos}`}
                 position={pos}
                 aspect={aspect}
                 dragStart={() => {
@@ -301,6 +301,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           {dragState && selected !== undefined && (
             <Piece
               dummy
+              key='dummy'
               color={t % 2 === 0 ? Color.A : Color.B}
               position={selected}
               offset={{ x: dragState.x, y: dragState.y }}
