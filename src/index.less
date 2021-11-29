@@ -21,6 +21,7 @@ body {
 
 .board {
   width: min(min(100%, 100vw), 150mm);
+  touch-action: none;
 }
 
 @media (pointer: coarse) {
@@ -82,10 +83,6 @@ body {
 
 .board circle.target.B {
   fill: fade(@bColor, 50%);
-}
-
-.board .piece {
-  touch-action: none;
 }
 
 .board .piece.A {
