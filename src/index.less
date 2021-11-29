@@ -7,91 +7,95 @@
 @bDark: darken(@bColor, 25%);
 
 body {
-    margin: 0;
-    padding: 1em;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #ccc;
-    background-color: #000;
-    text-align: center;
+  margin: 0;
+  padding: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #ccc;
+  background-color: #000;
+  text-align: center;
 }
 
 .board {
-    width: min(min(100%, 100vw), 150mm);
-    touch-action: none;
+  width: min(min(100%, 100vw), 150mm);
 }
 
 @media (pointer: coarse) {
-    .board {
-        width: min(min(100%, 100vw), 200mm);
-    }
-    button {
-        font-size: 150%;
-        padding: 0.5em;
-    }
+  .board {
+    width: min(min(100%, 100vw), 200mm);
+  }
+
+  button {
+    font-size: 150%;
+    padding: 0.5em;
+  }
 }
 
 .board line.bg {
-    stroke-width: .02;
-    stroke: @boardColor;
-    stroke-dasharray: .025;
+  stroke-width: .02;
+  stroke: @boardColor;
+  stroke-dasharray: .02;
 }
 
 .board circle.bg {
-    fill: @boardColor;
+  fill: @boardColor;
 }
 
 .board circle.bg.release.A {
-    fill: @aColor;
+  fill: @aColor;
 }
 
 .board circle.bg.release.B {
-    fill: @bColor;
+  fill: @bColor;
 }
 
 .board line.last {
-    stroke-width: .05;
+  stroke-width: .05;
 }
 
 .board line.last.A {
-    stroke: @aDark;
+  stroke: @aDark;
 }
 
 .board line.last.B {
-    stroke: @bDark;
+  stroke: @bDark;
 }
 
 .board circle.selected {
-    fill: @selectionColor;
+  fill: @selectionColor;
 }
 
 .board circle.last.A {
-    fill: @aDark;
+  fill: @aDark;
 }
 
 .board circle.last.B {
-    fill: @bDark;
+  fill: @bDark;
 }
 
 .board circle.target.A {
-    fill: fade(@aColor, 50%);
+  fill: fade(@aColor, 50%);
 }
 
 .board circle.target.B {
-    fill: fade(@bColor, 50%);
+  fill: fade(@bColor, 50%);
+}
+
+.board .piece {
+  touch-action: none;
 }
 
 .board .piece.A {
-    fill: @aColor;
+  fill: @aColor;
 }
 
 .board .piece.B {
-    fill: @bColor;
+  fill: @bColor;
 }
 
 .board .piece.dummy {
-    pointer-events: none;
+  pointer-events: none;
 }
