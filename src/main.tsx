@@ -417,7 +417,7 @@ const App: FunctionComponent = () => {
 
   return (
     <>
-      <p>Make a unit square or a line of 4 in any direction.</p>
+      <p>Make a unit square or line of 4 in any direction.</p>
       <Game initial={initial} />
       <h1>Teeko by John Scarne</h1>
       <p>
