@@ -20,13 +20,15 @@ body {
 }
 
 .board {
-  width: min(min(100%, 100vw), 150mm);
+  width: min(100%, 100vw);
+  max-width: 150mm;
   touch-action: none;
 }
 
 @media (pointer: coarse) {
   .board {
-    width: min(min(100%, 100vw), 200mm);
+    width: min(100%, 100vw);
+    max-width: 200mm;
   }
 
   button {
