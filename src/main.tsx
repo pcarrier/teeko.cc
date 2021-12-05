@@ -422,7 +422,7 @@ const App: FunctionComponent = () => {
       <h1>Teeko by John Scarne</h1>
       <p>
         <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
-        <a href="https://github.com/zap-games/teeko.cc">code</a>,{" "}
+        <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
         <a href="https://pcarrier.com/teeko">archives</a>
       </p>
     </>
