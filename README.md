@@ -1,0 +1,1 @@
+teeko.cc: game of Teeko by John Scarne
