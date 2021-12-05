@@ -1,10 +1,18 @@
+@color: #ccc;
+@bg: #000;
 @aColor: #0050d0;
 @bColor: #ff0000;
+@link: #00ff00;
 @boardColor: #303030;
 @selectionColor: #80808080;
 
 @aDark: darken(@aColor, 25%);
 @bDark: darken(@bColor, 25%);
+
+a, a:visited {
+  color: @link;
+  text-decoration: none;
+}
 
 body {
   margin: 0;
@@ -14,8 +22,8 @@ body {
   sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #ccc;
-  background-color: #000;
+  color: @color;
+  background-color: @bg;
   text-align: center;
 }
 
