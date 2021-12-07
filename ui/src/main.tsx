@@ -393,11 +393,11 @@ const Game: FunctionComponent<{
   }
 
   return (
-    <>
+    <div class="game">
       <BoardView board={board} drop={drop} move={move} />
       {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
       <button onClick={reset}>Reset</button>
-    </>
+    </div>
   );
 };
 
@@ -417,14 +417,18 @@ const App: FunctionComponent = () => {
 
   return (
     <>
-      <p>Make a unit square or line of 4 in any direction.</p>
+      {/* <p>Make a unit square or line of 4 in any direction.</p> */}
+      <div class="top left">TL</div>
+      <div class="top right">TR</div>
       <Game initial={initial} />
-      <h1>Teeko by John Scarne</h1>
+      {/* <h1>Teeko by John Scarne</h1>
       <p>
         <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
         <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
         <a href="https://pcarrier.com/teeko">archives</a>
-      </p>
+      </p> */}
+      <div class="bottom left">BL</div>
+      <div class="bottom right">BR</div>
     </>
   );
 };
