@@ -351,7 +351,7 @@ const Game: FunctionComponent<{
     } else {
       b = result;
     }
-    moveToBoard({ a, b, t: t + 1, p, l: [from, to] });
+    moveToBoard({ a, b, t: (t + 1) % 2, p, l: [from, to] });
   }
 
   function drop(pos: number) {
