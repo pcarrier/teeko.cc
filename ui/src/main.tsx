@@ -418,8 +418,8 @@ const App: FunctionComponent = () => {
   return (
     <>
       {/* <p>Make a unit square or line of 4 in any direction.</p> */}
-      <div class="top left">TL</div>
-      <div class="top right">TR</div>
+      <div class="top left">All Games</div>
+      <div class="top right">Reset</div>
       <Game initial={initial} />
       {/* <h1>Teeko by John Scarne</h1>
       <p>
@@ -427,8 +427,9 @@ const App: FunctionComponent = () => {
         <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
         <a href="https://pcarrier.com/teeko">archives</a>
       </p> */}
-      <div class="bottom left">BL</div>
-      <div class="bottom right">BR</div>
+      <div class="bottom left">Offline</div>
+      <div class="bottom right">Rules</div>
+      <div class="bottom left right subtle">TEEKO by John Scarne</div>
     </>
   );
 };
