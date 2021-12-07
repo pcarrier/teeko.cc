@@ -4,7 +4,7 @@ build-ui:
 
 .PHONY: deploy-ui
 deploy-ui: build-ui
-	rsync --archive --delay-updates ui/dist/ ident.me:/data/teeko.cc/
+	rsync --archive --delay-updates ui/dist/ ident.me:/data/teeko.cc/new/
 
 .PHONY: deploy
 deploy: deploy-ui
