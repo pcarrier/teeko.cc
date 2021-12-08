@@ -1,4 +1,5 @@
 @color: #ddd;
+@strong: #fff;
 @bg: #000;
 @boardColor: #404040;
 @selectionColor: #80808080;
@@ -26,6 +27,19 @@ body {
   text-align: center;
 }
 
+button {
+  font-size: 100%;
+  background-color: @bg;
+  color: @strong;
+  border: 1px solid @boardColor;
+  border-radius: 4px;
+  padding: 1em 2em;
+  margin: 0.5em;
+  &:hover {
+    background-color: @boardColor;
+  }
+}
+
 .board {
   width: min(100%, 100vh);
   max-width: 150mm;
@@ -36,11 +50,6 @@ body {
   .board {
     width: min(100%, 100vh);
     max-width: 200mm;
-  }
-
-  button {
-    font-size: 150%;
-    padding: 0.5em;
   }
 }
 
