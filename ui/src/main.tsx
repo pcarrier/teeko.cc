@@ -314,9 +314,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       </svg>
       <p>
         {aWin
-          ? `Blue won.`
+          ? `Blue won!`
           : bWin
-          ? `Red won.`
+          ? `Red won!`
           : dropping
           ? `${activePlayer} drops piece ${ourPieces.size + 1} out of 4…`
           : selected === undefined

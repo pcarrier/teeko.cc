@@ -41,14 +41,16 @@ button {
 }
 
 .board {
-  width: min(100%, 100vh);
-  max-width: 150mm;
   touch-action: none;
 }
 
+.board.full {
+  width: min(100%, 80vh);
+  max-width: 150mm;
+}
+
 @media (pointer: coarse) {
-  .board {
-    width: min(100%, 100vh);
+  .board.full {
     max-width: 200mm;
   }
 }
