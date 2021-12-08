@@ -14,3 +14,7 @@ build-ui: ui/public/icon-192x192.png ui/public/icon-512x512.png
 .PHONY: deploy-ui
 deploy-ui: build-ui
 	rsync --archive --delay-updates ui/dist/ ident.me:/data/teeko.cc/
+
+.PHONY: ws
+ws:
+	deno run --allow-net deno/ws.ts
