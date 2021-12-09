@@ -446,6 +446,11 @@ const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       klass="half"
     />
     <p>
+      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
+      <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
+      <a href="https://pcarrier.com/teeko">archives</a>
+    </p>
+    <p>
       <button onClick={close}>Play</button>
     </p>
   </div>
