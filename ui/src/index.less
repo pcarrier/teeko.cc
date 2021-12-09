@@ -33,10 +33,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: @color;
   background-color: @bg;
+  text-align: center;
 }
 
 p {
   margin: 0.5em;
+}
+
+h1 {
+  font-size: 100%;
+  font-weight: normal;
+  color: @strong;
 }
 
 button {
@@ -45,7 +52,7 @@ button {
   color: @strong;
   border: 1px solid @boardColor;
   border-radius: 4px;
-  padding: 1em 2em;
+  padding: 1em;
   margin: 0.5em;
 
   &:hover {
@@ -58,8 +65,12 @@ button {
 }
 
 .board.full {
-  width: min(100%, 80vh);
+  width: min(100%, 100vh);
   max-width: 150mm;
+}
+
+.board.half {
+  width: 50%;
 }
 
 @media (pointer: coarse) {

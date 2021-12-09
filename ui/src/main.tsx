@@ -51,9 +51,10 @@ function pieces(n: number): Set<number> {
 
 type BoardViewAttrs = {
   board: Board;
-  drop: (position: number) => void;
-  move: (from: number, to: number) => void;
+  drop?: (position: number) => void;
+  move?: (from: number, to: number) => void;
   klass?: string;
+  showStatus?: boolean;
 };
 
 const BoardView: FunctionComponent<BoardViewAttrs> = ({
@@ -61,6 +62,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   drop,
   move,
   klass,
+  showStatus,
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
@@ -103,11 +105,11 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     if (selected === position) {
       setSelected(undefined);
     } else if (selected !== undefined && validTargets.has(position)) {
-      move(selected, position);
+      move?.(selected, position);
       setSelected(undefined);
     } else {
       if (dropping) {
-        if (emptySlots.has(position)) drop(position);
+        if (emptySlots.has(position)) drop?.(position);
       } else {
         if (!win && movable.has(position)) {
           setSelected(position);
@@ -119,6 +121,23 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   }
 
   const activePlayer = t % 2 === 0 ? "Blue" : "Red";
+
+  const status = showStatus ? (
+    <p>
+      {aWin
+        ? `Blue won!`
+        : bWin
+        ? `Red won!`
+        : dropping
+        ? `${activePlayer} drops piece ${ourPieces.size + 1} out of 4…`
+        : selected === undefined
+        ? `${activePlayer} moves from…`
+        : `${activePlayer} moves to…`}
+    </p>
+  ) : (
+    <></>
+  );
+
   const lastAction = board.l;
 
   const svgRef = useRef<SVGSVGElement>(null);
@@ -314,17 +333,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           )}
         </g>
       </svg>
-      <p>
-        {aWin
-          ? `Blue won!`
-          : bWin
-          ? `Red won!`
-          : dropping
-          ? `${activePlayer} drops piece ${ourPieces.size + 1} out of 4…`
-          : selected === undefined
-          ? `${activePlayer} moves from…`
-          : `${activePlayer} moves to…`}
-      </p>
+      {status}
     </>
   );
 };
@@ -333,6 +342,7 @@ const Game: FunctionComponent<{
   initial: Board;
 }> = ({ initial }: { initial: Board }) => {
   const [board, setBoard] = useState(initial);
+  const [showHelp, setShowHelp] = useState(false);
 
   function moveToBoard(board: Board) {
     location.replace(
@@ -368,11 +378,6 @@ const Game: FunctionComponent<{
     moveToBoard({ a, b, t: t + 1, p, l: pos });
   }
 
-  function reset() {
-    if (board.a === 0 && board.b === 0) return;
-    moveToBoard({ ...EmptyBoard });
-  }
-
   function undo() {
     let { a, b } = board;
     const { t, p } = board;
@@ -394,16 +399,57 @@ const Game: FunctionComponent<{
     }
   }
 
+  if (showHelp) return <Help close={() => setShowHelp(false)} />;
+
   return (
     <>
-      <BoardView board={board} drop={drop} move={move} klass="full" />
+      <BoardView
+        board={board}
+        drop={drop}
+        move={move}
+        klass="full"
+        showStatus={true}
+      />
       <p>
         {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
-        <button onClick={reset}>Reset</button>
+        <button onClick={() => setShowHelp(true)}>Help</button>
+        <button
+          onClick={() => {
+            if (board.a === 0 && board.b === 0) return;
+            moveToBoard({ ...EmptyBoard });
+          }}
+        >
+          Reset
+        </button>
       </p>
+      <h1>TEEKO by John Scarne</h1>
     </>
   );
 };
+
+const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
+  <div class="help">
+    <p>Each player has 4 pieces.</p>
+    <p>
+      They first place one at a time on empty slots;
+      <br />
+      once all are placed, they move one at a time to an empty neighbor.
+    </p>
+    <p>Win by forming a straight line of 4 or a unit square:</p>
+    <BoardView board={{ ...EmptyBoard, a: 2236928, p: false }} klass="half" />
+    <BoardView board={{ ...EmptyBoard, b: 6336, p: false }} klass="half" />
+    <p>
+      which excludes larger squares and broken lines, hence nobody wins here:
+    </p>
+    <BoardView
+      board={{ ...EmptyBoard, a: 20992000, b: 1059, p: false }}
+      klass="half"
+    />
+    <p>
+      <button onClick={close}>Play</button>
+    </p>
+  </div>
+);
 
 const App: FunctionComponent = () => {
   const initial = { ...EmptyBoard };
@@ -421,14 +467,7 @@ const App: FunctionComponent = () => {
 
   return (
     <>
-      <p>Make a unit square or line of 4 in any direction.</p>
       <Game initial={initial} />
-      <h1>Teeko by John Scarne</h1>
-      <p>
-        <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
-        <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
-        <a href="https://pcarrier.com/teeko">archives</a>
-      </p>
     </>
   );
 };
