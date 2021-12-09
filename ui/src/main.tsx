@@ -53,12 +53,14 @@ type BoardViewAttrs = {
   board: Board;
   drop: (position: number) => void;
   move: (from: number, to: number) => void;
+  klass?: string;
 };
 
 const BoardView: FunctionComponent<BoardViewAttrs> = ({
   board,
   drop,
   move,
+  klass,
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
@@ -147,7 +149,7 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="-0.5 -0.5 5 5"
-        className="board"
+        className={classnames("board", klass)}
         ref={svgRef}
       >
         <g>
@@ -394,7 +396,7 @@ const Game: FunctionComponent<{
 
   return (
     <>
-      <BoardView board={board} drop={drop} move={move} />
+      <BoardView board={board} drop={drop} move={move} klass="full" />
       {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
       <button onClick={reset}>Reset</button>
     </>
