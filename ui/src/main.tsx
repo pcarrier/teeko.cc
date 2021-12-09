@@ -451,15 +451,22 @@ const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
 
 const App: FunctionComponent = () => {
   const initial = { ...EmptyBoard };
-  if (location.hash.length > 1) {
-    try {
-      const [a, b, t, l] = JSON.parse(decodeURI(location.hash.substring(1)));
-      initial.a = a;
-      initial.b = b;
-      initial.t = t;
-      initial.l = l;
-    } catch (_) {
-      console.log("Invalid URL parameters");
+  const hash = location.hash;
+  if (hash.length > 1) {
+    const authPrefix = "#auth:";
+    if (hash.startsWith(authPrefix)) {
+      localStorage.setItem("pill", hash.substring(authPrefix.length));
+      location.hash = "";
+    } else {
+      try {
+        const [a, b, t, l] = JSON.parse(decodeURI(hash.substring(1)));
+        initial.a = a;
+        initial.b = b;
+        initial.t = t;
+        initial.l = l;
+      } catch (_) {
+        console.log("Invalid URL parameters");
+      }
     }
   }
 
