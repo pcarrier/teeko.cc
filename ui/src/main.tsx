@@ -412,7 +412,6 @@ const Game: FunctionComponent<{
       />
       <p>
         {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
-        <button onClick={() => setShowHelp(true)}>Help</button>
         <button
           onClick={() => {
             if (board.a === 0 && board.b === 0) return;
@@ -421,6 +420,7 @@ const Game: FunctionComponent<{
         >
           Reset
         </button>
+        <button onClick={() => setShowHelp(true)}>Help</button>
       </p>
       <h1>TEEKO by John Scarne</h1>
     </>
