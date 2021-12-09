@@ -439,13 +439,6 @@ const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
     <BoardView board={{ ...EmptyBoard, a: 2236928, p: false }} klass="half" />
     <BoardView board={{ ...EmptyBoard, b: 6336, p: false }} klass="half" />
     <p>
-      which excludes larger squares and broken lines, hence nobody wins here:
-    </p>
-    <BoardView
-      board={{ ...EmptyBoard, a: 328000, b: 159744, p: false }}
-      klass="half"
-    />
-    <p>
       <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
       <a href="https://pcarrier.com/teeko">archives</a>
