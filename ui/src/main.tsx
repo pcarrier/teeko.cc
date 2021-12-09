@@ -442,7 +442,7 @@ const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       which excludes larger squares and broken lines, hence nobody wins here:
     </p>
     <BoardView
-      board={{ ...EmptyBoard, a: 20992000, b: 1059, p: false }}
+      board={{ ...EmptyBoard, a: 328000, b: 159744, p: false }}
       klass="half"
     />
     <p>
