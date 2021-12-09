@@ -14,9 +14,18 @@ a, a:visited {
   text-decoration: none;
 }
 
-body {
+html, body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin: 0;
-  padding: 1em;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
   "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
   sans-serif;
@@ -24,7 +33,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: @color;
   background-color: @bg;
-  text-align: center;
 }
 
 p {
@@ -39,6 +47,7 @@ button {
   border-radius: 4px;
   padding: 1em 2em;
   margin: 0.5em;
+
   &:hover {
     background-color: @boardColor;
   }

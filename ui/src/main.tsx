@@ -397,8 +397,10 @@ const Game: FunctionComponent<{
   return (
     <>
       <BoardView board={board} drop={drop} move={move} klass="full" />
-      {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
-      <button onClick={reset}>Reset</button>
+      <p>
+        {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
+        <button onClick={reset}>Reset</button>
+      </p>
     </>
   );
 };
