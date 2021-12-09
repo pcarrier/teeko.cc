@@ -1,5 +1,5 @@
 import "./index.less";
-import { FunctionComponent, h, render } from "preact";
+import { FunctionComponent, render, h } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { Rect, useRect } from "./draggable/useRect";
 import {
@@ -412,14 +412,11 @@ const Game: FunctionComponent<{
       />
       <p>
         {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
-        <button
-          onClick={() => {
-            if (board.a === 0 && board.b === 0) return;
-            moveToBoard({ ...EmptyBoard });
-          }}
-        >
-          Reset
-        </button>
+        {board.a !== 0 ? (
+          <button onClick={() => moveToBoard({ ...EmptyBoard })}>Reset</button>
+        ) : (
+          <></>
+        )}
         <button onClick={() => setShowHelp(true)}>Help</button>
       </p>
       <h1>TEEKO by John Scarne</h1>
