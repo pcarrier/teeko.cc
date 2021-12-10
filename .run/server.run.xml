@@ -7,6 +7,8 @@
     </scripts>
     <node-interpreter value="project" />
     <envs />
-    <method v="2" />
+    <method v="2">
+      <option name="LaunchBrowser.Before.Run" url="http://localhost:3000" />
+    </method>
   </configuration>
 </component>

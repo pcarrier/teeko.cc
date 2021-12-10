@@ -124,9 +124,9 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const status = showStatus ? (
     <p>
       {aWin
-        ? `Blue won!`
+        ? `Teeko! Blue won.`
         : bWin
-        ? `Red won!`
+        ? `Teeko! Red won.`
         : dropping
         ? `${activePlayer} drops piece ${ourPieces.size + 1} out of 4…`
         : selected === undefined
