@@ -81,7 +81,4 @@
                  keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
                  keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
     </circle>
-    <image x="0.5" y="0.5" height="1" width="1"
-           style="image-rendering: pixelated;"
-           href="data:image/webp;base64,UklGRnIAAABXRUJQVlA4TGYAAAAvFoAFAA8w//M///MfeHAd27aazCsjkxIy6cHd3YO7u8MXJVAB3xRAPU4RzG0jov8BcEIhdfBLfMPmSzZP24dJCfkU/E8dof64sdhgeE3iDZnBy0DnxYEY8XiTv6s8Xhx+MbocAU4="/>
 </svg>
