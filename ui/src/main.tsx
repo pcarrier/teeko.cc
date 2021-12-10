@@ -342,7 +342,7 @@ const Game: FunctionComponent<{
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    moveToBoard({ a, b, t: t + 1, p, l: pos });
+    moveToBoard({ a, b, t: (t + 1) % 2, p, l: pos });
   }
 
   function undo() {
