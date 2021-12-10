@@ -175,53 +175,17 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
           {[0, 1, 2, 3].map((x) =>
             [0, 1, 2, 3].map((y) => (
               <>
-                <line
-                  x1={x + LINE_MARGIN}
-                  y1={y}
-                  x2={x + 1 - LINE_MARGIN}
-                  y2={y}
-                  class="bg"
-                />
-                <line
-                  x1={x}
-                  y1={y + LINE_MARGIN}
-                  x2={x}
-                  y2={y + 1 - LINE_MARGIN}
-                  class="bg"
-                />
-                <line
-                  x1={x + LINE_MARGIN_DIAGONAL}
-                  y1={y + LINE_MARGIN_DIAGONAL}
-                  x2={x + 1 - LINE_MARGIN_DIAGONAL}
-                  y2={y + 1 - LINE_MARGIN_DIAGONAL}
-                  class="bg"
-                />
-                <line
-                  x1={x + LINE_MARGIN_DIAGONAL}
-                  y1={y + 1 - LINE_MARGIN_DIAGONAL}
-                  x2={x + 1 - LINE_MARGIN_DIAGONAL}
-                  y2={y + LINE_MARGIN_DIAGONAL}
-                  class="bg"
-                />
+                <line x1={x} y1={y} x2={x + 1} y2={y} class="bg" />
+                <line x1={x} y1={y} x2={x} y2={y + 1} class="bg" />
+                <line x1={x} y1={y} x2={x + 1} y2={y + 1} class="bg" />
+                <line x1={x} y1={y + 1} x2={x + 1} y2={y} class="bg" />
               </>
             ))
           )}
           {[0, 1, 2, 3].map((n) => (
             <>
-              <line
-                x1={n + LINE_MARGIN}
-                y1={4}
-                x2={n + 1 - LINE_MARGIN}
-                y2={4}
-                class="bg"
-              />
-              <line
-                x1={4}
-                y1={n + LINE_MARGIN}
-                x2={4}
-                y2={n + 1 - LINE_MARGIN}
-                class="bg"
-              />
+              <line x1={n} y1={4} x2={n + 1} y2={4} class="bg" />
+              <line x1={4} y1={n} x2={4} y2={n + 1} class="bg" />
             </>
           ))}
 
@@ -243,6 +207,10 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
               class={classnames("last", t % 2 === 0 ? "B" : "A")}
             />
           )}
+
+          {POS_ARRAY.map((pos) => (
+            <circle r={LINE_MARGIN} cx={x(pos)} cy={y(pos)} />
+          ))}
 
           {selected ? (
             <circle
