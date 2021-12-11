@@ -3,9 +3,5 @@ import preact from "@preact/preset-vite";
 
 export default defineConfig({
   plugins: [preact()],
-  build: {
-    target: "esnext",
-    polyfillDynamicImport: false,
-    sourcemap: true,
-  },
+  build: { sourcemap: true },
 });
