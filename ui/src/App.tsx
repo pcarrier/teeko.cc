@@ -1,8 +1,6 @@
 import { FunctionComponent } from "preact";
 import { Board, EmptyBoard } from "./model";
-import { Provider } from "@urql/preact";
 import { LocalGame } from "./LocalGame";
-import { client } from "./index";
 import Router from "preact-router";
 import { OnlineGame } from "./OnlineGame";
 import { registerSW } from "virtual:pwa-register";
@@ -35,11 +33,9 @@ export const App: FunctionComponent = () => {
   registerSW();
 
   return (
-    <Provider value={client}>
-      <Router>
-        <LocalGame initial={initial} default />
-        <OnlineGame path="/join/:room" />
-      </Router>
-    </Provider>
+    <Router>
+      <LocalGame initial={initial} default />
+      <OnlineGame path="/join/:room" />
+    </Router>
   );
 };
