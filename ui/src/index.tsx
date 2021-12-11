@@ -1,10 +1,21 @@
 import "./index.less";
 
 import { FunctionComponent, render } from "preact";
+import { createClient, Provider } from "@urql/preact";
 import { registerSW } from "virtual:pwa-register";
 
 import { Board, EmptyBoard } from "./model";
 import { LocalGame } from "./LocalGame";
+
+const client = createClient({
+  url: "https://api.teeko.cc/graphql",
+  fetchOptions: () => {
+    const pill = localStorage.getItem("pill");
+    return {
+      headers: pill ? { authorization: `Bearer ${pill}` } : undefined,
+    };
+  },
+});
 
 const App: FunctionComponent = () => {
   let initial: Board = { ...EmptyBoard };
@@ -39,9 +50,9 @@ const App: FunctionComponent = () => {
   }
 
   return (
-    <>
+    <Provider value={client}>
       <LocalGame initial={initial} />
-    </>
+    </Provider>
   );
 };
 
