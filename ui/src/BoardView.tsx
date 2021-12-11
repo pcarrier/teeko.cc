@@ -1,16 +1,8 @@
-import "./index.less";
-import { FunctionComponent, render, h } from "preact";
+import { FunctionComponent, h } from "preact";
 import { useRef, useState } from "preact/hooks";
+import { NEIGHS_BY_POSITION, WINNING_POSITIONS, x, y } from "./logic";
 import { Rect, useRect } from "./draggable/useRect";
-import {
-  NEIGHS_BY_POSITION,
-  Player,
-  SIZE,
-  SLOTS,
-  WINNING_POSITIONS,
-  x,
-  y,
-} from "./logic";
+import classnames from "classnames";
 import {
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
@@ -18,35 +10,10 @@ import {
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
-import { Color, Piece } from "./piece";
-import classnames from "classnames";
+import { Color, Piece } from "./Piece";
+import { Board, pieces, SIZE, SLOTS } from "./model";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
-
-type Board = {
-  a: number;
-  b: number;
-  t: number; // turn
-  p: boolean; // playing
-  l: number | [number, number] | null; // last action
-};
-
-const EmptyBoard: Board = {
-  a: 0,
-  b: 0,
-  t: Player.A,
-  p: true,
-  l: null,
-};
-
-function pieces(n: number): Set<number> {
-  const result = [];
-  for (let i = 0; i < SLOTS; i++) {
-    if (n & 1) result.push(i);
-    n >>= 1;
-  }
-  return new Set(result);
-}
 
 type BoardViewAttrs = {
   board: Board;
@@ -56,7 +23,7 @@ type BoardViewAttrs = {
   showStatus?: boolean;
 };
 
-const BoardView: FunctionComponent<BoardViewAttrs> = ({
+export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   board,
   drop,
   move,
@@ -304,141 +271,3 @@ const BoardView: FunctionComponent<BoardViewAttrs> = ({
     </>
   );
 };
-
-const Game: FunctionComponent<{
-  initial: Board;
-}> = ({ initial }: { initial: Board }) => {
-  const [board, setBoard] = useState(initial);
-  const [showHelp, setShowHelp] = useState(false);
-
-  function moveToBoard(board: Board) {
-    location.replace(
-      `#${JSON.stringify([board.a, board.b, board.t, board.l])}`
-    );
-    setBoard(board);
-  }
-
-  function move(from: number, to: number) {
-    let { a, b } = board;
-    const { t, p } = board;
-    const isA = t % 2 === 0;
-
-    const target = isA ? a : b;
-    const result = (target & ~(1 << from)) | (1 << to);
-    if (isA) {
-      a = result;
-    } else {
-      b = result;
-    }
-    moveToBoard({ a, b, t: (t + 1) % 2, p, l: [from, to] });
-  }
-
-  function drop(pos: number) {
-    let { a, b } = board;
-    const { t, p } = board;
-    const isA = t % 2 === 0;
-
-    const target = isA ? a : b;
-    const result = target | (1 << pos);
-    if (isA) a = result;
-    else b = result;
-    moveToBoard({ a, b, t: (t + 1) % 2, p, l: pos });
-  }
-
-  function undo() {
-    let { a, b } = board;
-    const { t, p } = board;
-    const last = board.l;
-    if (last === null) return;
-    const wasA = board.t % 2 === 1;
-    const target = wasA ? a : b;
-    if (Array.isArray(last)) {
-      const [to, from] = last;
-      const result = (target & ~(1 << from)) | (1 << to);
-      if (wasA) a = result;
-      else b = result;
-      moveToBoard({ a, b, t: t - 1, p, l: null });
-    } else {
-      const result = target & ~(1 << last);
-      if (wasA) a = result;
-      else b = result;
-      moveToBoard({ a, b, t: t - 1, p, l: null });
-    }
-  }
-
-  if (showHelp) return <Help close={() => setShowHelp(false)} />;
-
-  return (
-    <>
-      <BoardView
-        board={board}
-        drop={drop}
-        move={move}
-        klass="full"
-        showStatus={true}
-      />
-      <p>
-        {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
-        {board.a !== 0 ? (
-          <button onClick={() => moveToBoard({ ...EmptyBoard })}>Reset</button>
-        ) : (
-          <></>
-        )}
-        <button onClick={() => setShowHelp(true)}>Help</button>
-      </p>
-      <h1>TEEKO by John Scarne</h1>
-    </>
-  );
-};
-
-const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
-  <div class="help">
-    <p>Each player has 4 pieces.</p>
-    <p>
-      They first place one at a time on empty slots;
-      <br />
-      once all are placed, they move one at a time to an empty neighbor.
-    </p>
-    <p>Win by forming a straight line of 4 or a unit square:</p>
-    <BoardView board={{ ...EmptyBoard, a: 2236928, p: false }} klass="half" />
-    <BoardView board={{ ...EmptyBoard, b: 6336, p: false }} klass="half" />
-    <p>
-      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
-      <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
-      <a href="https://pcarrier.com/teeko">archives</a>
-    </p>
-    <p>
-      <button onClick={close}>Play</button>
-    </p>
-  </div>
-);
-
-const App: FunctionComponent = () => {
-  const initial = { ...EmptyBoard };
-  const hash = location.hash;
-  if (hash.length > 1) {
-    const authPrefix = "#auth:";
-    if (hash.startsWith(authPrefix)) {
-      localStorage.setItem("pill", hash.substring(authPrefix.length));
-      location.hash = "";
-    } else {
-      try {
-        const [a, b, t, l] = JSON.parse(decodeURI(hash.substring(1)));
-        initial.a = a;
-        initial.b = b;
-        initial.t = t;
-        initial.l = l;
-      } catch (_) {
-        console.log("Invalid URL parameters");
-      }
-    }
-  }
-
-  return (
-    <>
-      <Game initial={initial} />
-    </>
-  );
-};
-
-render(<App />, document.body);

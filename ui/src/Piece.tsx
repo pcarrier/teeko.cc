@@ -1,9 +1,9 @@
 import { Position, useDraggable } from "./draggable/useDraggable";
 import { Rect } from "./draggable/useRect";
 import { FunctionComponent, h } from "preact";
-import { SIZE } from "./logic";
 import classnames from "classnames";
 import { LARGE_CROWN_RADIUS, PIECE_RADIUS } from "./sizing";
+import { SIZE } from "./model";
 
 export enum Color {
   A,
