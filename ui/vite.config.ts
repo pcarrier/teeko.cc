@@ -10,6 +10,7 @@ export default defineConfig({
         name: "TEEKO by John Scarne",
         short_name: "TEEKO",
         theme_color: "#000000",
+        includeAssets: ["icon.svg", "robots.txt"],
         icons: [
           {
             src: "/icon-192x192.png",
