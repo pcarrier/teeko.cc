@@ -5,6 +5,7 @@ import { LocalGame } from "./LocalGame";
 import { client } from "./index";
 import Router from "preact-router";
 import { OnlineGame } from "./OnlineGame";
+import { registerSW } from "virtual:pwa-register";
 
 export const App: FunctionComponent = () => {
   let initial: Board = { ...EmptyBoard };
@@ -30,6 +31,8 @@ export const App: FunctionComponent = () => {
       initial = JSON.parse(stored);
     }
   }
+
+  registerSW();
 
   return (
     <Provider value={client}>

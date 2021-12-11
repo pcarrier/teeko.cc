@@ -5,12 +5,20 @@ import { createClient } from "@urql/preact";
 import { registerSW } from "virtual:pwa-register";
 import { App } from "./App";
 
-registerSW();
+declare global {
+  interface Crypto {
+    randomUUID: () => string;
+  }
+}
 
 const authPrefix = "#auth:";
 if (location.hash.startsWith(authPrefix)) {
   localStorage.setItem("pill", location.hash.substring(authPrefix.length));
   location.hash = "";
+} else {
+  if (!localStorage.getItem("pill")) {
+    localStorage.setItem("pill", crypto.randomUUID());
+  }
 }
 
 export const client = createClient({
@@ -24,3 +32,4 @@ export const client = createClient({
 });
 
 render(<App />, document.body);
+registerSW();
