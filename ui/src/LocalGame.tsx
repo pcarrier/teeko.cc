@@ -7,7 +7,8 @@ import { Help } from "./Help";
 
 export const LocalGame: FunctionComponent<{
   initial: Board;
-}> = ({ initial }: { initial: Board }) => {
+  testing: boolean;
+}> = ({ initial, testing }) => {
   const [board, setBoard] = useState(initial);
   const [showHelp, setShowHelp] = useState(false);
 

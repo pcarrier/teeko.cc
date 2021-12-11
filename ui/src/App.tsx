@@ -35,6 +35,7 @@ export const App: FunctionComponent = () => {
   return (
     <Router>
       <LocalGame initial={initial} default />
+      <LocalGame initial={initial} testing={true} path="/test" />
       <OnlineGame path="/join/:room" />
     </Router>
   );
