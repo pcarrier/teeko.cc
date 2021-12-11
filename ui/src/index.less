@@ -33,8 +33,8 @@ body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: @color;
@@ -145,4 +145,25 @@ button {
 
 .board .piece.dummy {
   pointer-events: none;
+}
+
+.board line.arrow {
+  stroke-width: .1;
+  stroke-linecap: round;
+}
+
+.board line.arrow.A {
+  stroke: shade(@aColor, 50%);
+}
+
+.board line.arrow.B {
+  stroke: shade(@bColor, 50%);
+}
+
+.board #arrowheadA {
+  fill: shade(@aColor, 50%);
+}
+
+.board #arrowheadB {
+  fill: shade(@bColor, 50%);
 }

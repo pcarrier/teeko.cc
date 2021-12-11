@@ -3,12 +3,7 @@ import { Rect } from "./draggable/useRect";
 import { FunctionComponent, h } from "preact";
 import classnames from "classnames";
 import { LARGE_CROWN_RADIUS, PIECE_RADIUS } from "./sizing";
-import { SIZE } from "./model";
-
-export enum Color {
-  A,
-  B,
-}
+import { Player, SIZE } from "./model";
 
 type PieceAttrs = {
   position: number;
@@ -16,7 +11,7 @@ type PieceAttrs = {
   dragStart?: () => void;
   dragMove?: (delta: Position) => void;
   dragEnd?: (newPosition: number) => void;
-  color: Color;
+  player: Player;
   selected?: boolean;
   selectable?: boolean;
   aspect?: Rect | null;
@@ -30,7 +25,7 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
   dragEnd,
   dragStart,
   dragMove,
-  color,
+  player,
   aspect,
   selectable,
   selected,
@@ -72,8 +67,8 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
       cx={limit(x + dxNorm + (offset?.x ?? 0))}
       cy={limit(y + dyNorm + (offset?.y ?? 0))}
       class={classnames("piece", {
-        A: color === Color.A,
-        B: color === Color.B,
+        A: player === Player.A,
+        B: player === Player.B,
         dragging: state.isDragging,
         dummy,
       })}

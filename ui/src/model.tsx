@@ -32,9 +32,9 @@ export function pieces(n: number): Set<number> {
 }
 
 // From north clockwise
-export const DIRECTIONS = [-5, -4, 1, 6, 5, 4, -1, -6];
+export const DIRECTIONS: number[] = [-5, -4, 1, 6, 5, 4, -1, -6];
 
-export const DELTA_TO_DIRECTIONS = {
+export const DELTA_TO_DIRECTIONS: Record<number, number> = {
   [-5]: 0,
   [-4]: 1,
   [1]: 2,
@@ -44,3 +44,19 @@ export const DELTA_TO_DIRECTIONS = {
   [-1]: 6,
   [-6]: 7,
 };
+
+type Delta = {
+  dx: number;
+  dy: number;
+};
+
+export const DIRECTION_TO_DELTAS: Delta[] = [
+  { dx: 0, dy: -1 },
+  { dx: 1, dy: -1 },
+  { dx: 1, dy: 0 },
+  { dx: 1, dy: 1 },
+  { dx: 0, dy: 1 },
+  { dx: -1, dy: 1 },
+  { dx: -1, dy: 0 },
+  { dx: -1, dy: -1 },
+];

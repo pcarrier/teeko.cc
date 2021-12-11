@@ -10,10 +10,24 @@ import {
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
-import { Color, Piece } from "./Piece";
-import { Board, pieces, SIZE, SLOTS } from "./model";
+import { Piece } from "./Piece";
+import {
+  Board,
+  DELTA_TO_DIRECTIONS,
+  DIRECTION_TO_DELTAS,
+  pieces,
+  Player,
+  SIZE,
+  SLOTS,
+} from "./model";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
+
+type BoardArrow = {
+  from: number;
+  to: number;
+  player: Player;
+};
 
 type BoardViewAttrs = {
   board: Board;
@@ -21,7 +35,29 @@ type BoardViewAttrs = {
   move?: (from: number, to: number) => void;
   klass?: string;
   showStatus?: boolean;
+  arrows?: BoardArrow[];
 };
+
+export const BoardBackground = (
+  <>
+    {[0, 1, 2, 3].map((x) =>
+      [0, 1, 2, 3].map((y) => (
+        <>
+          <line x1={x} y1={y} x2={x + 1} y2={y} class="bg" />
+          <line x1={x} y1={y} x2={x} y2={y + 1} class="bg" />
+          <line x1={x} y1={y} x2={x + 1} y2={y + 1} class="bg" />
+          <line x1={x} y1={y + 1} x2={x + 1} y2={y} class="bg" />
+        </>
+      ))
+    )}
+    {[0, 1, 2, 3].map((n) => (
+      <>
+        <line x1={n} y1={4} x2={n + 1} y2={4} class="bg" />
+        <line x1={4} y1={n} x2={4} y2={n + 1} class="bg" />
+      </>
+    ))}
+  </>
+);
 
 export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   board,
@@ -29,6 +65,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   move,
   klass,
   showStatus,
+  arrows,
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
@@ -137,135 +174,159 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         className={classnames("board", klass)}
         ref={svgRef}
       >
-        <g>
-          {[0, 1, 2, 3].map((x) =>
-            [0, 1, 2, 3].map((y) => (
-              <>
-                <line x1={x} y1={y} x2={x + 1} y2={y} class="bg" />
-                <line x1={x} y1={y} x2={x} y2={y + 1} class="bg" />
-                <line x1={x} y1={y} x2={x + 1} y2={y + 1} class="bg" />
-                <line x1={x} y1={y + 1} x2={x + 1} y2={y} class="bg" />
-              </>
-            ))
-          )}
-          {[0, 1, 2, 3].map((n) => (
-            <>
-              <line x1={n} y1={4} x2={n + 1} y2={4} class="bg" />
-              <line x1={4} y1={n} x2={4} y2={n + 1} class="bg" />
-            </>
-          ))}
+        <defs>
+          <marker
+            id="arrowheadA"
+            markerWidth="2"
+            markerHeight="2"
+            refX="1"
+            refY="1"
+            orient="auto"
+          >
+            <polygon points="0 0, 2 1, 0 2" />
+          </marker>
+          <marker
+            id="arrowheadB"
+            markerWidth="2"
+            markerHeight="2"
+            refX="1"
+            refY="1"
+            orient="auto"
+          >
+            <polygon points="0 0, 2 1, 0 2" />
+          </marker>
+        </defs>
 
-          {lastAction === null ? (
-            <></>
-          ) : Array.isArray(lastAction) ? (
+        {BoardBackground}
+        {lastAction === null ? (
+          <></>
+        ) : Array.isArray(lastAction) ? (
+          <line
+            x1={x(lastAction[0])}
+            y1={y(lastAction[0])}
+            x2={x(lastAction[1])}
+            y2={y(lastAction[1])}
+            class={classnames("last", t % 2 === 0 ? "B" : "A")}
+          />
+        ) : (
+          <circle
+            r={LAST_ACTION_RADIUS}
+            cx={lastAction % 5}
+            cy={Math.floor(lastAction / 5)}
+            class={classnames("last", t % 2 === 0 ? "B" : "A")}
+          />
+        )}
+
+        {POS_ARRAY.map((pos) => (
+          <circle r={LINE_MARGIN} cx={x(pos)} cy={y(pos)} />
+        ))}
+
+        {selected ? (
+          <circle
+            key="selected"
+            r={LARGE_CROWN_RADIUS}
+            cx={x(selected)}
+            cy={y(selected)}
+            class="selected"
+          />
+        ) : (
+          <></>
+        )}
+
+        {POS_ARRAY.map((pos) => (
+          <circle
+            key={`bg${pos}`}
+            r={SLOT_RADIUS}
+            cx={x(pos)}
+            cy={y(pos)}
+            class={classnames(
+              "bg",
+              releasePos === pos
+                ? "release"
+                : (dropping || selected !== undefined) && validTargets.has(pos)
+                ? "target"
+                : undefined,
+              t % 2 === 0 ? "A" : "B"
+            )}
+          />
+        ))}
+
+        {arrows?.map(({ from, to, player }) => {
+          const deltas = DIRECTION_TO_DELTAS[DELTA_TO_DIRECTIONS[to - from]];
+          const x1 = x(from);
+          const y1 = y(from);
+          return (
             <line
-              x1={x(lastAction[0])}
-              y1={y(lastAction[0])}
-              x2={x(lastAction[1])}
-              y2={y(lastAction[1])}
-              class={classnames("last", t % 2 === 0 ? "B" : "A")}
+              marker-end={`url(#arrowhead${player === Player.A ? "A" : "B"})`}
+              x1={x1}
+              y1={y1}
+              x2={x1 + deltas.dx * 0.8}
+              y2={y1 + deltas.dy * 0.8}
+              class={classnames("arrow", {
+                A: player === Player.A,
+                B: player === Player.B,
+              })}
             />
-          ) : (
-            <circle
-              r={LAST_ACTION_RADIUS}
-              cx={lastAction % 5}
-              cy={Math.floor(lastAction / 5)}
-              class={classnames("last", t % 2 === 0 ? "B" : "A")}
-            />
-          )}
+          );
+        })}
 
-          {POS_ARRAY.map((pos) => (
-            <circle r={LINE_MARGIN} cx={x(pos)} cy={y(pos)} />
-          ))}
-
-          {selected ? (
+        {!dropping &&
+          selected === undefined &&
+          [...validTargets].map((pos) => (
             <circle
-              key="selected"
+              key={`target${pos}`}
               r={LARGE_CROWN_RADIUS}
-              cx={x(selected)}
-              cy={y(selected)}
-              class="selected"
-            />
-          ) : (
-            <></>
-          )}
-
-          {POS_ARRAY.map((pos) => (
-            <circle
-              key={`bg${pos}`}
-              r={SLOT_RADIUS}
               cx={x(pos)}
               cy={y(pos)}
-              class={classnames(
-                "bg",
-                releasePos === pos
-                  ? "release"
-                  : (dropping || selected !== undefined) &&
-                    validTargets.has(pos)
-                  ? "target"
-                  : undefined,
-                t % 2 === 0 ? "A" : "B"
-              )}
+              class={classnames("target", t % 2 === 0 ? "A" : "B")}
             />
           ))}
 
-          {!dropping &&
-            selected === undefined &&
-            [...validTargets].map((pos) => (
-              <circle
-                key={`target${pos}`}
-                r={LARGE_CROWN_RADIUS}
-                cx={x(pos)}
-                cy={y(pos)}
-                class={classnames("target", t % 2 === 0 ? "A" : "B")}
-              />
-            ))}
+        {POS_ARRAY.map((pos) => (
+          <circle
+            key={pos}
+            r={PIECE_RADIUS}
+            cx={x(pos)}
+            cy={y(pos)}
+            fill="#00000000" // invisible
+            onClick={() => click(pos)}
+          />
+        ))}
 
-          {POS_ARRAY.map((pos) => (
-            <circle
-              key={pos}
-              r={PIECE_RADIUS}
-              cx={x(pos)}
-              cy={y(pos)}
-              fill="#00000000" // invisible
-              onClick={() => click(pos)}
-            />
-          ))}
-
-          {[...aPieces, ...bPieces].map((pos) => {
-            return (
-              <Piece
-                key={`piece${pos}`}
-                position={pos}
-                aspect={aspect}
-                dragStart={() => {
-                  setSelected(pos);
-                }}
-                dragMove={({ x, y }) => {
-                  setDragState({ x, y });
-                }}
-                dragEnd={(position) => {
-                  setDragState(undefined);
-                  if (neighborsOfSelected.has(position)) click(position);
-                  else setSelected(undefined);
-                }}
-                color={aPieces.has(pos) ? Color.A : Color.B}
-                selected={selected === pos}
-                selectable={validTargets.has(pos)}
-                click={() => click(pos)}
-              />
-            );
-          })}
-          {dragState && selected !== undefined && (
+        {[...aPieces, ...bPieces].map((pos) => {
+          return (
             <Piece
-              dummy
-              key="dummy"
-              color={t % 2 === 0 ? Color.A : Color.B}
-              position={selected}
-              offset={{ x: dragState.x, y: dragState.y }}
+              key={`piece${pos}`}
+              position={pos}
+              aspect={aspect}
+              dragStart={() => {
+                setSelected(pos);
+              }}
+              dragMove={({ x, y }) => {
+                setDragState({ x, y });
+              }}
+              dragEnd={(position) => {
+                setDragState(undefined);
+                if (neighborsOfSelected.has(position)) click(position);
+                else setSelected(undefined);
+              }}
+              player={aPieces.has(pos) ? Player.A : Player.B}
+              selected={selected === pos}
+              selectable={validTargets.has(pos)}
+              click={() => click(pos)}
             />
-          )}
-        </g>
+          );
+        })}
+
+        {dragState && selected !== undefined && (
+          <Piece
+            dummy
+            key="dummy"
+            player={t % 2 === 0 ? Player.A : Player.B}
+            position={selected}
+            offset={{ x: dragState.x, y: dragState.y }}
+          />
+        )}
       </svg>
       {status}
     </>
