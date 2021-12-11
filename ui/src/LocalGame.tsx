@@ -31,7 +31,7 @@ export const LocalGame: FunctionComponent<{
     } else {
       b = result;
     }
-    moveToBoard({ a, b, t: (t + 1) % 2, p, l: [from, to] });
+    moveToBoard({ a, b, t: t + 1, p, l: [from, to] });
   }
 
   function drop(pos: number) {
@@ -43,7 +43,7 @@ export const LocalGame: FunctionComponent<{
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    moveToBoard({ a, b, t: (t + 1) % 2, p, l: pos });
+    moveToBoard({ a, b, t: t + 1, p, l: pos });
   }
 
   function undo() {
