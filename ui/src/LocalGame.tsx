@@ -20,9 +20,9 @@ export const LocalGame: FunctionComponent<{
   }
 
   function move(from: number, to: number) {
-    let { a, b } = board;
-    const { t, p } = board;
+    let { a, b, t, p } = board;
     const isA = t % 2 === 0;
+    t = t + 1;
 
     const target = isA ? a : b;
     const result = (target & ~(1 << from)) | (1 << to);
@@ -31,19 +31,19 @@ export const LocalGame: FunctionComponent<{
     } else {
       b = result;
     }
-    moveToBoard({ a, b, t: t + 1, p, l: [from, to] });
+    moveToBoard({ a, b, t, p, l: [from, to] });
   }
 
   function drop(pos: number) {
-    let { a, b } = board;
-    const { t, p } = board;
+    let { a, b, t, p } = board;
     const isA = t % 2 === 0;
+    t = t + 1;
 
     const target = isA ? a : b;
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
-    moveToBoard({ a, b, t: t + 1, p, l: pos });
+    moveToBoard({ a, b, t, p, l: pos });
   }
 
   function undo() {
