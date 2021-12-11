@@ -14,7 +14,7 @@ export const LocalGame: FunctionComponent<{
 
   function moveToBoard(board: Board) {
     location.replace(
-      `#${JSON.stringify([board.a, board.b, board.t, board.l])}`
+      `#${encodeURI(JSON.stringify([board.a, board.b, board.t, board.l]))}`
     );
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);

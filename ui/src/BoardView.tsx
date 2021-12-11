@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { FunctionComponent } from "preact";
+import { FunctionComponent, h } from "preact";
 import { useRef, useState } from "preact/hooks";
 
 import { Rect, useRect } from "./draggable/useRect";

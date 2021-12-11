@@ -1,4 +1,4 @@
-import { FunctionComponent } from "preact";
+import { FunctionComponent, h } from "preact";
 
 export const OnlineGame: FunctionComponent<{
   room: string;

@@ -9,7 +9,7 @@ export const App: FunctionComponent = () => {
   let initial: Board = { ...EmptyBoard };
   let foundBoardInURL = false;
 
-  if (location.hash.startsWith("#[")) {
+  if (location.hash.startsWith("#%5B")) {
     try {
       const [a, b, t, l] = JSON.parse(decodeURI(location.hash.substring(1)));
       initial = { a, b, t, l, p: true };
@@ -34,9 +34,9 @@ export const App: FunctionComponent = () => {
 
   return (
     <Router>
-      <LocalGame initial={initial} default />
-      <LocalGame initial={initial} testing={true} path="/test" />
       <OnlineGame path="/join/:room" />
+      <LocalGame initial={initial} testing={true} path="/test" />
+      <LocalGame initial={initial} default />
     </Router>
   );
 };
