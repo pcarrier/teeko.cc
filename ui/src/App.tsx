@@ -2,6 +2,7 @@ import "./index.less";
 import { FunctionComponent, h, render } from "preact";
 import { EmptyBoard } from "./model";
 import { LocalGame } from "./LocalGame";
+import { registerSW } from "virtual:pwa-register";
 
 const App: FunctionComponent = () => {
   const initial = { ...EmptyBoard };
@@ -31,4 +32,5 @@ const App: FunctionComponent = () => {
   );
 };
 
+registerSW();
 render(<App />, document.body);
