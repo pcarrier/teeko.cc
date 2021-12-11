@@ -1,16 +1,9 @@
-import { FunctionComponent, h } from "preact";
-import { useRef, useState } from "preact/hooks";
-import { NEIGHS_BY_POSITION, WINNING_POSITIONS, x, y } from "./logic";
-import { Rect, useRect } from "./draggable/useRect";
 import classnames from "classnames";
-import {
-  LARGE_CROWN_RADIUS,
-  LAST_ACTION_RADIUS,
-  LINE_MARGIN,
-  PIECE_RADIUS,
-  SLOT_RADIUS,
-} from "./sizing";
-import { Piece } from "./Piece";
+import { FunctionComponent } from "preact";
+import { useRef, useState } from "preact/hooks";
+
+import { Rect, useRect } from "./draggable/useRect";
+
 import {
   Board,
   DELTA_TO_DIRECTIONS,
@@ -20,6 +13,15 @@ import {
   SIZE,
   SLOTS,
 } from "./model";
+import { NEIGHS_BY_POSITION, WINNING_POSITIONS, x, y } from "./logic";
+import {
+  LARGE_CROWN_RADIUS,
+  LAST_ACTION_RADIUS,
+  LINE_MARGIN,
+  PIECE_RADIUS,
+  SLOT_RADIUS,
+} from "./sizing";
+import { Piece } from "./Piece";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
 

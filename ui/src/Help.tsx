@@ -1,4 +1,5 @@
 import { FunctionComponent, h } from "preact";
+
 import { BoardView } from "./BoardView";
 import { EmptyBoard, Player } from "./model";
 

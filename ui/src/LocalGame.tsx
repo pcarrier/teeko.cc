@@ -1,6 +1,7 @@
 import { FunctionComponent, h } from "preact";
-import { Board, EmptyBoard } from "./model";
 import { useState } from "preact/hooks";
+
+import { Board, EmptyBoard } from "./model";
 import { BoardView } from "./BoardView";
 import { Help } from "./Help";
 
@@ -14,6 +15,7 @@ export const LocalGame: FunctionComponent<{
     location.replace(
       `#${JSON.stringify([board.a, board.b, board.t, board.l])}`
     );
+    localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
   }
 

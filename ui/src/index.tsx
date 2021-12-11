@@ -1,11 +1,15 @@
 import "./index.less";
-import { FunctionComponent, h, render } from "preact";
-import { EmptyBoard } from "./model";
-import { LocalGame } from "./LocalGame";
+
+import { FunctionComponent, render } from "preact";
 import { registerSW } from "virtual:pwa-register";
 
+import { Board, EmptyBoard } from "./model";
+import { LocalGame } from "./LocalGame";
+
 const App: FunctionComponent = () => {
-  const initial = { ...EmptyBoard };
+  let initial: Board = { ...EmptyBoard };
+  let found = false;
+
   const hash = location.hash;
   if (hash.length > 1) {
     const authPrefix = "#auth:";
@@ -15,13 +19,22 @@ const App: FunctionComponent = () => {
     } else {
       try {
         const [a, b, t, l] = JSON.parse(decodeURI(hash.substring(1)));
+        initial = { a, b, t, l, p: true };
         initial.a = a;
         initial.b = b;
         initial.t = t;
         initial.l = l;
+        found = true;
       } catch (_) {
         console.log("Invalid URL parameters");
       }
+    }
+  }
+
+  if (!found) {
+    const stored = localStorage.getItem("board");
+    if (stored) {
+      initial = JSON.parse(stored);
     }
   }
 
