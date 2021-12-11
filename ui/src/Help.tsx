@@ -11,7 +11,7 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       once all are placed, they move one at a time to an empty neighbor:
     </p>
     <BoardView
-      board={{ ...EmptyBoard, a: 143424, b: 329856, p: false }}
+      board={{ ...EmptyBoard, a: 143424, b: 329856, p: false, t: 0 }}
       klass="half"
       arrows={[
         { from: 6, to: 0, player: Player.A },
@@ -28,7 +28,7 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       ]}
     />
     <BoardView
-      board={{ ...EmptyBoard, a: 143424, b: 329856, p: false }}
+      board={{ ...EmptyBoard, a: 143424, b: 329856, p: false, t: 1 }}
       klass="half"
       arrows={[
         { from: 7, to: 1, player: Player.B },
