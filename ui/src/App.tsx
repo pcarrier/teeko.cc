@@ -4,6 +4,7 @@ import { LocalGame } from "./LocalGame";
 import Router from "preact-router";
 import { OnlineGame } from "./OnlineGame";
 import { registerSW } from "virtual:pwa-register";
+import { setHash } from "./index";
 
 export const App: FunctionComponent = () => {
   let initial: Board = { ...EmptyBoard };
@@ -27,6 +28,7 @@ export const App: FunctionComponent = () => {
     const stored = localStorage.getItem("board");
     if (stored) {
       initial = JSON.parse(stored);
+      setHash(initial);
     }
   }
 

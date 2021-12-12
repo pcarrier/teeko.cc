@@ -4,6 +4,7 @@ import { useState } from "preact/hooks";
 import { Board, EmptyBoard } from "./model";
 import { BoardView } from "./BoardView";
 import { Help } from "./Help";
+import { setHash } from "./index";
 
 export const LocalGame: FunctionComponent<{
   initial: Board;
@@ -13,9 +14,7 @@ export const LocalGame: FunctionComponent<{
   const [showHelp, setShowHelp] = useState(false);
 
   function moveToBoard(board: Board) {
-    location.replace(
-      `#${encodeURI(JSON.stringify([board.a, board.b, board.t, board.l]))}`
-    );
+    setHash(board);
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
   }
