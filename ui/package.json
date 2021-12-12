@@ -5,7 +5,8 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "tsc && eslint . && prettier -c ."
+    "lint": "tsc && eslint . && prettier -c .",
+    "lint:fix": "prettier -w ."
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.1.5",

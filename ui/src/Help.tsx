@@ -44,6 +44,7 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
         { from: 16, to: 20, player: Player.B },
         { from: 16, to: 21, player: Player.B },
         { from: 16, to: 22, player: Player.B },
+        { from: 18, to: 14, player: Player.B },
         { from: 18, to: 19, player: Player.B },
         { from: 18, to: 22, player: Player.B },
         { from: 18, to: 23, player: Player.B },

@@ -48,10 +48,10 @@ export const LocalGame: FunctionComponent<{
   }
 
   function undo() {
-    let { a, b } = board;
-    const { t, p } = board;
+    let { a, b, t, p } = board;
     const last = board.l;
     if (last === null) return;
+    t = t - 1;
     const wasA = board.t % 2 === 1;
     const target = wasA ? a : b;
     if (Array.isArray(last)) {
@@ -59,12 +59,12 @@ export const LocalGame: FunctionComponent<{
       const result = (target & ~(1 << from)) | (1 << to);
       if (wasA) a = result;
       else b = result;
-      moveToBoard({ a, b, t: t - 1, p, l: null });
+      moveToBoard({ a, b, t: t, p, l: null });
     } else {
       const result = target & ~(1 << last);
       if (wasA) a = result;
       else b = result;
-      moveToBoard({ a, b, t: t - 1, p, l: null });
+      moveToBoard({ a, b, t: t, p, l: null });
     }
   }
 
