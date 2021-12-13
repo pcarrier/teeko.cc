@@ -1,12 +1,14 @@
-import { FunctionComponent } from "preact";
+import { FunctionComponent, h } from "preact";
 import { Board, EmptyBoard } from "./model";
 import { LocalGame } from "./LocalGame";
 import Router from "preact-router";
 import { OnlineGame } from "./OnlineGame";
-import { registerSW } from "virtual:pwa-register";
 import { setHash } from "./index";
+import { useRegisterSW } from "virtual:pwa-register/preact";
 
 export const App: FunctionComponent = () => {
+  const { needRefresh, updateServiceWorker } = useRegisterSW();
+
   let initial: Board = { ...EmptyBoard };
   let foundBoardInURL = false;
 
@@ -32,13 +34,21 @@ export const App: FunctionComponent = () => {
     }
   }
 
-  registerSW();
-
   return (
-    <Router>
-      <OnlineGame path="/join/:room" />
-      <LocalGame initial={initial} testing={true} path="/test" />
-      <LocalGame initial={initial} default />
-    </Router>
+    <>
+      {needRefresh ? (
+        <p>
+          New version available;{" "}
+          <a onClick={() => updateServiceWorker(true)}>reload</a>.
+        </p>
+      ) : (
+        <></>
+      )}
+      <Router>
+        <OnlineGame path="/join/:room" />
+        <LocalGame initial={initial} testing={true} path="/test" />
+        <LocalGame initial={initial} default />
+      </Router>
+    </>
   );
 };

@@ -5,7 +5,7 @@ import { EmptyBoard, Player } from "./model";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
-    <p>Each player has 4 pieces.</p>
+    <p>Each player has 4 pieces. Blue starts.</p>
     <p>
       First drop one piece at a time on an empty slot;
       <br />

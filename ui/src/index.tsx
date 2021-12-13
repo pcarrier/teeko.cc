@@ -2,7 +2,6 @@ import "./index.less";
 
 import { render } from "preact";
 import { v4 } from "uuid";
-import { registerSW } from "virtual:pwa-register";
 import { App } from "./App";
 import { Board } from "./model";
 
