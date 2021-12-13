@@ -87,7 +87,7 @@ export const LocalGame: FunctionComponent<{
         )}
         <button onClick={() => setShowHelp(true)}>Help</button>
       </p>
-      <h1>TEEKO by John Scarne</h1>
+      <h1>Teeko by John Scarne</h1>
     </>
   );
 };

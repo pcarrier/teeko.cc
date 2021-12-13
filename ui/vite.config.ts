@@ -7,8 +7,8 @@ export default defineConfig({
     preact(),
     VitePWA({
       manifest: {
-        name: "TEEKO by John Scarne",
-        short_name: "TEEKO",
+        name: "Teeko by John Scarne",
+        short_name: "Teeko",
         theme_color: "#000000",
         includeAssets: ["icon.svg", "robots.txt"],
         icons: [
