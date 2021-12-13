@@ -71,6 +71,7 @@ export const LocalGame: FunctionComponent<{
 
   return (
     <>
+      {testing ? <p class="banner">Test mode</p> : <></>}
       <BoardView
         board={board}
         drop={drop}

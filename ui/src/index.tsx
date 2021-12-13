@@ -22,4 +22,3 @@ export function setHash(board: Board) {
 }
 
 render(<App />, document.body);
-registerSW();
