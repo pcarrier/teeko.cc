@@ -15,6 +15,7 @@
 
 a,
 a:visited {
+  cursor: pointer;
   color: @link;
   text-decoration: none;
 }
@@ -57,9 +58,10 @@ button {
   font-size: 100%;
   background-color: @bg;
   color: @strong;
-  border: 1px solid @boardColor;
-  border-radius: 4px;
-  padding: 1em;
+  border: none;
+  border-bottom: 1px solid @boardColor;
+  border-radius: .25em;
+  padding: 0.5em 1em;
   margin: 0.5em;
 
   &:hover {
@@ -167,4 +169,8 @@ button {
 
 .board #arrowheadB {
   fill: shade(@bColor, 50%);
+}
+
+p.banner {
+  background-color: #400;
 }

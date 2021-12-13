@@ -7,7 +7,14 @@ import { setHash } from "./index";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 
 export const App: FunctionComponent = () => {
-  const { needRefresh, updateServiceWorker } = useRegisterSW();
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) {
+      r && setInterval(() => r.update(), 60 * 1000);
+    },
+  });
 
   let initial: Board = { ...EmptyBoard };
   let foundBoardInURL = false;
@@ -37,9 +44,17 @@ export const App: FunctionComponent = () => {
   return (
     <>
       {needRefresh ? (
-        <p>
+        <p class="banner">
           New version available;{" "}
-          <a onClick={() => updateServiceWorker(true)}>reload</a>.
+          <a
+            onClick={async () => {
+              await updateServiceWorker(true);
+              setNeedRefresh(false);
+            }}
+          >
+            reload
+          </a>
+          .
         </p>
       ) : (
         <></>

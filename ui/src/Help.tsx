@@ -5,7 +5,7 @@ import { EmptyBoard, Player } from "./model";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
-    <p>Each player has 4 pieces. Blue starts.</p>
+    <p>Each player has 4 pieces. Blue opens.</p>
     <p>
       First drop one piece at a time on an empty slot;
       <br />
@@ -55,9 +55,9 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
     <BoardView board={{ ...EmptyBoard, a: 2236928, p: false }} klass="half" />
     <BoardView board={{ ...EmptyBoard, b: 6336, p: false }} klass="half" />
     <p>
-      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
-      <a href="https://pcarrier.com/teeko">archives</a>
+      <a href="https://pcarrier.com/teeko">archives</a>,{" "}
+      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>
     </p>
     <p>
       <button onClick={close}>Play</button>
