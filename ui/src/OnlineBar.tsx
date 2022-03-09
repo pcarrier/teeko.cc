@@ -16,7 +16,7 @@ export const OnlineBar: FunctionComponent<{
 
   return (
     <div class="onlineBar">
-      <div class="title">{title}</div>
+      <h1>{title}</h1>
       <div class="buttons">
         {
           isJoining ? <>
