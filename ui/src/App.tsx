@@ -6,8 +6,10 @@ import { useState } from "preact/hooks";
 import { historyPush, setHash } from "./utils.ts";
 import { OnlineBar } from "./OnlineBar.tsx";
 import { useEvent } from "./useEvent.ts";
+import { Help } from "./Help.tsx";
 
 export const App: FunctionComponent = () => {
+  const [showHelp, setShowHelp] = useState(false);
   const [wsPath, setWsPath] = useState(undefined);
 
   const {
@@ -57,6 +59,8 @@ export const App: FunctionComponent = () => {
     updateWsPath();
   }
 
+  if (showHelp) return <Help close={() => setShowHelp(false)} />;
+
   return (
     <>
       {needRefresh ? (
@@ -74,7 +78,7 @@ export const App: FunctionComponent = () => {
       ) : (
         <OnlineBar wsPath={wsPath} jump={jump} />
       )}
-      <Game initial={initial} wsPath={wsPath} />
+      <Game initial={initial} wsPath={wsPath} showHelp={() => setShowHelp(true)} />
     </>
   );
 };

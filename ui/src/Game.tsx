@@ -4,16 +4,15 @@ import Sockette from "sockette";
 
 import { Board, EmptyBoard } from "./model";
 import { BoardView } from "./BoardView";
-import { Help } from "./Help";
 import { setHash } from "./utils.ts";
 
 export const Game: FunctionComponent<{
   initial: Board;
   wsPath?: string;
-}> = ({ initial, wsPath }) => {
+  showHelp: () => void;
+}> = ({ initial, wsPath, showHelp }) => {
 
   const [board, setBoard] = useState(initial);
-  const [showHelp, setShowHelp] = useState(false);
   const [ws, setWs] = useState<Sockette>(undefined);
 
   useEffect(() => {
@@ -92,8 +91,6 @@ export const Game: FunctionComponent<{
     }
   }
 
-  if (showHelp) return <Help close={() => setShowHelp(false)} />;
-
   return (
     <>
       <BoardView
@@ -110,7 +107,7 @@ export const Game: FunctionComponent<{
         ) : (
           <></>
         )}
-      <button onClick={() => setShowHelp(true)}>Rules</button>
+        <button onClick={showHelp}>Rules</button>
       </p>
       <h1>Teeko by John Scarne</h1>
     </>
