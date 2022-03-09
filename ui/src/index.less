@@ -195,12 +195,15 @@ p.banner button {
 }
 
 .onlineBar .title {
-  text-align: left;
   flex-grow: 1;
+  text-align: left;
   font-size: 1.5em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .onlineBar .buttons {
+  flex-shrink: 0;
   text-align: right;
-  flex-grow: 1;
 }
