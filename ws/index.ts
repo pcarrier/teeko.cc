@@ -82,7 +82,7 @@ function handleClose(ctx: Context, evt: CloseEvent) {
   const room = getRoom(ctx);
   room.clients = room.clients.filter((c) => c !== ctx.socket);
   if (room.clients.length === 0)
-    room.timeout = setTimeout(() => closeRoom(room), 10_000);
+    room.timeout = setTimeout(() => closeRoom(room), 600_000);
 }
 
 async function main() {
