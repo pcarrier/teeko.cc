@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "preact/hooks";
-import { useStateRef } from "./useStateRef";
+import { useStateRef } from "./useStateRef.ts";
 import { RefObject } from "preact";
-import { useEvent } from "./useEvent";
-import { useTimer } from "./useTimer";
-import { useDebounced } from "./useDebounced";
+import { useEvent } from "./useEvent.ts";
+import { useTimer } from "./useTimer.ts";
+import { useDebounced } from "./useDebounced.ts";
 
 export type Rect = {
   x: number;

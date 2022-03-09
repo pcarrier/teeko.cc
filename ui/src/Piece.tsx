@@ -1,5 +1,5 @@
-import { Position, useDraggable } from "./draggable/useDraggable";
-import { Rect } from "./draggable/useRect";
+import { Position, useDraggable } from "./useDraggable.ts";
+import { Rect } from "./useRect.ts";
 import { FunctionComponent, h } from "preact";
 import classnames from "classnames";
 import { LARGE_CROWN_RADIUS, PIECE_RADIUS } from "./sizing";

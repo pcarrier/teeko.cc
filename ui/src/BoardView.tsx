@@ -2,7 +2,7 @@ import classnames from "classnames";
 import { FunctionComponent, h } from "preact";
 import { useRef, useState } from "preact/hooks";
 
-import { Rect, useRect } from "./draggable/useRect";
+import { Rect, useRect } from "./useRect.ts";
 
 import {
   Board,

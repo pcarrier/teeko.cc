@@ -3,10 +3,10 @@ import { Board, EmptyBoard } from "./model";
 import { Game } from "./Game";
 import { setHash } from "./index";
 import { useRegisterSW } from "virtual:pwa-register/preact";
-import { useRef, useState } from "preact/hooks";
-import { historyPush, useEvent } from "./utils.ts";
+import { useState } from "preact/hooks";
+import { historyPush } from "./utils.ts";
 import { OnlineBar } from "./OnlineBar.tsx";
-import Sockette from "sockette";
+import { useEvent } from "./useEvent.ts";
 
 export const App: FunctionComponent = () => {
   const [wsPath, setWsPath] = useState(undefined);
@@ -48,12 +48,13 @@ export const App: FunctionComponent = () => {
   function updateWsPath() {
     setWsPath(window.location.pathname.length < 2 ? undefined : window.location.pathname.substring(1));
   }
+
   updateWsPath();
 
   useEvent("popstate", updateWsPath);
 
   function jump(location: string | undefined) {
-    historyPush(location ? `/${location}` : '/');
+    historyPush(location ? `/${location}` : "/");
     updateWsPath();
   }
 
