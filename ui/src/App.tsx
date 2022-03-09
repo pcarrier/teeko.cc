@@ -78,7 +78,7 @@ export const App: FunctionComponent = () => {
       ) : (
         <OnlineBar wsPath={wsPath} jump={jump} />
       )}
-      <Game initial={initial} wsPath={wsPath} showHelp={() => setShowHelp(true)} />
+      <Game initial={initial} roomPath={wsPath} showHelp={() => setShowHelp(true)} />
     </>
   );
 };

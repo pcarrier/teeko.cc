@@ -8,16 +8,16 @@ import { setHash } from "./utils.ts";
 
 export const Game: FunctionComponent<{
   initial: Board;
-  wsPath?: string;
+  roomPath?: string;
   showHelp: () => void;
-}> = ({ initial, wsPath, showHelp }) => {
+}> = ({ initial, roomPath, showHelp }) => {
 
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette>(undefined);
 
   useEffect(() => {
-    if (wsPath) {
-      setWs(new Sockette(`wss://ws.teeko.cc/${wsPath}`, {
+    if (roomPath) {
+      setWs(new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
         onmessage: (msg) => {
           const evt = JSON.parse(msg.data);
           if (evt.state === null) {
@@ -32,7 +32,7 @@ export const Game: FunctionComponent<{
         ws.close();
       };
     }
-  }, [wsPath]);
+  }, [roomPath]);
 
   function moveToBoard(board: Board, propagate = true) {
     setHash(board);

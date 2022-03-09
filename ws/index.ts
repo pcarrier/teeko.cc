@@ -1,7 +1,7 @@
 type RoomState = unknown;
 
 interface Room {
-  url: string;
+  path: string;
   clients: WebSocket[];
   state: RoomState;
   timeout?: number;
@@ -17,23 +17,23 @@ const serverState: Server = {
 
 interface Context {
   socket: WebSocket;
-  roomURL: string;
+  roomPath: string;
 }
 
 function getRoom(ctx: Context): Room {
-  const url = ctx.roomURL;
-  const existing = serverState.rooms.get(url);
+  const path = ctx.roomPath;
+  const existing = serverState.rooms.get(path);
   if (existing) {
     existing.clients.push(ctx.socket);
     return existing;
   }
   const created: Room = {
-    url,
+    path,
     clients: [ctx.socket],
     state: null
   };
-  serverState.rooms.set(url, created);
-  console.log(`Opened room ${url}`);
+  serverState.rooms.set(path, created);
+  console.log(`Opened room ${path}`);
   return created;
 }
 
@@ -49,8 +49,8 @@ function setState(room: Room, state: RoomState, from: WebSocket) {
 }
 
 function closeRoom(room: Room) {
-  serverState.rooms.delete(room.url);
-  console.log(`Closed room ${room.url}`);
+  serverState.rooms.delete(room.path);
+  console.log(`Closed room ${room.path}`);
 }
 
 function handleConnected(ctx: Context) {
@@ -85,6 +85,8 @@ function handleClose(ctx: Context, evt: CloseEvent) {
     room.timeout = setTimeout(() => closeRoom(room), 600_000);
 }
 
+const roomPrefix = '/room/';
+
 async function main() {
   for await (const conn of Deno.listen({ port: 8081 })) {
     const httpConn = Deno.serveHttp(conn);
@@ -92,14 +94,22 @@ async function main() {
       if (evt.request.headers.get("upgrade") != "websocket") {
         await evt.respondWith(new Response(null, { status: 501 }));
       } else {
-        const roomURL = evt.request.url;
-        const { socket, response } = Deno.upgradeWebSocket(evt.request);
-        const ctx: Context = { socket, roomURL };
-        socket.onopen = () => handleConnected(ctx);
-        socket.onmessage = (m) => handleMessage(ctx, m.data);
-        socket.onclose = (e) => handleClose(ctx, e);
-        socket.onerror = (e) => handleError(ctx, e);
-        await evt.respondWith(response);
+        const url = new URL(evt.request.url);
+        const path = url.pathname;
+
+        if (path.startsWith(roomPrefix)) {
+          const { socket, response } = Deno.upgradeWebSocket(evt.request);
+
+          const ctx: Context = { socket, roomPath: path.substring(roomPrefix.length) };
+          socket.onopen = () => handleConnected(ctx);
+          socket.onmessage = (m) => handleMessage(ctx, m.data);
+          socket.onclose = (e) => handleClose(ctx, e);
+          socket.onerror = (e) => handleError(ctx, e);
+
+          await evt.respondWith(response);
+        } else {
+          await evt.respondWith(new Response(null, { status: 404 }));
+        }
       }
     }
   }
