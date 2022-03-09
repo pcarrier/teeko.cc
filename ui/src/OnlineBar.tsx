@@ -43,7 +43,7 @@ export const OnlineBar: FunctionComponent<{
                     });
                   else {
                     navigator.clipboard.writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
-                      .then(() => window.alert("Invite in clipboard"));
+                      .then(() => window.alert("Invite in clipboard."));
                   }
                 }}>Invite
                 </button>
