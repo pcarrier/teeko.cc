@@ -1,4 +1,4 @@
-import { useState, useRef, MutableRef, StateUpdater } from "preact/hooks";
+import { MutableRef, StateUpdater, useRef, useState } from "preact/hooks";
 
 export function useStateRef<T>(init: T): [MutableRef<T>, StateUpdater<T>] {
   const [v, setter] = useState<T>(init);

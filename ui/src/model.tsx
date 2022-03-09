@@ -60,9 +60,3 @@ export const DIRECTION_TO_DELTAS: Delta[] = [
   { dx: -1, dy: 0 },
   { dx: -1, dy: -1 },
 ];
-
-export enum OnlineState {
-  OFFLINE,
-  RECONNECTING,
-  ONLINE,
-}

@@ -100,6 +100,7 @@ export function useDraggable(opts?: DraggableOptions): Draggable {
       }));
     }
   }
+
   function onPointerMove(e: PointerEvent) {
     const { x0, y0, isDragging: wasDragging, isPointerDown } = state.current;
     if (!isPointerDown) return;
@@ -118,6 +119,7 @@ export function useDraggable(opts?: DraggableOptions): Draggable {
     }
     setState((s) => ({ ...s, dx, dy, isDragging }));
   }
+
   function onPointerCancel(e: PointerEvent) {
     const { target, pointerId } = e;
     (target as Element).releasePointerCapture(pointerId);
@@ -139,6 +141,7 @@ export function useDraggable(opts?: DraggableOptions): Draggable {
       y0: 0,
     }));
   }
+
   function onPointerUp(e: PointerEvent) {
     const { target } = e;
     (target as Element).releasePointerCapture(e.pointerId);
@@ -171,6 +174,7 @@ export function useDraggable(opts?: DraggableOptions): Draggable {
       py: py + dy,
     }));
   }
+
   function onClick(e: Event) {
     const { onClick } = { ...opts };
     const { suppressClick } = privateState.current;

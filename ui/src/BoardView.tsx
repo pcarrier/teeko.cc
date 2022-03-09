@@ -70,6 +70,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   arrows,
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
+  const [dragTurn, setDragTurn] = useState<number | undefined>(undefined);
 
   const { a, b, t, p } = board;
   const aPieces = pieces(a);
@@ -159,7 +160,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   >(undefined);
 
   const dragPos =
-    selected !== undefined && dragState !== undefined
+    selected !== undefined && dragState !== undefined && dragTurn === t
       ? Math.round(dragState.x + (selected % SIZE)) +
         SIZE * Math.round(Math.floor(selected / SIZE) + dragState.y)
       : undefined;
@@ -303,13 +304,15 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
               aspect={aspect}
               dragStart={() => {
                 setSelected(pos);
+                setDragTurn(t);
               }}
               dragMove={({ x, y }) => {
-                setDragState({ x, y });
+                if (t === dragTurn) setDragState({ x, y });
               }}
               dragEnd={(position) => {
                 setDragState(undefined);
-                if (neighborsOfSelected.has(position)) click(position);
+                if (t === dragTurn && neighborsOfSelected.has(position))
+                  click(position);
                 else setSelected(undefined);
               }}
               player={aPieces.has(pos) ? Player.A : Player.B}
@@ -320,7 +323,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           );
         })}
 
-        {dragState && selected !== undefined && (
+        {dragState && dragTurn === t && (
           <Piece
             dummy
             key="dummy"

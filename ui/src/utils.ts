@@ -1,7 +1,7 @@
 import { Board } from "./model.tsx";
 
 export function historyPush(path) {
-  history.pushState({}, null, path)
+  history.pushState({}, null, path);
 }
 
 export function setHash(board: Board) {

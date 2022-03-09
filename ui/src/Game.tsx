@@ -3,31 +3,33 @@ import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
 import { Board, EmptyBoard } from "./model";
-import { BoardView } from "./BoardView";
 import { setHash } from "./utils.ts";
+
+import { BoardView } from "./BoardView";
 
 export const Game: FunctionComponent<{
   initial: Board;
   roomPath?: string;
   showHelp: () => void;
 }> = ({ initial, roomPath, showHelp }) => {
-
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette>(undefined);
 
   useEffect(() => {
     if (roomPath) {
-      setWs(new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
-        onmessage: (msg) => {
-          const evt = JSON.parse(msg.data);
-          if (evt.state === null) {
-            ws.send(JSON.stringify({ state: { board } }));
-          }
-          if (evt.state?.board) {
-            moveToBoard(evt.state.board, false);
-          }
-        }
-      }));
+      setWs(
+        new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
+          onmessage: (msg) => {
+            const evt = JSON.parse(msg.data);
+            if (evt.state === null) {
+              ws?.send(JSON.stringify({ state: { board } }));
+            }
+            if (evt.state?.board) {
+              moveToBoard(evt.state.board, false);
+            }
+          },
+        })
+      );
       return () => {
         ws.close();
       };
@@ -48,10 +50,19 @@ export const Game: FunctionComponent<{
     const isA = t % 2 === 0;
     t = t + 1;
 
-    const [target, other] = isA ? [a, b] : [b, a];
-    if (target & (1 << from) === 0) return;
-    if (other & (1 << to) !== 0) return;
-    const result = (target & ~(1 << from)) | (1 << to);
+    const [ours, theirs] = isA ? [a, b] : [b, a];
+    if (!(ours & (1 << from))) {
+      console.log("skipped drop");
+    }
+    if (ours & (1 << to)) {
+      console.log("avoided collision with self");
+      return;
+    }
+    if (theirs & (1 << to)) {
+      console.log("avoided collision with other player");
+      return;
+    }
+    const result = (ours & ~(1 << from)) | (1 << to);
     if (isA) {
       a = result;
     } else {

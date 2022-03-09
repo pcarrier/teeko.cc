@@ -1,12 +1,13 @@
 import { FunctionComponent, h } from "preact";
-import { Board, EmptyBoard } from "./model";
-import { Game } from "./Game";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useState } from "preact/hooks";
+
 import { historyPush, setHash } from "./utils.ts";
-import { OnlineBar } from "./OnlineBar.tsx";
 import { useEvent } from "./useEvent.ts";
+import { Board, EmptyBoard } from "./model";
+import { Game } from "./Game";
 import { Help } from "./Help.tsx";
+import { OnlineBar } from "./OnlineBar.tsx";
 
 export const App: FunctionComponent = () => {
   const [showHelp, setShowHelp] = useState(false);
@@ -14,11 +15,11 @@ export const App: FunctionComponent = () => {
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker
+    updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
       r && setInterval(() => r.update(), 60 * 1000);
-    }
+    },
   });
 
   let initial: Board = { ...EmptyBoard };
@@ -26,7 +27,9 @@ export const App: FunctionComponent = () => {
 
   if (window.location.hash.startsWith("#%5B")) {
     try {
-      const [a, b, t, l] = JSON.parse(decodeURI(window.location.hash.substring(1)));
+      const [a, b, t, l] = JSON.parse(
+        decodeURI(window.location.hash.substring(1))
+      );
       initial = { a, b, t, l, p: true };
       initial.a = a;
       initial.b = b;
@@ -47,7 +50,11 @@ export const App: FunctionComponent = () => {
   }
 
   function updateWsPath() {
-    setWsPath(window.location.pathname.length < 2 ? undefined : window.location.pathname.substring(1));
+    setWsPath(
+      window.location.pathname.length < 2
+        ? undefined
+        : window.location.pathname.substring(1)
+    );
   }
 
   updateWsPath();
@@ -78,7 +85,11 @@ export const App: FunctionComponent = () => {
       ) : (
         <OnlineBar wsPath={wsPath} jump={jump} />
       )}
-      <Game initial={initial} roomPath={wsPath} showHelp={() => setShowHelp(true)} />
+      <Game
+        initial={initial}
+        roomPath={wsPath}
+        showHelp={() => setShowHelp(true)}
+      />
     </>
   );
 };

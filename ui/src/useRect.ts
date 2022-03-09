@@ -50,6 +50,7 @@ export function useRect(
       ? ([useRef<T>(init), null] as [{ current: T }, any])
       : useStateRef<T>(init);
   const [rectRef, setRectRef] = refFn<Rect | null>(null);
+
   function update() {
     const { current } = ref;
     if (current) {
@@ -66,6 +67,7 @@ export function useRect(
       }
     }
   }
+
   useEffect(update, []);
   useEvent("resize", update);
   useEvent("orientationchange", update);
