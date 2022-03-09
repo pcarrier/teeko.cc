@@ -54,7 +54,7 @@ h1 {
   color: @strong;
 }
 
-button {
+button, input {
   font-size: 100%;
   background-color: @bg;
   color: @strong;
@@ -69,12 +69,17 @@ button {
   }
 }
 
+input {
+  border: 1px solid @boardColor;
+  padding: 0.5em;
+}
+
 .board {
   touch-action: none;
 }
 
 .board.full {
-  width: min(100%, 80vh); // replaces height:100% on body to leave room for text, not great
+  width: min(100%, 80vh);
   max-width: 150mm;
 }
 
@@ -179,4 +184,23 @@ p.banner {
 
 p.banner button {
   background-color: #400;
+}
+
+.onlineBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: min(100%, 80vh);
+  max-width: 150mm;
+}
+
+.onlineBar .title {
+  text-align: left;
+  flex-grow: 1;
+  font-size: 1.5em;
+}
+
+.onlineBar .buttons {
+  text-align: right;
+  flex-grow: 1;
 }

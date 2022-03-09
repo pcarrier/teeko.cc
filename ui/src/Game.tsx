@@ -11,13 +11,14 @@ export const Game: FunctionComponent<{
   initial: Board;
   wsPath?: string;
 }> = ({ initial, wsPath }) => {
+
   const [board, setBoard] = useState(initial);
   const [showHelp, setShowHelp] = useState(false);
   const ws = useRef<Sockette>(null);
 
   useEffect(() => {
     if (wsPath) {
-      ws.current = new Sockette(`wss://ws.teeko.cc${wsPath}`, {
+      ws.current = new Sockette(`wss://ws.teeko.cc/${wsPath}`, {
         onmessage: (msg) => {
           const evt = JSON.parse(msg.data);
           if (!evt.state) {

@@ -3,8 +3,14 @@ import { Board, EmptyBoard } from "./model";
 import { Game } from "./Game";
 import { setHash } from "./index";
 import { useRegisterSW } from "virtual:pwa-register/preact";
+import { useRef, useState } from "preact/hooks";
+import { historyPush, useEvent } from "./utils.ts";
+import { OnlineBar } from "./OnlineBar.tsx";
+import Sockette from "sockette";
 
 export const App: FunctionComponent = () => {
+  const [wsPath, setWsPath] = useState(undefined);
+
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker
@@ -17,9 +23,9 @@ export const App: FunctionComponent = () => {
   let initial: Board = { ...EmptyBoard };
   let foundBoardInURL = false;
 
-  if (location.hash.startsWith("#%5B")) {
+  if (window.location.hash.startsWith("#%5B")) {
     try {
-      const [a, b, t, l] = JSON.parse(decodeURI(location.hash.substring(1)));
+      const [a, b, t, l] = JSON.parse(decodeURI(window.location.hash.substring(1)));
       initial = { a, b, t, l, p: true };
       initial.a = a;
       initial.b = b;
@@ -39,7 +45,19 @@ export const App: FunctionComponent = () => {
     }
   }
 
-  const wsPath = location.pathname === "/" ? undefined : location.pathname;
+  const ws = useRef<Sockette>(null);
+
+  function updateWsPath() {
+    setWsPath(window.location.pathname.length < 2 ? undefined : window.location.pathname.substring(1));
+  }
+  updateWsPath();
+
+  useEvent("popstate", updateWsPath);
+
+  function jump(location: string | undefined) {
+    historyPush(location ? `/${location}` : '/');
+    updateWsPath();
+  }
 
   return (
     <>
@@ -56,9 +74,9 @@ export const App: FunctionComponent = () => {
           </button>
         </p>
       ) : (
-        <></>
+        <OnlineBar wsPath={wsPath} jump={jump} />
       )}
-      <Game initial={initial} wsPath={wsPath} />
+      <Game initial={initial} ws={ws.current} />
     </>
   );
 };
