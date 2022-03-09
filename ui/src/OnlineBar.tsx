@@ -33,21 +33,23 @@ export const OnlineBar: FunctionComponent<{
             </>
             :
             (wsPath ?
-              <button onClick={() => {
-                if (navigator.share)
-                  navigator.share({
-                    title: `teeko.cc (${wsPath})`,
-                    text: "Play Teeko with me!",
-                    url: `https://teeko.cc/${wsPath}`
-                  });
-                else {
-                  navigator.clipboard.writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
-                    .then(() => window.alert("Invite in clipboard"));
-                }
-              }}>Share</button>
-              <button onClick={() => jump()}>Leave</button>
-          </> :
-          <button onclick={() => setJoining(true)}>Online</button>)
+              <>
+                <button onClick={() => {
+                  if (navigator.share)
+                    navigator.share({
+                      title: `teeko.cc (${wsPath})`,
+                      text: "Play Teeko with me!",
+                      url: `https://teeko.cc/${wsPath}`
+                    });
+                  else {
+                    navigator.clipboard.writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
+                      .then(() => window.alert("Invite in clipboard"));
+                  }
+                }}>Invite
+                </button>
+                <button onClick={() => jump()}>Leave</button>
+              </> :
+              <button onclick={() => setJoining(true)}>Online</button>)
         }
       </div>
     </div>
