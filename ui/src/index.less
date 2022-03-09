@@ -80,17 +80,11 @@ input {
 
 .board.full {
   width: min(100%, 80vh);
-  max-width: 150mm;
+  max-width: 100mm;
 }
 
 .board.half {
   width: 50%;
-}
-
-@media (pointer: coarse) {
-  .board.full {
-    max-width: 200mm;
-  }
 }
 
 .board line.bg {
@@ -191,7 +185,7 @@ p.banner button {
   flex-direction: row;
   align-items: center;
   width: min(100%, 80vh);
-  max-width: 150mm;
+  max-width: 100mm;
 }
 
 .onlineBar .title {
@@ -206,4 +200,10 @@ p.banner button {
 .onlineBar .buttons {
   flex-shrink: 0;
   text-align: right;
+}
+
+@media (pointer: coarse) {
+  .onlineBar, .board.full {
+    max-width: 150mm;
+  }
 }
