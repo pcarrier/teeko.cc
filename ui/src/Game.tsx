@@ -48,7 +48,9 @@ export const Game: FunctionComponent<{
     const isA = t % 2 === 0;
     t = t + 1;
 
-    const target = isA ? a : b;
+    const [target, other] = isA ? [a, b] : [b, a];
+    if (target & (1 << from) === 0) return;
+    if (other & (1 << to) !== 0) return;
     const result = (target & ~(1 << from)) | (1 << to);
     if (isA) {
       a = result;
@@ -63,7 +65,8 @@ export const Game: FunctionComponent<{
     const isA = t % 2 === 0;
     t = t + 1;
 
-    const target = isA ? a : b;
+    const [target, other] = isA ? [a, b] : [b, a];
+    if (other & (1 << pos)) return;
     const result = target | (1 << pos);
     if (isA) a = result;
     else b = result;
