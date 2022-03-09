@@ -59,14 +59,18 @@ function handleConnected(ctx: Context) {
 
 function handleMessage(ctx: Context, data: string) {
     const room = getRoom(ctx);
-    const msg = JSON.parse(data);
-    if (msg.state) {
-        setState(room, msg.state, ctx.socket);
+    try {
+        const msg = JSON.parse(data);
+        if (msg.state) {
+            setState(room, msg.state, ctx.socket);
+        }
+    } catch (e) {
+        console.log(`handleMessage error ${e}`);
     }
 }
 
 function handleError(ctx: Context, evt: Event | ErrorEvent) {
-    console.log(`Error ${evt instanceof ErrorEvent ? evt.message : evt.type}`);
+    console.log(`WS error ${evt instanceof ErrorEvent ? evt.message : evt.type}`);
 }
 
 function handleClose(ctx: Context, evt: CloseEvent) {

@@ -10,7 +10,7 @@ export type Board = {
   a: number;
   b: number;
   t: number; // turn
-  p: boolean; // playing
+  p: boolean; // playing or not
   l: number | [number, number] | null; // last action
 };
 

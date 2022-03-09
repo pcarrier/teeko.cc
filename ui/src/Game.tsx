@@ -1,22 +1,47 @@
 import { FunctionComponent, h } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { Board, EmptyBoard } from "./model";
 import { BoardView } from "./BoardView";
 import { Help } from "./Help";
 import { setHash } from "./index";
+import Sockette from "sockette";
 
-export const LocalGame: FunctionComponent<{
+export const Game: FunctionComponent<{
   initial: Board;
-  testing: boolean;
-}> = ({ initial, testing }) => {
+  wsPath?: string;
+}> = ({ initial, wsPath }) => {
   const [board, setBoard] = useState(initial);
   const [showHelp, setShowHelp] = useState(false);
+  const ws = useRef<Sockette>(null);
 
-  function moveToBoard(board: Board) {
+  useEffect(() => {
+    if (wsPath) {
+      ws.current = new Sockette(`wss://ws.teeko.cc${wsPath}`, {
+        onmessage: (msg) => {
+          const evt = JSON.parse(msg.data);
+          if (!evt.state) {
+            ws.current?.send(JSON.stringify({ state: { board } }));
+          }
+          if (evt.state?.board) {
+            moveToBoard(evt.state.board, false);
+          }
+        }
+      });
+      const wsCurrent = ws.current;
+      return () => {
+        wsCurrent.close();
+      };
+    }
+  }, [wsPath]);
+
+  function moveToBoard(board: Board, propagate = true) {
     setHash(board);
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
+    if (propagate && ws.current) {
+      ws.current.send(JSON.stringify({ state: { board } }));
+    }
   }
 
   function move(from: number, to: number) {
@@ -71,7 +96,6 @@ export const LocalGame: FunctionComponent<{
 
   return (
     <>
-      {testing ? <p class="banner">Test mode</p> : <></>}
       <BoardView
         board={board}
         drop={drop}
@@ -87,7 +111,7 @@ export const LocalGame: FunctionComponent<{
           <></>
         )}
       </p>
-      <h1>Teeko by John Scarne{testing ? " (local)" : ""}</h1>
+      <h1>Teeko by John Scarne</h1>
       <a onClick={() => setShowHelp(true)}>How to play</a>
     </>
   );

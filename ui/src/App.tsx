@@ -1,19 +1,17 @@
 import { FunctionComponent, h } from "preact";
 import { Board, EmptyBoard } from "./model";
-import { LocalGame } from "./LocalGame";
-import Router from "preact-router";
-import { OnlineGame } from "./OnlineGame";
+import { Game } from "./Game";
 import { setHash } from "./index";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 
 export const App: FunctionComponent = () => {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
+    updateServiceWorker
   } = useRegisterSW({
     onRegistered(r) {
       r && setInterval(() => r.update(), 60 * 1000);
-    },
+    }
   });
 
   let initial: Board = { ...EmptyBoard };
@@ -41,29 +39,26 @@ export const App: FunctionComponent = () => {
     }
   }
 
+  const wsPath = location.pathname === "/" ? undefined : location.pathname;
+
   return (
     <>
       {needRefresh ? (
         <p class="banner">
-          New version available;{" "}
-          <a
+          New version available.{" "}
+          <button
             onClick={async () => {
               await updateServiceWorker(true);
               setNeedRefresh(false);
             }}
           >
-            reload
-          </a>
-          .
+            Reload
+          </button>
         </p>
       ) : (
         <></>
       )}
-      <Router>
-        <OnlineGame path="/join/:room" />
-        <LocalGame initial={initial} testing={true} path="/test" />
-        <LocalGame initial={initial} default />
-      </Router>
+      <Game initial={initial} wsPath={wsPath} />
     </>
   );
 };
