@@ -30,7 +30,7 @@ function getRoom(ctx: Context): Room {
   const created: Room = {
     url,
     clients: [ctx.socket],
-    state: undefined
+    state: null
   };
   serverState.rooms.set(url, created);
   console.log(`Opened room ${url}`);

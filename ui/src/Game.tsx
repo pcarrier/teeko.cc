@@ -1,11 +1,11 @@
 import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
+import Sockette from "sockette";
 
 import { Board, EmptyBoard } from "./model";
 import { BoardView } from "./BoardView";
 import { Help } from "./Help";
-import { setHash } from "./index";
-import Sockette from "sockette";
+import { setHash } from "./utils.ts";
 
 export const Game: FunctionComponent<{
   initial: Board;
@@ -21,7 +21,7 @@ export const Game: FunctionComponent<{
       setWs(new Sockette(`wss://ws.teeko.cc/${wsPath}`, {
         onmessage: (msg) => {
           const evt = JSON.parse(msg.data);
-          if (!evt.state) {
+          if (evt.state === null) {
             ws.send(JSON.stringify({ state: { board } }));
           }
           if (evt.state?.board) {

@@ -1,10 +1,9 @@
 import { FunctionComponent, h } from "preact";
 import { Board, EmptyBoard } from "./model";
 import { Game } from "./Game";
-import { setHash } from "./index";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useState } from "preact/hooks";
-import { historyPush } from "./utils.ts";
+import { historyPush, setHash } from "./utils.ts";
 import { OnlineBar } from "./OnlineBar.tsx";
 import { useEvent } from "./useEvent.ts";
 
