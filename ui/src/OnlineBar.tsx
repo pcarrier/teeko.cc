@@ -7,7 +7,7 @@ export const OnlineBar: FunctionComponent<{
 }> = ({ wsPath, jump }) => {
   const [isJoining, setJoining] = useState(false);
   const [nextRoom, setNextRoom] = useState(undefined);
-  const title = wsPath ? <>Room <tt>{wsPath}</tt></> : <>Local game</>;
+  const title = wsPath ? <>Room <tt>{decodeURI(wsPath)}</tt></> : <>Local game</>;
 
   function toNextRoom() {
     setJoining(false);
