@@ -45,8 +45,6 @@ export const App: FunctionComponent = () => {
     }
   }
 
-  const ws = useRef<Sockette>(null);
-
   function updateWsPath() {
     setWsPath(window.location.pathname.length < 2 ? undefined : window.location.pathname.substring(1));
   }
@@ -76,7 +74,7 @@ export const App: FunctionComponent = () => {
       ) : (
         <OnlineBar wsPath={wsPath} jump={jump} />
       )}
-      <Game initial={initial} ws={ws.current} />
+      <Game initial={initial} wsPath={wsPath} />
     </>
   );
 };

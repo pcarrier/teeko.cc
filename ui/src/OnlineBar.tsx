@@ -9,7 +9,7 @@ export const OnlineBar: FunctionComponent<{
   const [nextRoom, setNextRoom] = useState(undefined);
   const title = wsPath ? <>Room <tt>{decodeURI(wsPath)}</tt></> : <>Local game</>;
 
-  function toNextRoom() {
+  function submitJoin() {
     setJoining(false);
     jump(nextRoom);
   }
@@ -25,11 +25,11 @@ export const OnlineBar: FunctionComponent<{
                      onkeyup={(e) => {
                        if (e.keyCode === 13) {
                          e.preventDefault();
-                         toNextRoom();
+                         submitJoin();
                        }
                      }}
               />
-              <button onclick={() => toNextRoom(nextRoom)}>Join</button>
+              <button onclick={() => submitJoin(nextRoom)}>Join</button>
             </>
             :
             (wsPath ?

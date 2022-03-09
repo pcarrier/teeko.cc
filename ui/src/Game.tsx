@@ -1,5 +1,5 @@
 import { FunctionComponent, h } from "preact";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { Board, EmptyBoard } from "./model";
 import { BoardView } from "./BoardView";
@@ -14,24 +14,23 @@ export const Game: FunctionComponent<{
 
   const [board, setBoard] = useState(initial);
   const [showHelp, setShowHelp] = useState(false);
-  const ws = useRef<Sockette>(null);
+  const [ws, setWs] = useState<Sockette>(undefined);
 
   useEffect(() => {
     if (wsPath) {
-      ws.current = new Sockette(`wss://ws.teeko.cc/${wsPath}`, {
+      setWs(new Sockette(`wss://ws.teeko.cc/${wsPath}`, {
         onmessage: (msg) => {
           const evt = JSON.parse(msg.data);
           if (!evt.state) {
-            ws.current?.send(JSON.stringify({ state: { board } }));
+            ws.send(JSON.stringify({ state: { board } }));
           }
           if (evt.state?.board) {
             moveToBoard(evt.state.board, false);
           }
         }
-      });
-      const wsCurrent = ws.current;
+      }));
       return () => {
-        wsCurrent.close();
+        ws.close();
       };
     }
   }, [wsPath]);
@@ -40,8 +39,8 @@ export const Game: FunctionComponent<{
     setHash(board);
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
-    if (propagate && ws.current) {
-      ws.current.send(JSON.stringify({ state: { board } }));
+    if (propagate && ws) {
+      ws.send(JSON.stringify({ state: { board } }));
     }
   }
 
