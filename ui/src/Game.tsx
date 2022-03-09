@@ -110,9 +110,9 @@ export const Game: FunctionComponent<{
         ) : (
           <></>
         )}
+      <button onClick={() => setShowHelp(true)}>Rules</button>
       </p>
       <h1>Teeko by John Scarne</h1>
-      <a onClick={() => setShowHelp(true)}>How to play</a>
     </>
   );
 };
