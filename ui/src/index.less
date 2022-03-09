@@ -8,6 +8,8 @@
 @link: #0f0;
 @aDark: darken(@aColor, 25%);
 @bDark: darken(@bColor, 25%);
+@boardWidth: min(100%, 75vh);
+@maxBoardWidth: 100mm;
 
 * {
   box-sizing: border-box;
@@ -79,8 +81,8 @@ input {
 }
 
 .board.full {
-  width: min(100%, 75vh);
-  max-width: 100mm;
+  width: @boardWidth;
+  max-width: @maxBoardWidth;
 }
 
 .board.half {
@@ -184,8 +186,8 @@ p.banner button {
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: min(100%, 75vh);
-  max-width: 100mm;
+  width: @boardWidth;
+  max-width: @maxBoardWidth;
 }
 
 .onlineBar h1 {
