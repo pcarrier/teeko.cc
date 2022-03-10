@@ -15,7 +15,7 @@ export const App: FunctionComponent = () => {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      r && setInterval(() => r.update(), 60 * 1000);
+      r && setInterval(() => r.update(), 10_000);
     },
   });
 
