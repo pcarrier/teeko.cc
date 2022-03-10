@@ -2,7 +2,13 @@ import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
-import { Board, emptyBoard, SIZE, SLOTS } from "teeko-cc-common/src/model";
+import {
+  Board,
+  emptyBoard,
+  Message,
+  SIZE,
+  SLOTS,
+} from "teeko-cc-common/src/model";
 import { setHash } from "./utils.ts";
 
 import { BoardView } from "./BoardView";
@@ -43,7 +49,7 @@ export const Game: FunctionComponent<{
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
     if (propagate && ws) {
-      ws.send(JSON.stringify({ state: { board } }));
+      ws.send(JSON.stringify({ state: { board } } as Message));
     }
   }
 

@@ -1,6 +1,12 @@
 {
   "name": "teeko-cc",
   "private": true,
+  "scripts": {
+    "lint:fix": "prettier -w ."
+  },
+  "devDependencies": {
+    "prettier": "^2.5.1"
+  },
   "workspaces": [
     "common",
     "ui"

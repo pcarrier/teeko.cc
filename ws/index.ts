@@ -1,3 +1,5 @@
+import { Message } from "../common/src/model.ts";
+
 type RoomState = unknown;
 
 interface Room {
@@ -12,7 +14,7 @@ interface Server {
 }
 
 const serverState: Server = {
-  rooms: new Map()
+  rooms: new Map(),
 };
 
 interface Context {
@@ -30,7 +32,7 @@ function getRoom(ctx: Context): Room {
   const created: Room = {
     path,
     clients: [ctx.socket],
-    state: null
+    state: null,
   };
   serverState.rooms.set(path, created);
   console.log(`Opened room ${path}`);
@@ -65,7 +67,7 @@ function handleConnected(ctx: Context) {
 function handleMessage(ctx: Context, data: string) {
   const room = getRoom(ctx);
   try {
-    const msg = JSON.parse(data);
+    const msg = JSON.parse(data) as Message;
     if (msg.state) {
       setState(room, msg.state, ctx.socket);
     }
@@ -85,7 +87,7 @@ function handleClose(ctx: Context, evt: CloseEvent) {
     room.timeout = setTimeout(() => closeRoom(room), 600_000);
 }
 
-const roomPrefix = '/room/';
+const roomPrefix = "/room/";
 
 async function main() {
   for await (const conn of Deno.listen({ port: 8081 })) {
@@ -100,7 +102,10 @@ async function main() {
         if (path.startsWith(roomPrefix)) {
           const { socket, response } = Deno.upgradeWebSocket(evt.request);
 
-          const ctx: Context = { socket, roomPath: path.substring(roomPrefix.length) };
+          const ctx: Context = {
+            socket,
+            roomPath: path.substring(roomPrefix.length),
+          };
           socket.onopen = () => handleConnected(ctx);
           socket.onmessage = (m) => handleMessage(ctx, m.data);
           socket.onclose = (e) => handleClose(ctx, e);

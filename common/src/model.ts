@@ -82,3 +82,7 @@ export function x(pos: number) {
 export function y(pos: number) {
   return Math.floor(pos / SIZE);
 }
+
+export type Message = {
+  state: Board;
+};
