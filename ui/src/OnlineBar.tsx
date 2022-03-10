@@ -49,6 +49,7 @@ export const OnlineBar: FunctionComponent<{
           </>
         ) : wsPath ? (
           <>
+            <button onClick={() => jump()}>Leave</button>
             <button
               onClick={() => {
                 if (navigator.share)
@@ -66,7 +67,6 @@ export const OnlineBar: FunctionComponent<{
             >
               Invite
             </button>
-            <button onClick={() => jump()}>Leave</button>
           </>
         ) : (
           <button onclick={() => setJoining(true)}>Online</button>

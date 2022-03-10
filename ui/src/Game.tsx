@@ -141,7 +141,7 @@ export const Game: FunctionComponent<{
             <></>
           )}
           <button onClick={showHelp}>Rules</button>
-          <button onClick={copy}>Emojis</button>
+          <button onClick={copy}>Copy</button>
         </p>
       }
       <h1>Teeko by John Scarne</h1>
