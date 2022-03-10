@@ -10,6 +10,7 @@
 @bDark: darken(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
 @maxBoardWidth: 100mm;
+@maxBoardCoarseWidth: 120mm;
 
 * {
   box-sizing: border-box;
@@ -215,6 +216,6 @@ p.banner button {
 @media (pointer: coarse) {
   .onlineBar,
   .board.full {
-    max-width: 150mm;
+    max-width: @maxBoardCoarseWidth;
   }
 }
