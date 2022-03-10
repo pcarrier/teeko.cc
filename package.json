@@ -1,0 +1,8 @@
+{
+  "name": "teeko-cc",
+  "private": true,
+  "workspaces": [
+    "common",
+    "ui"
+  ]
+}

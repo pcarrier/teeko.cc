@@ -3,7 +3,7 @@ import { Rect } from "./useRect.ts";
 import { FunctionComponent, h } from "preact";
 import classnames from "classnames";
 import { LARGE_CROWN_RADIUS, PIECE_RADIUS } from "./sizing";
-import { Player, SIZE } from "./model";
+import { Player, SIZE } from "teeko-cc-common/src/model";
 
 type PieceAttrs = {
   position: number;

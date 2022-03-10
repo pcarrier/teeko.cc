@@ -2,7 +2,7 @@ import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
-import { Board, emptyBoard, SIZE, SLOTS } from "./model";
+import { Board, emptyBoard, SIZE, SLOTS } from "teeko-cc-common/src/model";
 import { setHash } from "./utils.ts";
 
 import { BoardView } from "./BoardView";
@@ -31,7 +31,7 @@ export const Game: FunctionComponent<{
           if (evt.state?.board) {
             moveToBoard(evt.state.board, false);
           }
-        }
+        },
       });
       setWs(sockette);
       return () => sockette.close();

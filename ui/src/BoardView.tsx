@@ -12,8 +12,13 @@ import {
   Player,
   SIZE,
   SLOTS,
-} from "./model";
-import { NEIGHS_BY_POSITION, WINNING_POSITIONS, x, y } from "./logic";
+} from "teeko-cc-common/src/model";
+import {
+  NEIGHS_BY_POSITION,
+  WINNING_POSITIONS,
+  x,
+  y,
+} from "../../common/src/model";
 import {
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,

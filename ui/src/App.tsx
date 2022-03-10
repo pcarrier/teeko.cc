@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 
 import { historyPush, setHash } from "./utils.ts";
 import { useEvent } from "./useEvent.ts";
-import { emptyBoard } from "./model";
+import { emptyBoard } from "teeko-cc-common/src/model";
 import { Game } from "./Game";
 import { Help } from "./Help.tsx";
 import { OnlineBar } from "./OnlineBar.tsx";

@@ -33,7 +33,9 @@ export const OnlineBar: FunctionComponent<{
 
   return (
     <div class="onlineBar">
-      {!isJoining && wsPath ? <button onClick={() => jump()}>Leave</button> : null}
+      {!isJoining && wsPath ? (
+        <button onClick={() => jump()}>Leave</button>
+      ) : null}
       <h1>{title}</h1>
       <div class="buttons">
         {isJoining ? (
@@ -64,7 +66,7 @@ export const OnlineBar: FunctionComponent<{
                   navigator.share({
                     title: `teeko.cc (${wsPath})`,
                     text: "Play Teeko with me!",
-                    url: `https://teeko.cc/${wsPath}`
+                    url: `https://teeko.cc/${wsPath}`,
                   });
                 else {
                   navigator.clipboard
