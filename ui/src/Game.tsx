@@ -121,9 +121,8 @@ export const Game: FunctionComponent<{
         ) : (
           <></>
         )}
-        <button onClick={showHelp}>Rules</button>
+        <button onClick={showHelp}>Help</button>
       </p>
-      <h1>Teeko by John Scarne</h1>
     </>
   );
 };
