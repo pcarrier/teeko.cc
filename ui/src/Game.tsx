@@ -6,8 +6,6 @@ import {
   Board,
   emptyBoard,
   Message,
-  SIZE,
-  SLOTS,
 } from "teeko-cc-common/src/model";
 
 import { BoardView } from "./BoardView";
@@ -19,11 +17,6 @@ export const Game: FunctionComponent<{
 }> = ({ initial, roomPath, showHelp }) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
-  const [hasCopied, setHasCopied] = useState(false);
-
-  useEffect(() => {
-    if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
-  }, [hasCopied]);
 
   useEffect(() => {
     if (roomPath) {
@@ -116,17 +109,6 @@ export const Game: FunctionComponent<{
     }
   }
 
-  function copy() {
-    let result = "";
-    for (let i = 0; i < SLOTS; i++) {
-      result += board.a & (1 << i) ? "🔵" : board.b & (1 << i) ? "🔴" : "⚫️";
-      if (i % SIZE === SIZE - 1 && i != SLOTS - 1) {
-        result += "\n";
-      }
-    }
-    navigator.clipboard.writeText(result).then(() => setHasCopied(true));
-  }
-
   return (
     <>
       <BoardView
@@ -144,7 +126,6 @@ export const Game: FunctionComponent<{
           <></>
         )}
         <button onClick={showHelp}>Rules</button>
-        <button onClick={copy}>{hasCopied ? "Copied!" : "Copy"}</button>
       </p>
       <h1>Teeko by John Scarne</h1>
     </>
