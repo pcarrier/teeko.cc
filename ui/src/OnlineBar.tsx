@@ -1,13 +1,19 @@
 import { FunctionComponent } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { nanoid } from "nanoid";
 
 export const OnlineBar: FunctionComponent<{
   wsPath?: string;
   jump: (path: string) => void;
 }> = ({ wsPath, jump }) => {
+  const [hasCopied, setHasCopied] = useState(false);
   const [isJoining, setJoining] = useState(false);
   const [nextRoom, setNextRoom] = useState();
+
+  useEffect(() => {
+    if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
+  }, [hasCopied]);
+
   const title = wsPath ? decodeURI(wsPath) : "Offline";
 
   function submitJoin() {
@@ -15,15 +21,18 @@ export const OnlineBar: FunctionComponent<{
     jump(nextRoom || nanoid());
   }
 
+  if (hasCopied) return <div class="onlineBar"><h1>Copied to clipboard.</h1></div>;
+
   return (
     <div class="onlineBar">
       {isJoining ? <></> : <h1>{title}</h1>}
       <div class="buttons">
         {isJoining ? (
           <>
+            <button onClick={() => setJoining(false)}>Cancel</button>
             <input
               type="text"
-              width="8"
+              width="100%"
               value={nextRoom}
               placeholder="Board name (optional)"
               onInput={(e: FormEvent<HTMLFormElement>) =>
@@ -37,7 +46,6 @@ export const OnlineBar: FunctionComponent<{
               }}
             />
             <button onclick={() => submitJoin(nextRoom)}>Join</button>
-            <button onClick={() => setJoining(false)}>Cancel</button>
           </>
         ) : wsPath ? (
           <>
@@ -47,12 +55,12 @@ export const OnlineBar: FunctionComponent<{
                   navigator.share({
                     title: `teeko.cc (${wsPath})`,
                     text: "Play Teeko with me!",
-                    url: `https://teeko.cc/${wsPath}`,
+                    url: `https://teeko.cc/${wsPath}`
                   });
                 else {
                   navigator.clipboard
                     .writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
-                    .then(() => window.alert("Invite in clipboard."));
+                    .then(() => setHasCopied(true));
                 }
               }}
             >
