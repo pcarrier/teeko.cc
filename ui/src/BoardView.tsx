@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import { FunctionComponent, h } from "preact";
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { Rect, useRect } from "./useRect.ts";
 
@@ -84,6 +84,13 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const ourPieces =
     !p || win ? new Set<number>() : t % 2 === 0 ? aPieces : bPieces;
+
+  useEffect(() => {
+    if (!ourPieces.has(selected)) {
+      setSelected(undefined);
+    }
+  }, [selected, ourPieces]);
+
   const movable = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
@@ -316,7 +323,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 else setSelected(undefined);
               }}
               player={aPieces.has(pos) ? Player.A : Player.B}
-              selected={selected === pos}
+              selected={selected === pos && ourPieces.has(selected)}
               selectable={validTargets.has(pos)}
               click={() => click(pos)}
             />

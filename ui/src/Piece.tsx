@@ -53,10 +53,10 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
       },
     });
 
-  const dxNorm = state.isDragging && aspect ? state.dx / aspect.width : 0;
-  const dyNorm = state.isDragging && aspect ? state.dy / aspect.height : 0;
+  const dxNorm = (selectable && state.isDragging && aspect) ? state.dx / aspect.width : 0;
+  const dyNorm = (selectable && state.isDragging && aspect) ? state.dy / aspect.height : 0;
 
-  function limit(n: number) {
+  function limitToBoard(n: number) {
     return Math.max(0, Math.min(n, SIZE - 1));
   }
 
@@ -64,8 +64,8 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
     <circle
       onClick={click}
       r={dummy ? LARGE_CROWN_RADIUS : PIECE_RADIUS}
-      cx={limit(x + dxNorm + (offset?.x ?? 0))}
-      cy={limit(y + dyNorm + (offset?.y ?? 0))}
+      cx={limitToBoard(x + dxNorm + (offset?.x ?? 0))}
+      cy={limitToBoard(y + dyNorm + (offset?.y ?? 0))}
       class={classnames("piece", {
         A: player === Player.A,
         B: player === Player.B,
