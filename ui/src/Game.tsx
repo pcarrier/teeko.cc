@@ -2,11 +2,7 @@ import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
-import {
-  Board,
-  emptyBoard,
-  Message,
-} from "teeko-cc-common/src/model";
+import { Board, emptyBoard, Message } from "teeko-cc-common/src/model";
 
 import { BoardView } from "./BoardView";
 
