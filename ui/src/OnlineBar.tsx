@@ -1,23 +1,18 @@
 import { FunctionComponent } from "preact";
 import { useState } from "preact/hooks";
+import { nanoid } from "nanoid";
 
 export const OnlineBar: FunctionComponent<{
   wsPath?: string;
   jump: (path: string) => void;
 }> = ({ wsPath, jump }) => {
   const [isJoining, setJoining] = useState(false);
-  const [nextRoom, setNextRoom] = useState(undefined);
-  const title = wsPath ? (
-    <>
-      Board <tt>{decodeURI(wsPath)}</tt>
-    </>
-  ) : (
-    <>Offline board</>
-  );
+  const [nextRoom, setNextRoom] = useState();
+  const title = wsPath ? decodeURI(wsPath) : "Offline";
 
   function submitJoin() {
     setJoining(false);
-    jump(nextRoom);
+    jump(nextRoom || nanoid());
   }
 
   return (
@@ -30,7 +25,7 @@ export const OnlineBar: FunctionComponent<{
               type="text"
               width="8"
               value={nextRoom}
-              placeholder="Name the board"
+              placeholder="Board name (optional)"
               onInput={(e: FormEvent<HTMLFormElement>) =>
                 setNextRoom(e.target.value)
               }
@@ -42,6 +37,7 @@ export const OnlineBar: FunctionComponent<{
               }}
             />
             <button onclick={() => submitJoin(nextRoom)}>Join</button>
+            <button onClick={() => setJoining(false)}>Cancel</button>
           </>
         ) : wsPath ? (
           <>
