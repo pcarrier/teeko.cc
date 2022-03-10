@@ -1,6 +1,6 @@
 import { FunctionComponent, h } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { historyPush, setHash } from "./utils.ts";
 import { useEvent } from "./useEvent.ts";
@@ -19,33 +19,23 @@ export const App: FunctionComponent = () => {
     },
   });
 
+  useEffect(async () => {
+    if (needRefresh) {
+      setNeedRefresh(false);
+      await updateServiceWorker(true);
+    }
+  });
+
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const [wsPath, setWsPath] = useState<string | undefined>(undefined);
 
   let initial = emptyBoard();
 
-  let foundBoardInURL = false;
-
-  if (window.location.hash.startsWith("#%5B")) {
-    try {
-      const [a, b, m] = JSON.parse(
-        decodeURI(window.location.hash.substring(1))
-      );
-      initial = { a, b, m, p: true };
-      foundBoardInURL = true;
-    } catch (_) {
-      console.log("Invalid URL parameters");
-    }
-  }
-
-  if (!foundBoardInURL) {
-    const stored = localStorage.getItem("board");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed.m) {
-        initial = parsed;
-        setHash(initial);
-      }
+  const stored = localStorage.getItem("board");
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    if (parsed.m) {
+      initial = parsed;
     }
   }
 
@@ -58,7 +48,6 @@ export const App: FunctionComponent = () => {
   }
 
   updateWsPath();
-
   useEvent("popstate", updateWsPath);
 
   function jump(location: string | undefined) {
@@ -70,21 +59,7 @@ export const App: FunctionComponent = () => {
 
   return (
     <>
-      {needRefresh ? (
-        <p class="banner">
-          New version available.{" "}
-          <button
-            onClick={async () => {
-              await updateServiceWorker(true);
-              setNeedRefresh(false);
-            }}
-          >
-            Reload
-          </button>
-        </p>
-      ) : (
-        <OnlineBar wsPath={wsPath} jump={jump} />
-      )}
+      <OnlineBar wsPath={wsPath} jump={jump} />
       <Game
         initial={initial}
         roomPath={wsPath}

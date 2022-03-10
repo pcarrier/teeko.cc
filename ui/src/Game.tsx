@@ -9,7 +9,6 @@ import {
   SIZE,
   SLOTS,
 } from "teeko-cc-common/src/model";
-import { setHash } from "./utils.ts";
 
 import { BoardView } from "./BoardView";
 
@@ -45,7 +44,6 @@ export const Game: FunctionComponent<{
   }, [roomPath]);
 
   function moveToBoard(board: Board, propagate = true) {
-    setHash(board);
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
     if (propagate && ws) {
