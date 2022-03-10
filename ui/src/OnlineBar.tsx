@@ -77,7 +77,7 @@ export const OnlineBar: FunctionComponent<{
         </>
       ) : (
         <>
-          <h1 style="margin-left: 1em;">
+          <h1 style="margin-left: 1.5em;">
             <span className="board">Offline board</span>
           </h1>
           <button onClick={() => setJoining(true)}>Online</button>
