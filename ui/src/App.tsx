@@ -10,9 +10,6 @@ import { Help } from "./Help.tsx";
 import { OnlineBar } from "./OnlineBar.tsx";
 
 export const App: FunctionComponent = () => {
-  const [showHelp, setShowHelp] = useState<boolean>(false);
-  const [wsPath, setWsPath] = useState<string | undefined>(undefined);
-
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -21,6 +18,9 @@ export const App: FunctionComponent = () => {
       r && setInterval(() => r.update(), 60 * 1000);
     },
   });
+
+  const [showHelp, setShowHelp] = useState<boolean>(false);
+  const [wsPath, setWsPath] = useState<string | undefined>(undefined);
 
   let initial = emptyBoard();
 

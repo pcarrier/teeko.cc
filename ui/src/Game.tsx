@@ -31,7 +31,7 @@ export const Game: FunctionComponent<{
           if (evt.state?.board) {
             moveToBoard(evt.state.board, false);
           }
-        },
+        }
       });
       setWs(sockette);
       return () => sockette.close();
@@ -132,20 +132,16 @@ export const Game: FunctionComponent<{
         klass="full"
         showStatus={true}
       />
-      {hasCopied ? (
-        <div class="buttonish">Copied to clipboard.</div>
-      ) : (
-        <p>
-          {board.m.length === 0 ? null : <button onClick={undo}>Undo</button>}
-          {board.a !== 0 ? (
-            <button onClick={() => moveToBoard(emptyBoard())}>Reset</button>
-          ) : (
-            <></>
-          )}
-          <button onClick={showHelp}>Rules</button>
-          <button onClick={copy}>Copy</button>
-        </p>
-      )}
+      <p>
+        {board.m.length === 0 ? null : <button onClick={undo}>Undo</button>}
+        {board.a !== 0 ? (
+          <button onClick={() => moveToBoard(emptyBoard())}>Reset</button>
+        ) : (
+          <></>
+        )}
+        <button onClick={showHelp}>Rules</button>
+        <button onClick={copy}>{hasCopied ? "Copied!" : "Copy"}</button>
+      </p>
       <h1>Teeko by John Scarne</h1>
     </>
   );

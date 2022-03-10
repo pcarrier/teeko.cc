@@ -31,13 +31,6 @@ export const OnlineBar: FunctionComponent<{
     jump(nextRoom || randomRoom());
   }
 
-  if (hasCopied)
-    return (
-      <div class="onlineBar">
-        <div class="buttonish">Copied to clipboard.</div>
-      </div>
-    );
-
   return (
     <div class="onlineBar">
       {isJoining ? <></> : <h1>{title}</h1>}
@@ -71,7 +64,7 @@ export const OnlineBar: FunctionComponent<{
                   navigator.share({
                     title: `teeko.cc (${wsPath})`,
                     text: "Play Teeko with me!",
-                    url: `https://teeko.cc/${wsPath}`,
+                    url: `https://teeko.cc/${wsPath}`
                   });
                 else {
                   navigator.clipboard
@@ -80,7 +73,7 @@ export const OnlineBar: FunctionComponent<{
                 }
               }}
             >
-              Invite
+              {hasCopied ? "Copied!" : "Invite"}
             </button>
           </>
         ) : (
