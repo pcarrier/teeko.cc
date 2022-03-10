@@ -33,7 +33,7 @@ export const OnlineBar: FunctionComponent<{
 
   return (
     <div class="onlineBar">
-      {!isJoining && wsPath && <button onClick={() => jump()}>Leave</button>}
+      {!isJoining && wsPath && <div class="button"><button onClick={() => jump()}>Leave</button></div>}
       {!isJoining && <h1>{title}</h1>}
       <div class="buttons">
         {isJoining ? (
