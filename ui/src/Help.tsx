@@ -7,9 +7,7 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
     <p>Each player has 4 pieces. Blue opens.</p>
     <p>
-      First drop one piece at a time on an empty slot;
-      <br />
-      after dropping all pieces, move one at a time to an empty neighbor:
+      First place all pieces down one by one in turn, then move one to an empty neighbor each turn.
     </p>
     <BoardView
       board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
