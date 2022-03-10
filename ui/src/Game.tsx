@@ -2,7 +2,7 @@ import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
-import { Board, EmptyBoard } from "./model";
+import { Board, EmptyBoard, SIZE, SLOTS } from "./model";
 import { setHash } from "./utils.ts";
 
 import { BoardView } from "./BoardView";
@@ -14,6 +14,11 @@ export const Game: FunctionComponent<{
 }> = ({ initial, roomPath, showHelp }) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette>(undefined);
+  const [hasCopied, setHasCopied] = useState(false);
+
+  useEffect(() => {
+    if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
+  }, [hasCopied]);
 
   useEffect(() => {
     if (roomPath) {
@@ -27,7 +32,7 @@ export const Game: FunctionComponent<{
             if (evt.state?.board) {
               moveToBoard(evt.state.board, false);
             }
-          },
+          }
         })
       );
       return () => {
@@ -105,6 +110,19 @@ export const Game: FunctionComponent<{
     }
   }
 
+  function copy() {
+    let result = "";
+    for (let i = 0; i < SLOTS; i++) {
+      result += (board.a & (1 << i)) ? "🔵" : (board.b & (1 << i)) ? "🔴" : "⚫️";
+      if (i % SIZE === SIZE - 1 && i != SLOTS - 1) {
+        result += "\n";
+      }
+    }
+    navigator.clipboard
+      .writeText(result)
+      .then(() => setHasCopied(true));
+  }
+
   return (
     <>
       <BoardView
@@ -114,15 +132,18 @@ export const Game: FunctionComponent<{
         klass="full"
         showStatus={true}
       />
-      <p>
-        {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
-        {board.a !== 0 ? (
-          <button onClick={() => moveToBoard({ ...EmptyBoard })}>Reset</button>
-        ) : (
-          <></>
-        )}
-        <button onClick={showHelp}>Rules</button>
-      </p>
+      {
+        hasCopied ? <h1>Copied to clipboard.</h1> : <p>
+          {board.l !== null ? <button onClick={undo}>Undo</button> : <></>}
+          {board.a !== 0 ? (
+            <button onClick={() => moveToBoard({ ...EmptyBoard })}>Reset</button>
+          ) : (
+            <></>
+          )}
+          <button onClick={showHelp}>Rules</button>
+          <button onClick={copy}>Emojis</button>
+        </p>
+      }
       <h1>Teeko by John Scarne</h1>
     </>
   );
