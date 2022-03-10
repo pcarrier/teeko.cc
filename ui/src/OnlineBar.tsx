@@ -17,7 +17,9 @@ export const OnlineBar: FunctionComponent<{
     if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
   }, [hasCopied]);
 
-  const title = wsPath ? decodeURI(wsPath) : "Offline";
+  const title = wsPath ?
+    <><span class="board">Board </span>{decodeURI(wsPath)}</>
+    : <span class="board">Offline board</span>;
 
   function submitJoin() {
     setJoining(false);
