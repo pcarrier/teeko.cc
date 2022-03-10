@@ -196,21 +196,17 @@ p.banner button {
   max-width: @maxBoardWidth;
 }
 
-.onlineBar > * {
-  flex-grow: 1;
-  flex-shrink: 1;
-}
-
-.onlineBar > h1 {
+.onlineBar > h1,
+input {
   text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  flex: 1;
 }
 
-.onlineBar > .buttons {
+.onlineBar button {
   flex-grow: 0;
-  flex-shrink: 0;
 }
 
 .onlineBar span.board {

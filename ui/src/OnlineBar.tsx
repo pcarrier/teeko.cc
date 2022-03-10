@@ -31,55 +31,58 @@ export const OnlineBar: FunctionComponent<{
     jump(nextRoom || randomRoom());
   }
 
+  function share() {
+    if (navigator.share)
+      navigator.share({
+        title: `teeko.cc (${wsPath})`,
+        text: "Play Teeko with me!",
+        url: `https://teeko.cc/${wsPath}`,
+      });
+    else {
+      navigator.clipboard
+        .writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
+        .then(() => setHasCopied(true));
+    }
+  }
+
   return (
     <div class="onlineBar">
-      {!isJoining && wsPath && <div class="button"><button onClick={() => jump()}>Leave</button></div>}
-      {!isJoining && <h1>{title}</h1>}
-      <div class="buttons">
-        {isJoining ? (
-          <>
-            <button onClick={() => setJoining(false)}>Cancel</button>
-            <input
-              type="text"
-              width="100%"
-              value={nextRoom}
-              placeholder="Board name (optional)"
-              onInput={(e: FormEvent<HTMLFormElement>) =>
-                setNextRoom(e.target.value)
+      {isJoining ? (
+        <>
+          <button onClick={() => setJoining(false)}>Cancel</button>
+          <input
+            type="text"
+            value={nextRoom}
+            placeholder="Board name (optional)"
+            onInput={(e: FormEvent<HTMLFormElement>) =>
+              setNextRoom(e.target.value)
+            }
+            onKeyUp={(e) => {
+              if (e.keyCode === 13) {
+                e.preventDefault();
+                submitJoin();
               }
-              onkeyup={(e) => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  submitJoin();
-                }
-              }}
-            />
-            <button onclick={() => submitJoin(nextRoom)}>Join</button>
-          </>
-        ) : wsPath ? (
-          <>
-            <button
-              onClick={() => {
-                if (navigator.share)
-                  navigator.share({
-                    title: `teeko.cc (${wsPath})`,
-                    text: "Play Teeko with me!",
-                    url: `https://teeko.cc/${wsPath}`,
-                  });
-                else {
-                  navigator.clipboard
-                    .writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
-                    .then(() => setHasCopied(true));
-                }
-              }}
-            >
-              {hasCopied ? "Copied!" : "Invite"}
-            </button>
-          </>
-        ) : (
-          <button onclick={() => setJoining(true)}>Online</button>
-        )}
-      </div>
+            }}
+          />
+          <button onClick={() => submitJoin(nextRoom)}>Join</button>
+        </>
+      ) : wsPath ? (
+        <>
+          <button onClick={() => jump()}>Leave</button>
+          <h1>
+            <span class="board">Board </span>
+            {decodeURI(wsPath)}
+          </h1>
+          <button onClick={share}>{hasCopied ? "Copied!" : "Invite"}</button>
+        </>
+      ) : (
+        <>
+          <h1>
+            <span className="board">Offline board</span>
+          </h1>
+          <button onClick={() => setJoining(true)}>Online</button>
+        </>
+      )}
     </div>
   );
 };
