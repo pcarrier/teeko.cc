@@ -4,11 +4,14 @@ deploy: deploy-ui deploy-ws
 ui/public/icon-512x512.png: ui/public/icon.svg
 	rsvg-convert --height 512 --output ui/public/icon-512x512.png ui/public/icon.svg
 
+ui/public/icon-256x256.png: ui/public/icon.svg
+	rsvg-convert --height 256 --output ui/public/icon-256x256.png ui/public/icon.svg
+
 ui/public/icon-192x192.png: ui/public/icon.svg
 	rsvg-convert --height 192 --output ui/public/icon-192x192.png ui/public/icon.svg
 
 .PHONY: build-ui
-build-ui: ui/public/icon-192x192.png ui/public/icon-512x512.png
+build-ui: ui/public/icon-512x512.png ui/public/icon-256x256.png ui/public/icon-192x192.png
 	cd ui && npm ci && npm run build
 
 .PHONY: deploy-ui
