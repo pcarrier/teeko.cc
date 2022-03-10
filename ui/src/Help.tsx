@@ -54,13 +54,11 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
     <p>Win by forming a straight line of 4 or a unit square:</p>
     <BoardView board={{ ...emptyBoard(), a: 2236928, p: false }} klass="half" />
     <BoardView board={{ ...emptyBoard(), b: 6336, p: false }} klass="half" />
+    <button onClick={close}>Close</button>
     <p>
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
-      <a href="https://pcarrier.com/teeko">archives</a>,{" "}
-      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>
-    </p>
-    <p>
-      <button onClick={close}>Play</button>
+      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
+      <a href="https://pcarrier.com/teeko">archives</a>
     </p>
   </div>
 );
