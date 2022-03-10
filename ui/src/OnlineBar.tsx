@@ -9,10 +9,10 @@ export const OnlineBar: FunctionComponent<{
   const [nextRoom, setNextRoom] = useState(undefined);
   const title = wsPath ? (
     <>
-      Room <tt>{decodeURI(wsPath)}</tt>
+      Board <tt>{decodeURI(wsPath)}</tt>
     </>
   ) : (
-    <>Local game</>
+    <>Offline board</>
   );
 
   function submitJoin() {
@@ -30,7 +30,7 @@ export const OnlineBar: FunctionComponent<{
               type="text"
               width="8"
               value={nextRoom}
-              placeholder="Room name"
+              placeholder="Name the board"
               onInput={(e: FormEvent<HTMLFormElement>) =>
                 setNextRoom(e.target.value)
               }
