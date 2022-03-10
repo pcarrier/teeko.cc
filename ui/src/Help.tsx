@@ -1,7 +1,7 @@
 import { FunctionComponent, h } from "preact";
 
 import { BoardView } from "./BoardView";
-import { EmptyBoard, Player } from "./model";
+import { emptyBoard, Player } from "./model";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
@@ -12,7 +12,7 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       after dropping all pieces, move one at a time to an empty neighbor:
     </p>
     <BoardView
-      board={{ ...EmptyBoard, a: 143424, b: 329856, p: false, t: 0 }}
+      board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
       klass="half"
       arrows={[
         { from: 6, to: 0, player: Player.A },
@@ -29,7 +29,7 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       ]}
     />
     <BoardView
-      board={{ ...EmptyBoard, a: 143424, b: 329856, p: false, t: 1 }}
+      board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
       klass="half"
       arrows={[
         { from: 7, to: 1, player: Player.B },
@@ -52,8 +52,8 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       ]}
     />
     <p>Win by forming a straight line of 4 or a unit square:</p>
-    <BoardView board={{ ...EmptyBoard, a: 2236928, p: false }} klass="half" />
-    <BoardView board={{ ...EmptyBoard, b: 6336, p: false }} klass="half" />
+    <BoardView board={{ ...emptyBoard(), a: 2236928, p: false }} klass="half" />
+    <BoardView board={{ ...emptyBoard(), b: 6336, p: false }} klass="half" />
     <p>
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
       <a href="https://pcarrier.com/teeko">archives</a>,{" "}

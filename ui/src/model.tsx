@@ -9,18 +9,18 @@ export enum Player {
 export type Board = {
   a: number;
   b: number;
-  t: number; // turn
+  m: (number | [number, number])[];
   p: boolean; // playing or not
-  l: number | [number, number] | null; // last action
 };
 
-export const EmptyBoard: Board = {
-  a: 0,
-  b: 0,
-  t: Player.A,
-  p: true,
-  l: null,
-};
+export function emptyBoard(): Board {
+  return {
+    a: 0,
+    b: 0,
+    m: [],
+    p: true,
+  };
+}
 
 export function pieces(n: number): Set<number> {
   const result = [];

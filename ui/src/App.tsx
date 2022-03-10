@@ -4,14 +4,14 @@ import { useState } from "preact/hooks";
 
 import { historyPush, setHash } from "./utils.ts";
 import { useEvent } from "./useEvent.ts";
-import { Board, EmptyBoard } from "./model";
+import { emptyBoard } from "./model";
 import { Game } from "./Game";
 import { Help } from "./Help.tsx";
 import { OnlineBar } from "./OnlineBar.tsx";
 
 export const App: FunctionComponent = () => {
-  const [showHelp, setShowHelp] = useState(false);
-  const [wsPath, setWsPath] = useState(undefined);
+  const [showHelp, setShowHelp] = useState<boolean>(false);
+  const [wsPath, setWsPath] = useState<string | undefined>(undefined);
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -22,19 +22,16 @@ export const App: FunctionComponent = () => {
     },
   });
 
-  let initial: Board = { ...EmptyBoard };
+  let initial = emptyBoard();
+
   let foundBoardInURL = false;
 
   if (window.location.hash.startsWith("#%5B")) {
     try {
-      const [a, b, t, l] = JSON.parse(
+      const [a, b, m] = JSON.parse(
         decodeURI(window.location.hash.substring(1))
       );
-      initial = { a, b, t, l, p: true };
-      initial.a = a;
-      initial.b = b;
-      initial.t = t;
-      initial.l = l;
+      initial = { a, b, m, p: true };
       foundBoardInURL = true;
     } catch (_) {
       console.log("Invalid URL parameters");
@@ -44,8 +41,11 @@ export const App: FunctionComponent = () => {
   if (!foundBoardInURL) {
     const stored = localStorage.getItem("board");
     if (stored) {
-      initial = JSON.parse(stored);
-      setHash(initial);
+      const parsed = JSON.parse(stored);
+      if (parsed.m) {
+        initial = parsed;
+        setHash(initial);
+      }
     }
   }
 

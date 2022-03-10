@@ -17,16 +17,26 @@ export const OnlineBar: FunctionComponent<{
     if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
   }, [hasCopied]);
 
-  const title = wsPath ?
-    <><span class="board">Board </span>{decodeURI(wsPath)}</>
-    : <span class="board">Offline board</span>;
+  const title = wsPath ? (
+    <>
+      <span class="board">Board </span>
+      {decodeURI(wsPath)}
+    </>
+  ) : (
+    <span class="board">Offline board</span>
+  );
 
   function submitJoin() {
     setJoining(false);
     jump(nextRoom || randomRoom());
   }
 
-  if (hasCopied) return <div class="onlineBar"><h1>Copied to clipboard.</h1></div>;
+  if (hasCopied)
+    return (
+      <div class="onlineBar">
+        <div class="buttonish">Copied to clipboard.</div>
+      </div>
+    );
 
   return (
     <div class="onlineBar">
@@ -61,7 +71,7 @@ export const OnlineBar: FunctionComponent<{
                   navigator.share({
                     title: `teeko.cc (${wsPath})`,
                     text: "Play Teeko with me!",
-                    url: `https://teeko.cc/${wsPath}`
+                    url: `https://teeko.cc/${wsPath}`,
                   });
                 else {
                   navigator.clipboard

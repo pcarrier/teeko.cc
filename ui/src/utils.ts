@@ -6,6 +6,6 @@ export function historyPush(path) {
 
 export function setHash(board: Board) {
   location.replace(
-    `#${encodeURI(JSON.stringify([board.a, board.b, board.t, board.l]))}`
+    `#${encodeURI(JSON.stringify([board.a, board.b, board.m]))}`
   );
 }

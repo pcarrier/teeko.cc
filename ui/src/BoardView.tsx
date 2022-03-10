@@ -72,7 +72,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const [selected, setSelected] = useState<number | undefined>(undefined);
   const [dragTurn, setDragTurn] = useState<number | undefined>(undefined);
 
-  const { a, b, t, p } = board;
+  const { a, b, m, p } = board;
+  const t = m.length % 2;
   const aPieces = pieces(a);
   const bPieces = pieces(b);
   const emptySlots = new Set(
@@ -86,7 +87,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     !p || win ? new Set<number>() : t % 2 === 0 ? aPieces : bPieces;
 
   useEffect(() => {
-    if (!ourPieces.has(selected)) {
+    if (selected === undefined || !ourPieces.has(selected)) {
       setSelected(undefined);
     }
   }, [selected, ourPieces]);
@@ -151,7 +152,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     <></>
   );
 
-  const lastAction = board.l;
+  const lastAction =
+    board.m.length > 0 ? board.m[board.m.length - 1] : undefined;
 
   const svgRef = useRef<SVGSVGElement>(null);
   const svgRect = useRect(svgRef);
@@ -208,7 +210,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </defs>
 
         {BoardBackground}
-        {lastAction === null ? (
+        {lastAction === undefined ? (
           <></>
         ) : Array.isArray(lastAction) ? (
           <line

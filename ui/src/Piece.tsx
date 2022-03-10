@@ -53,8 +53,10 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
       },
     });
 
-  const dxNorm = (selectable && state.isDragging && aspect) ? state.dx / aspect.width : 0;
-  const dyNorm = (selectable && state.isDragging && aspect) ? state.dy / aspect.height : 0;
+  const dxNorm =
+    selectable && state.isDragging && aspect ? state.dx / aspect.width : 0;
+  const dyNorm =
+    selectable && state.isDragging && aspect ? state.dy / aspect.height : 0;
 
   function limitToBoard(n: number) {
     return Math.max(0, Math.min(n, SIZE - 1));

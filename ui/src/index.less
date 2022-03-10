@@ -57,7 +57,8 @@ h1 {
 }
 
 button,
-input {
+input,
+.buttonish {
   font-size: 100%;
   background-color: @bg;
   color: @strong;
@@ -66,10 +67,14 @@ input {
   border-radius: 0.25em;
   padding: 0.5em 1em;
   margin: 1em 0.5em;
+}
 
-  &:hover {
-    background-color: @boardColor;
-  }
+button:hover {
+  background-color: @boardColor;
+}
+
+.buttonish {
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 input {
