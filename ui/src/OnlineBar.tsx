@@ -33,7 +33,8 @@ export const OnlineBar: FunctionComponent<{
 
   return (
     <div class="onlineBar">
-      {isJoining ? <></> : <h1>{title}</h1>}
+      {!isJoining && wsPath ? <button onClick={() => jump()}>Leave</button> : null}
+      <h1>{title}</h1>
       <div class="buttons">
         {isJoining ? (
           <>
@@ -57,7 +58,6 @@ export const OnlineBar: FunctionComponent<{
           </>
         ) : wsPath ? (
           <>
-            <button onClick={() => jump()}>Leave</button>
             <button
               onClick={() => {
                 if (navigator.share)
