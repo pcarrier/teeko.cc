@@ -2,7 +2,13 @@ import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
-import { Board, emptyBoard, Message } from "teeko-cc-common/src/model";
+import {
+  Board,
+  computeDrop,
+  computeMove,
+  emptyBoard,
+  Message,
+} from "teeko-cc-common/src/model";
 
 import { BoardView } from "./BoardView";
 
@@ -41,46 +47,13 @@ export const Game: FunctionComponent<{
   }
 
   function move(from: number, to: number) {
-    let { a, b, m, p } = board;
-    const t = m.length % 2;
-    const isA = t % 2 === 0;
-
-    m.push([from, to]);
-
-    const [ours, theirs] = isA ? [a, b] : [b, a];
-    if (!(ours & (1 << from))) {
-      console.log("skipped drop");
-    }
-    if (ours & (1 << to)) {
-      console.log("avoided collision with self");
-      return;
-    }
-    if (theirs & (1 << to)) {
-      console.log("avoided collision with other player");
-      return;
-    }
-    const result = (ours & ~(1 << from)) | (1 << to);
-    if (isA) {
-      a = result;
-    } else {
-      b = result;
-    }
-    moveToBoard({ a, b, p, m });
+    const after = computeMove(board, from, to);
+    if (after) moveToBoard(after);
   }
 
   function drop(pos: number) {
-    let { a, b, m, p } = board;
-    const t = m.length % 2;
-    const isA = t % 2 === 0;
-
-    m.push(pos);
-
-    const [target, other] = isA ? [a, b] : [b, a];
-    if (other & (1 << pos)) return;
-    const result = target | (1 << pos);
-    if (isA) a = result;
-    else b = result;
-    moveToBoard({ a, b, m, p });
+    const after = computeDrop(board, pos);
+    if (after) moveToBoard(after);
   }
 
   function undo() {

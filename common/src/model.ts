@@ -86,3 +86,36 @@ export function y(pos: number) {
 export type Message = {
   state: Board;
 };
+
+export function computeMove(board: Board, from: number, to: number) {
+  let { a, b, m, p } = board;
+  const t = m.length % 2;
+  const isA = t % 2 === 0;
+  m = [...m, [from, to]];
+
+  const [ours, theirs] = isA ? [a, b] : [b, a];
+  if (!(ours & (1 << from))) return;
+  if (ours & (1 << to)) return;
+  if (theirs & (1 << to)) return;
+  const result = (ours & ~(1 << from)) | (1 << to);
+  if (isA) {
+    a = result;
+  } else {
+    b = result;
+  }
+  return { a, b, m, p };
+}
+
+export function computeDrop(board: Board, pos: number) {
+  let { a, b, m, p } = board;
+  const t = m.length % 2;
+  const isA = t % 2 === 0;
+  m = [...m, pos];
+
+  const [target, other] = isA ? [a, b] : [b, a];
+  if (other & (1 << pos)) return;
+  const result = target | (1 << pos);
+  if (isA) a = result;
+  else b = result;
+  return { a, b, m, p };
+}
