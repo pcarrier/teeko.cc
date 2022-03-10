@@ -1,6 +1,9 @@
 import { FunctionComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { nanoid } from "nanoid";
+
+function randomRoom() {
+  return Math.floor(Math.random() * 100000).toString();
+}
 
 export const OnlineBar: FunctionComponent<{
   wsPath?: string;
@@ -18,7 +21,7 @@ export const OnlineBar: FunctionComponent<{
 
   function submitJoin() {
     setJoining(false);
-    jump(nextRoom || nanoid());
+    jump(nextRoom || randomRoom());
   }
 
   if (hasCopied) return <div class="onlineBar"><h1>Copied to clipboard.</h1></div>;
