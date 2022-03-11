@@ -95,6 +95,7 @@ export const Game: FunctionComponent<{
           <></>
         )}
         <button onClick={showHelp}>Help</button>
+        <button onclick={() => window.location.href = 'https://discord.gg/KEj9brTRS6'}>Discord</button>
       </p>
     </>
   );
