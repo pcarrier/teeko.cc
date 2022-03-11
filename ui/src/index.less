@@ -58,12 +58,10 @@ h1 {
 }
 
 button,
-input,
-.buttonish {
+input {
   font-size: 100%;
   background-color: transparent;
   color: @strong;
-  border: none;
   border: 1px solid @boardColor;
   border-radius: 0.25em;
   padding: 0.5em 1em;
@@ -72,10 +70,6 @@ input,
 
 button:hover {
   background-color: @boardColor;
-}
-
-.buttonish {
-  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 input {
@@ -204,10 +198,6 @@ input {
   overflow: hidden;
   white-space: nowrap;
   flex: 1;
-}
-
-.onlineBar button {
-  flex-grow: 0;
 }
 
 .onlineBar span.board {

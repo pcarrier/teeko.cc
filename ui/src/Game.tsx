@@ -87,15 +87,21 @@ export const Game: FunctionComponent<{
         klass="full"
         showStatus={true}
       />
-      <p>
+      <p class="buttons">
         {board.m.length === 0 ? null : <button onClick={undo}>Undo</button>}
         {board.a !== 0 ? (
           <button onClick={() => moveToBoard(emptyBoard())}>Reset</button>
         ) : (
           <></>
         )}
+        <button
+          onClick={() =>
+            (window.location.href = "https://discord.gg/KEj9brTRS6")
+          }
+        >
+          Discord
+        </button>
         <button onClick={showHelp}>Help</button>
-        <button onclick={() => window.location.href = 'https://discord.gg/KEj9brTRS6'}>Discord</button>
       </p>
     </>
   );
