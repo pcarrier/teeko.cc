@@ -259,8 +259,8 @@ export const OnlineBar: FunctionComponent<{
           <h1 style="margin-left: 1.5em;">
             <span className="board">Offline board</span>
           </h1>
-          {/*<button onClick={() => setMatching(true)}>{isMatching ? <>{spinner} Matching…</> : 'Matched'}</button>*/}
-          <button onClick={() => setJoining(true)}>Online</button>
+          <button onClick={() => setMatching(true)}>{isMatching ? <>{spinner} Matching…</> : 'Matched'}</button>
+          <button onClick={() => setJoining(true)}>Friends</button>
         </>
       )}
     </div>
