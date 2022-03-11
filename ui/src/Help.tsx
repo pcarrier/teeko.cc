@@ -6,7 +6,7 @@ import { emptyBoard, Player } from "teeko-cc-common/src/model";
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
     <p>Each player has 4 pieces. Blue opens.</p>
-    <p>First, place all pieces down one by one in turn.</p>
+    <p>First, place all pieces down, one each turn.</p>
     <p>Then, move one to an empty neighbor each turn:</p>
     <BoardView
       board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
