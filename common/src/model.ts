@@ -95,7 +95,7 @@ export type Message = {
 export function computeMove(board: Board, from: number, to: number) {
   let { a, b, m, p } = board;
   const t = m.length % 2;
-  const isA = t % 2 === 0;
+  const isA = t === 0;
   m = [...m, [from, to]];
 
   const [ours, theirs] = isA ? [a, b] : [b, a];
@@ -114,7 +114,7 @@ export function computeMove(board: Board, from: number, to: number) {
 export function computeDrop(board: Board, pos: number) {
   let { a, b, m, p } = board;
   const t = m.length % 2;
-  const isA = t % 2 === 0;
+  const isA = t === 0;
   m = [...m, pos];
 
   const [target, other] = isA ? [a, b] : [b, a];

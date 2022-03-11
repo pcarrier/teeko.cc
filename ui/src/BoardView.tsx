@@ -295,7 +295,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
               r={LARGE_CROWN_RADIUS}
               cx={x(pos)}
               cy={y(pos)}
-              class={classnames("target", t % 2 === 0 ? "A" : "B")}
+              class={classnames("target", t === 0 ? "A" : "B")}
             />
           ))}
 
@@ -341,7 +341,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           <Piece
             dummy
             key="dummy"
-            player={t % 2 === 0 ? Player.A : Player.B}
+            player={t === 0 ? Player.A : Player.B}
             position={selected}
             offset={{ x: dragState.x, y: dragState.y }}
           />
