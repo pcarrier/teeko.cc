@@ -1,29 +1,27 @@
-import { FunctionComponent, h } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import {FunctionComponent, h} from "preact";
+import {useEffect, useState} from "preact/hooks";
 import Sockette from "sockette";
 
-import {
-  Board,
-  computeDrop,
-  computeMove,
-  emptyBoard,
-  Message,
-} from "teeko-cc-common/src/model";
+import {Board, computeDrop, computeMove, emptyBoard, Message,} from "teeko-cc-common/src/model";
 
-import { BoardView } from "./BoardView";
+import {BoardView} from "./BoardView";
+import {OnlineStatus} from "./App.tsx";
 
 export const Game: FunctionComponent<{
   initial: Board;
   roomPath?: string;
   showHelp: () => void;
   setPop: (count: number) => void;
-}> = ({ initial, roomPath, showHelp, setPop }) => {
+  setOnlineStatus: (status: OnlineStatus) => void;
+}> = ({ initial, roomPath, showHelp, setPop, setOnlineStatus }) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
 
   useEffect(() => {
     if (roomPath) {
       const sockette = new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
+        onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
+        onreconnect: () => setOnlineStatus(OnlineStatus.OFFLINE),
         onmessage: (evt: MessageEvent) => {
           const msg = JSON.parse(evt.data) as Message;
           if (msg.st === null) {

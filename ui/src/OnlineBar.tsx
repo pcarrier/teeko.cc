@@ -1,5 +1,6 @@
-import { FunctionComponent } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import {FunctionComponent} from "preact";
+import {useEffect, useState} from "preact/hooks";
+import {OnlineStatus} from "./App.tsx";
 
 function randomRoom() {
   return Math.floor(Math.random() * 100000).toString();
@@ -179,7 +180,8 @@ export const OnlineBar: FunctionComponent<{
   wsPath?: string;
   jump: (path: string) => void;
   pop: number | undefined;
-}> = ({ wsPath, jump, pop }) => {
+  onlineStatus: OnlineStatus;
+}> = ({ wsPath, jump, pop, onlineStatus }) => {
   const [hasCopied, setHasCopied] = useState(false);
   const [isJoining, setJoining] = useState(false);
   const [isMatching, setMatching] = useState(false);
@@ -242,7 +244,7 @@ export const OnlineBar: FunctionComponent<{
         <>
           <button onClick={() => jump()}>Leave</button>
           <h1>
-            <span class="deemph">Board </span>
+            <span class="deemph"><span style={onlineStatus === OnlineStatus.ONLINE ? 'color:#0f0' : 'color:#f00'}>⬤</span> Board </span>
             {decodeURI(wsPath)}
           </h1>
           <p className="pop">

@@ -9,9 +9,14 @@ import { Game } from "./Game";
 import { Help } from "./Help.tsx";
 import { OnlineBar } from "./OnlineBar.tsx";
 
+export enum OnlineStatus {
+  OFFLINE,
+  ONLINE
+}
+
 export const App: FunctionComponent = () => {
   const {
-    needRefresh: [needRefresh, setNeedRefresh],
+    needRefresh: [needsRefresh, setNeedsRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
@@ -20,8 +25,8 @@ export const App: FunctionComponent = () => {
   });
 
   useEffect(async () => {
-    if (needRefresh) {
-      setNeedRefresh(false);
+    if (needsRefresh) {
+      setNeedsRefresh(false);
       await updateServiceWorker(true);
     }
   });
@@ -29,6 +34,7 @@ export const App: FunctionComponent = () => {
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const [wsPath, setWsPath] = useState<string | undefined>(undefined);
   const [pop, setPop] = useState<number | undefined>(undefined);
+  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(OnlineStatus.OFFLINE);
 
   let initial = emptyBoard();
 
@@ -60,12 +66,13 @@ export const App: FunctionComponent = () => {
 
   return (
     <>
-      <OnlineBar wsPath={wsPath} pop={pop} jump={jump} />
+      <OnlineBar wsPath={wsPath} pop={pop} jump={jump} onlineStatus={onlineStatus} />
       <Game
         initial={initial}
         roomPath={wsPath}
         showHelp={() => setShowHelp(true)}
         setPop={setPop}
+        setOnlineStatus={setOnlineStatus}
       />
     </>
   );
