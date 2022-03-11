@@ -3,9 +3,9 @@
 @bg: #000;
 @boardColor: #444;
 @selectionColor: #888;
+@link: #04f;
 @aColor: #04f;
 @bColor: #f00;
-@link: #00f;
 @aDark: darken(@aColor, 25%);
 @bDark: darken(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
@@ -201,6 +201,10 @@ input {
   flex: 1;
 }
 
-.onlineBar span.board {
+.onlineBar span.deemph {
   color: @boardColor;
+}
+
+.onlineBar .alone {
+  color: @bColor;
 }

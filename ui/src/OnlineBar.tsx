@@ -240,24 +240,27 @@ export const OnlineBar: FunctionComponent<{
         </>
       ) : wsPath ? (
         <>
-          <button onClick={() => jump()}>
-            Leave
-            {pop === undefined || pop === 1
-              ? null
-              : pop === 2
-              ? " 1 player"
-              : ` ${pop - 1} players`}
-          </button>
+          <button onClick={() => jump()}>Leave</button>
           <h1>
-            <span class="board">Board </span>
+            <span class="deemph">Board </span>
             {decodeURI(wsPath)}
+            <span class="deemph">
+              {!pop ? null : pop === 1 ? (
+                <>
+                  {" "}
+                  (<span className="alone">alone</span>)
+                </>
+              ) : (
+                ` (${pop} players)`
+              )}
+            </span>
           </h1>
           <button onClick={share}>{hasCopied ? "Copied!" : "Invite"}</button>
         </>
       ) : (
         <>
           <h1 style="margin-left: 1.5em;">
-            <span className="board">Offline board</span>
+            <span className="deemph">Offline board</span>
           </h1>
           {/*<button onClick={() => setMatching(true)}>{isMatching ? <>{spinner} Matching…</> : 'Matched'}</button>*/}
           <button onClick={() => setJoining(true)}>Online</button>
