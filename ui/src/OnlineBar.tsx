@@ -244,23 +244,20 @@ export const OnlineBar: FunctionComponent<{
           <h1>
             <span class="deemph">Board </span>
             {decodeURI(wsPath)}
-            <span class="deemph">
-              {!pop ? null : pop === 1 ? (
-                <>
-                  {" "}
-                  (<span className="alone">alone</span>)
-                </>
-              ) : (
-                ` (${pop} players)`
-              )}
-            </span>
           </h1>
+          <p className="pop">
+              {!pop ? null : pop === 1 ? (
+                    <span className="alone">alone</span>
+              ) : (
+                  <span>{pop} players</span>
+              )}
+            </p>
           <button onClick={share}>{hasCopied ? "Copied!" : "Invite"}</button>
         </>
       ) : (
         <>
-          <h1 style="margin-left: 1.5em;">
-            <span className="deemph">Offline board</span>
+          <h1 class="offline">
+            <span className="deemph">Local game</span>
           </h1>
           {/*<button onClick={() => setMatching(true)}>{isMatching ? <>{spinner} Matching…</> : 'Matched'}</button>*/}
           <button onClick={() => setJoining(true)}>Online</button>

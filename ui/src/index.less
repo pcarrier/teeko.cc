@@ -192,17 +192,24 @@ p.banner button {
   max-width: @maxBoardWidth;
 }
 
-.onlineBar > h1,
-input {
+.onlineBar > h1 {
   text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.onlineBar > input, .onlineBar > p.pop, .onlineBar > h1.offline {
   flex: 1;
+  text-align: left;
+}
+
+.onlineBar > h1.offline {
+  margin-left: 10mm;
 }
 
 .onlineBar span.deemph {
-  color: @boardColor;
+  color: @color;
 }
 
 .onlineBar .alone {
