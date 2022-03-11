@@ -89,13 +89,13 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const win = aWin || bWin;
 
   const ourPieces =
-    !p || win ? new Set<number>() : t % 2 === 0 ? aPieces : bPieces;
+    !p || win ? new Set<number>() : t === 0 ? aPieces : bPieces;
 
   useEffect(() => {
     if (selected === undefined || !ourPieces.has(selected)) {
       setSelected(undefined);
     }
-  }, [selected, ourPieces]);
+  }, [selected, t]);
 
   const movable = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
@@ -139,7 +139,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
   }
 
-  const activePlayer = t % 2 === 0 ? "Blue" : "Red";
+  const activePlayer = t === 0 ? "Blue" : "Red";
 
   const status = showStatus ? (
     <p>
@@ -223,14 +223,14 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
             y1={y(lastAction[0])}
             x2={x(lastAction[1])}
             y2={y(lastAction[1])}
-            class={classnames("last", t % 2 === 0 ? "B" : "A")}
+            class={classnames("last", t === 0 ? "B" : "A")}
           />
         ) : (
           <circle
             r={LAST_ACTION_RADIUS}
             cx={lastAction % 5}
             cy={Math.floor(lastAction / 5)}
-            class={classnames("last", t % 2 === 0 ? "B" : "A")}
+            class={classnames("last", t === 0 ? "B" : "A")}
           />
         )}
 
@@ -263,7 +263,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 : (dropping || selected !== undefined) && validTargets.has(pos)
                 ? "target"
                 : undefined,
-              t % 2 === 0 ? "A" : "B"
+              t === 0 ? "A" : "B"
             )}
           />
         ))}

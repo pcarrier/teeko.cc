@@ -60,11 +60,10 @@ export const Game: FunctionComponent<{
 
   function undo() {
     let { a, b, m, p } = board;
-    const t = m.length % 2;
+    const wasA = m.length % 2 === 1;
     const last = m.pop();
     if (last === undefined) return;
 
-    const wasA = t % 2 === 1;
     const target = wasA ? a : b;
     if (Array.isArray(last)) {
       const [to, from] = last;
