@@ -85,10 +85,11 @@ export function y(pos: number) {
 
 export type State = {
   board: Board;
-}
+};
 
 export type Message = {
-  st: State;
+  pop?: number;
+  st?: State;
 };
 
 export function computeMove(board: Board, from: number, to: number) {

@@ -28,6 +28,7 @@ export const App: FunctionComponent = () => {
 
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const [wsPath, setWsPath] = useState<string | undefined>(undefined);
+  const [pop, setPop] = useState<number | undefined>(undefined);
 
   let initial = emptyBoard();
 
@@ -59,11 +60,12 @@ export const App: FunctionComponent = () => {
 
   return (
     <>
-      <OnlineBar wsPath={wsPath} jump={jump} />
+      <OnlineBar wsPath={wsPath} pop={pop} jump={jump} />
       <Game
         initial={initial}
         roomPath={wsPath}
         showHelp={() => setShowHelp(true)}
+        setPop={setPop}
       />
     </>
   );

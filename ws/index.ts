@@ -1,11 +1,11 @@
-import { Message } from "../common/src/model.ts";
+import { State, Message } from "../common/src/model.ts";
 
-type RoomState = unknown;
+type RoomState = State;
 
 interface Room {
   path: string;
   clients: WebSocket[];
-  state: RoomState;
+  state: RoomState | null;
   timeout?: number;
 }
 
@@ -26,17 +26,22 @@ function getRoom(ctx: Context): Room {
   const path = ctx.roomPath;
   const existing = serverState.rooms.get(path);
   if (existing) {
-    existing.clients.push(ctx.socket);
     return existing;
   }
   const created: Room = {
     path,
-    clients: [ctx.socket],
+    clients: [],
     state: null,
   };
   serverState.rooms.set(path, created);
   console.log(`Opened room ${path}`);
   return created;
+}
+
+function sendPop(room: Room) {
+  room.clients.forEach((socket) =>
+    socket.send(JSON.stringify({ pop: room.clients.length }))
+  );
 }
 
 function sendState(room: Room, socket: WebSocket) {
@@ -61,6 +66,8 @@ function handleConnected(ctx: Context) {
     clearTimeout(room.timeout);
     room.timeout = undefined;
   }
+  room.clients.push(ctx.socket);
+  sendPop(room);
   sendState(room, ctx.socket);
 }
 
@@ -85,6 +92,7 @@ function handleClose(ctx: Context, evt: CloseEvent) {
   room.clients = room.clients.filter((c) => c !== ctx.socket);
   if (room.clients.length === 0)
     room.timeout = setTimeout(() => closeRoom(room), 600_000);
+  else sendPop(room);
 }
 
 const roomPrefix = "/room/";

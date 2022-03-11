@@ -16,7 +16,8 @@ export const Game: FunctionComponent<{
   initial: Board;
   roomPath?: string;
   showHelp: () => void;
-}> = ({ initial, roomPath, showHelp }) => {
+  setPop: (count: number) => void;
+}> = ({ initial, roomPath, showHelp, setPop }) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
 
@@ -30,6 +31,9 @@ export const Game: FunctionComponent<{
           }
           if (msg.st?.board) {
             moveToBoard(msg.st.board, false);
+          }
+          if (msg.pop !== undefined) {
+            setPop(msg.pop);
           }
         },
       });
