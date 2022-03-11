@@ -122,12 +122,12 @@ export const OnlineBar: FunctionComponent<{
     if (navigator.share)
       navigator.share({
         title: `teeko.cc (${wsPath})`,
-        text: "Play Teeko with me!",
+        text: "Teeko?",
         url: `https://teeko.cc/${wsPath}`,
       });
     else {
       navigator.clipboard
-        .writeText(`Play Teeko with me! https://teeko.cc/${wsPath}`)
+        .writeText(`Teeko? https://teeko.cc/${wsPath}`)
         .then(() => setHasCopied(true));
     }
   }
