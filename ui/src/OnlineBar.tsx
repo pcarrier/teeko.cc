@@ -262,7 +262,7 @@ export const OnlineBar: FunctionComponent<{
             {!pop ? null : pop === 1 ? (
               <span className="alone">alone</span>
             ) : (
-              <span>{pop} players</span>
+              <span>{pop}P</span>
             )}
           </p>
           <button onClick={share}>{hasCopied ? "Copied!" : "Invite"}</button>
