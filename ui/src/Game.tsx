@@ -42,7 +42,10 @@ export const Game: FunctionComponent<{
         },
       });
       setWs(sockette);
-      return () => sockette.close();
+      return () => {
+        sockette.close();
+        setWs(undefined);
+      }
     }
   }, [roomPath]);
 
