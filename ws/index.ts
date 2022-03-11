@@ -40,7 +40,7 @@ function getRoom(ctx: Context): Room {
 }
 
 function sendState(room: Room, socket: WebSocket) {
-  socket.send(JSON.stringify({ state: room.state }));
+  socket.send(JSON.stringify({ st: room.state }));
 }
 
 function setState(room: Room, state: RoomState, from: WebSocket) {
@@ -68,8 +68,8 @@ function handleMessage(ctx: Context, data: string) {
   const room = getRoom(ctx);
   try {
     const msg = JSON.parse(data) as Message;
-    if (msg.state) {
-      setState(room, msg.state, ctx.socket);
+    if (msg.st) {
+      setState(room, msg.st, ctx.socket);
     }
   } catch (e) {
     console.log(`handleMessage error ${e}`);

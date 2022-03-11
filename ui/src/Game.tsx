@@ -23,13 +23,13 @@ export const Game: FunctionComponent<{
   useEffect(() => {
     if (roomPath) {
       const sockette = new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
-        onmessage: (msg) => {
-          const evt = JSON.parse(msg.data);
-          if (evt.state === null) {
-            ws?.send(JSON.stringify({ state: { board } }));
+        onmessage: (evt: MessageEvent) => {
+          const msg = JSON.parse(evt.data) as Message;
+          if (msg.st === null) {
+            ws?.send(JSON.stringify({ st: { board } } as Message));
           }
-          if (evt.state?.board) {
-            moveToBoard(evt.state.board, false);
+          if (msg.st?.board) {
+            moveToBoard(msg.st.board, false);
           }
         },
       });
@@ -42,7 +42,7 @@ export const Game: FunctionComponent<{
     localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
     if (propagate && ws) {
-      ws.send(JSON.stringify({ state: { board } } as Message));
+      ws.send(JSON.stringify({ st: { board } } as Message));
     }
   }
 

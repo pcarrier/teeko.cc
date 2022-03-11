@@ -5,12 +5,99 @@ function randomRoom() {
   return Math.floor(Math.random() * 100000).toString();
 }
 
+const spinner =
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="-0.5 -0.5 3 3"
+         width="1em" height="1em">
+      <circle r="0.35" fill="#0040ff" cx="0" cy="0">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="0; 1; 2; 2; 2; 1; 0; 0; 0"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="0; 0; 0; 1; 2; 2; 2; 1; 0"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#0040ff" cx="1" cy="0">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="1; 2; 2; 2; 1; 0; 0; 0; 1"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="0; 0; 1; 2; 2; 2; 1; 0; 0"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#0040ff" cx="2" cy="0">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="2; 2; 2; 1; 0; 0; 0; 1; 2"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="0; 1; 2; 2; 2; 1; 0; 0; 0"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#0040ff" cx="2" cy="1">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="2; 2; 1; 0; 0; 0; 1; 2; 2"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="1; 2; 2; 2; 1; 0; 0; 0; 1"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#ff0000" cx="2" cy="2">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="2; 1; 0; 0; 0; 1; 2; 2; 2"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="2; 2; 2; 1; 0; 0; 0; 1; 2"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#ff0000" cx="1" cy="2">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="1; 0; 0; 0; 1; 2; 2; 2; 1"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="2; 2; 1; 0; 0; 0; 1; 2; 2"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#ff0000" cx="0" cy="2">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="0; 0; 0; 1; 2; 2; 2; 1; 0"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="2; 1; 0; 0; 0; 1; 2; 2; 2"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+      <circle r="0.35" fill="#ff0000" cx="0" cy="1">
+        <animate calcMode="spline" attributeName="cx" dur="4s" repeatCount="indefinite"
+                 values="0; 0; 1; 2; 2; 2; 1; 0; 0"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+        <animate calcMode="spline" attributeName="cy" dur="4s" repeatCount="indefinite"
+                 values="1; 0; 0; 0; 1; 2; 2; 2; 1"
+                 keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1"
+                 keySplines="0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1; 0.8 0 0.2 1"/>
+      </circle>
+    </svg>;
+
 export const OnlineBar: FunctionComponent<{
   wsPath?: string;
   jump: (path: string) => void;
 }> = ({ wsPath, jump }) => {
   const [hasCopied, setHasCopied] = useState(false);
   const [isJoining, setJoining] = useState(false);
+  const [isMatching, setMatching] = useState(false);
   const [nextRoom, setNextRoom] = useState();
 
   useEffect(() => {
@@ -80,7 +167,8 @@ export const OnlineBar: FunctionComponent<{
           <h1 style="margin-left: 1.5em;">
             <span className="board">Offline board</span>
           </h1>
-          <button onClick={() => setJoining(true)}>Online</button>
+          {/*<button onClick={() => setMatching(true)}>{isMatching ? <>{spinner} Matching…</> : 'Matched'}</button>*/}
+          <button onClick={() => setJoining(true)}>Friends</button>
         </>
       )}
     </div>

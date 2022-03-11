@@ -83,8 +83,12 @@ export function y(pos: number) {
   return Math.floor(pos / SIZE);
 }
 
+export type State = {
+  board: Board;
+}
+
 export type Message = {
-  state: Board;
+  st: State;
 };
 
 export function computeMove(board: Board, from: number, to: number) {
