@@ -8,6 +8,7 @@ import {
   computeMove,
   emptyBoard,
   Message,
+  WINNING_POSITIONS,
 } from "teeko-cc-common/src/model";
 
 import { BoardView } from "./BoardView";
@@ -45,7 +46,7 @@ export const Game: FunctionComponent<{
       return () => {
         sockette.close();
         setWs(undefined);
-      }
+      };
     }
   }, [roomPath]);
 
@@ -90,6 +91,8 @@ export const Game: FunctionComponent<{
     }
   }
 
+  const won = WINNING_POSITIONS.has(board.a) || WINNING_POSITIONS.has(board.b);
+
   return (
     <>
       <BoardView
@@ -102,7 +105,9 @@ export const Game: FunctionComponent<{
       <p class="buttons">
         {board.m.length === 0 ? null : <button onClick={undo}>Undo</button>}
         {board.a !== 0 ? (
-          <button onClick={() => moveToBoard(emptyBoard())}>Reset</button>
+          <button onClick={() => moveToBoard(emptyBoard())}>
+            {won ? "New game" : "Concede"}
+          </button>
         ) : (
           <></>
         )}
