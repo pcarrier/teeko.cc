@@ -11,7 +11,7 @@ import { OnlineBar } from "./OnlineBar.tsx";
 
 export enum OnlineStatus {
   OFFLINE,
-  ONLINE
+  ONLINE,
 }
 
 export const App: FunctionComponent = () => {
@@ -34,7 +34,9 @@ export const App: FunctionComponent = () => {
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const [wsPath, setWsPath] = useState<string | undefined>(undefined);
   const [pop, setPop] = useState<number | undefined>(undefined);
-  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(OnlineStatus.OFFLINE);
+  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
+    OnlineStatus.OFFLINE
+  );
 
   let initial = emptyBoard();
 
@@ -66,7 +68,12 @@ export const App: FunctionComponent = () => {
 
   return (
     <>
-      <OnlineBar wsPath={wsPath} pop={pop} jump={jump} onlineStatus={onlineStatus} />
+      <OnlineBar
+        wsPath={wsPath}
+        pop={pop}
+        jump={jump}
+        onlineStatus={onlineStatus}
+      />
       <Game
         initial={initial}
         roomPath={wsPath}

@@ -1,11 +1,17 @@
-import {FunctionComponent, h} from "preact";
-import {useEffect, useState} from "preact/hooks";
+import { FunctionComponent, h } from "preact";
+import { useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
-import {Board, computeDrop, computeMove, emptyBoard, Message,} from "teeko-cc-common/src/model";
+import {
+  Board,
+  computeDrop,
+  computeMove,
+  emptyBoard,
+  Message,
+} from "teeko-cc-common/src/model";
 
-import {BoardView} from "./BoardView";
-import {OnlineStatus} from "./App.tsx";
+import { BoardView } from "./BoardView";
+import { OnlineStatus } from "./App.tsx";
 
 export const Game: FunctionComponent<{
   initial: Board;
@@ -71,6 +77,7 @@ export const Game: FunctionComponent<{
       const result = (target & ~(1 << from)) | (1 << to);
       if (wasA) a = result;
       else b = result;
+      console.log({ a, b, m, p });
       moveToBoard({ a, b, m, p });
     } else {
       const result = target & ~(1 << last);
