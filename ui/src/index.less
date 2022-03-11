@@ -9,8 +9,7 @@
 @aDark: darken(@aColor, 25%);
 @bDark: darken(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
-@maxBoardWidth: 100mm;
-@maxBoardCoarseWidth: 120mm;
+@maxBoardWidth: 120mm;
 
 * {
   box-sizing: border-box;
@@ -204,11 +203,4 @@ input {
 
 .onlineBar span.board {
   color: @boardColor;
-}
-
-@media (pointer: coarse) {
-  .onlineBar,
-  .board.full {
-    max-width: @maxBoardCoarseWidth;
-  }
 }
