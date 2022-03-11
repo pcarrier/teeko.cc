@@ -64,6 +64,7 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
 
   return (
     <circle
+      key={`p${position}`}
       onClick={click}
       r={dummy ? LARGE_CROWN_RADIUS : PIECE_RADIUS}
       cx={limitToBoard(x + dxNorm + (offset?.x ?? 0))}

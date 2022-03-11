@@ -50,17 +50,17 @@ export const BoardBackground = (
     {[0, 1, 2, 3].map((x) =>
       [0, 1, 2, 3].map((y) => (
         <>
-          <line x1={x} y1={y} x2={x + 1} y2={y} class="bg" />
-          <line x1={x} y1={y} x2={x} y2={y + 1} class="bg" />
-          <line x1={x} y1={y} x2={x + 1} y2={y + 1} class="bg" />
-          <line x1={x} y1={y + 1} x2={x + 1} y2={y} class="bg" />
+          <line key={`${x}${y}a`} x1={x} y1={y} x2={x + 1} y2={y} class="bg" />
+          <line key={`${x}${y}b`} x1={x} y1={y} x2={x} y2={y + 1} class="bg" />
+          <line key={`${x}${y}c`} x1={x} y1={y} x2={x + 1} y2={y + 1} class="bg" />
+          <line key={`${x}${y}d`} x1={x} y1={y + 1} x2={x + 1} y2={y} class="bg" />
         </>
       ))
     )}
     {[0, 1, 2, 3].map((n) => (
       <>
-        <line x1={n} y1={4} x2={n + 1} y2={4} class="bg" />
-        <line x1={4} y1={n} x2={4} y2={n + 1} class="bg" />
+        <line key={`${n}a`} x1={n} y1={4} x2={n + 1} y2={4} class="bg" />
+        <line key={`${n}b`} x1={4} y1={n} x2={4} y2={n + 1} class="bg" />
       </>
     ))}
   </>
@@ -301,7 +301,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
         {POS_ARRAY.map((pos) => (
           <circle
-            key={pos}
+            key={`click${pos}`}
             r={PIECE_RADIUS}
             cx={x(pos)}
             cy={y(pos)}
