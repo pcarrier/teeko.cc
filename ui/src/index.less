@@ -69,8 +69,13 @@ input {
   font-size: 10pt;
 }
 
-button:hover {
+button:hover:enabled {
   background-color: @boardColor;
+}
+
+button:disabled {
+  color: @boardColor;
+  border: 1px solid shade(@boardColor, 50%);
 }
 
 input {

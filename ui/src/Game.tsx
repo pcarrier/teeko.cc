@@ -96,19 +96,9 @@ export const Game: FunctionComponent<{
         showStatus={true}
       />
       <p class="buttons">
-        {board.m.length === 0 ? null : <button onClick={undo}>Undo</button>}
-        {board.a !== 0 ? (
-          <button onClick={() => moveToBoard(emptyBoard())}>
-            {won ? "New game" : "Reset"}
-          </button>
-        ) : (
-          <></>
-        )}
-        <button
-          onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
-        >
-          Discord
-        </button>
+        <button onClick={undo} disabled={board.m.length === 0}>Undo</button>
+        <button onClick={() => moveToBoard(emptyBoard())} disabled={board.a === 0}>{won ? "New game" : "Reset"}</button>
+        <button onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}>Discord</button>
         <button onClick={showHelp}>Help</button>
       </p>
     </>
