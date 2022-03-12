@@ -1,10 +1,10 @@
-import { State, Message } from "../common/src/model.ts";
+import { Message, State } from "../common/src/model.ts";
 
 type RoomState = State;
 
 interface Room {
   path: string;
-  clients: WebSocket[];
+  clients: Map<string | undefined, WebSocket[]>;
   state: RoomState | null;
   timeout?: number;
 }
@@ -18,6 +18,7 @@ const serverState: Server = {
 };
 
 interface Context {
+  pill: string | undefined;
   socket: WebSocket;
   roomPath: string;
 }
@@ -30,7 +31,7 @@ function getRoom(ctx: Context): Room {
   }
   const created: Room = {
     path,
-    clients: [],
+    clients: new Map(),
     state: null,
   };
   serverState.rooms.set(path, created);
@@ -39,8 +40,9 @@ function getRoom(ctx: Context): Room {
 }
 
 function sendPop(room: Room) {
-  room.clients.forEach((socket) =>
-    socket.send(JSON.stringify({ pop: room.clients.length }))
+  const pop = room.clients.size;
+  room.clients.forEach((sockets) =>
+    sockets.forEach((socket) => socket.send(JSON.stringify({ pop })))
   );
 }
 
@@ -50,8 +52,10 @@ function sendState(room: Room, socket: WebSocket) {
 
 function setState(room: Room, state: RoomState, from: WebSocket) {
   room.state = state;
-  room.clients.forEach((c) => {
-    if (c !== from) sendState(room, c);
+  room.clients.forEach((sockets) => {
+    sockets.forEach((socket) => {
+      if (socket !== from) sendState(room, socket);
+    });
   });
 }
 
@@ -66,7 +70,12 @@ function handleConnected(ctx: Context) {
     clearTimeout(room.timeout);
     room.timeout = undefined;
   }
-  room.clients.push(ctx.socket);
+  let sockets = room.clients.get(ctx.pill);
+  if (!sockets) {
+    sockets = [];
+    room.clients.set(ctx.pill, sockets);
+  }
+  sockets.push(ctx.socket);
   sendPop(room);
   sendState(room, ctx.socket);
 }
@@ -89,9 +98,16 @@ function handleError(ctx: Context, evt: Event | ErrorEvent) {
 
 function handleClose(ctx: Context, evt: CloseEvent) {
   const room = getRoom(ctx);
-  room.clients = room.clients.filter((c) => c !== ctx.socket);
-  if (room.clients.length === 0)
-    room.timeout = setTimeout(() => closeRoom(room), 600_000);
+  const forPill = room.clients.get(ctx.pill);
+  if (!forPill) return;
+  const remaining = forPill.filter((c) => c !== ctx.socket);
+  if (remaining.length > 0) {
+    room.clients.set(ctx.pill, remaining);
+  } else {
+    room.clients.delete(ctx.pill);
+  }
+  if (room.clients.size === 0)
+    room.timeout = setTimeout(() => closeRoom(room), 60_000);
   else sendPop(room);
 }
 
@@ -105,12 +121,14 @@ async function main() {
         await evt.respondWith(new Response(null, { status: 501 }));
       } else {
         const url = new URL(evt.request.url);
+        const pill = url.searchParams.get("pill") || undefined;
         const path = url.pathname;
 
         if (path.startsWith(roomPrefix)) {
           const { socket, response } = Deno.upgradeWebSocket(evt.request);
 
           const ctx: Context = {
+            pill,
             socket,
             roomPath: path.substring(roomPrefix.length),
           };
