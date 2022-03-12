@@ -10,7 +10,7 @@ export type Board = {
   a: number;
   b: number;
   m: (number | [number, number])[];
-  p: boolean; // playing or not
+  p: boolean;
 };
 
 export function emptyBoard(): Board {

@@ -29,6 +29,7 @@ export const Game: FunctionComponent<{
       const sockette = new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
         onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
         onreconnect: () => setOnlineStatus(OnlineStatus.OFFLINE),
+        onclose: () => setOnlineStatus(OnlineStatus.OFFLINE),
         onmessage: (evt: MessageEvent) => {
           const msg = JSON.parse(evt.data) as Message;
           if (msg.st === null) {
