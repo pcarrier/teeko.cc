@@ -18,18 +18,23 @@ export const Game: FunctionComponent<{
   initial: Board;
   roomPath?: string;
   showHelp: () => void;
-  setPop: (count: number) => void;
+  setPop: (count: number | undefined) => void;
   setOnlineStatus: (status: OnlineStatus) => void;
 }> = ({ initial, roomPath, showHelp, setPop, setOnlineStatus }) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
 
+  function offline() {
+    setOnlineStatus(OnlineStatus.OFFLINE);
+    setPop(undefined);
+  }
+
   useEffect(() => {
     if (roomPath) {
       const sockette = new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
         onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
-        onreconnect: () => setOnlineStatus(OnlineStatus.OFFLINE),
-        onclose: () => setOnlineStatus(OnlineStatus.OFFLINE),
+        onreconnect: offline,
+        onclose: offline,
         onmessage: (evt: MessageEvent) => {
           const msg = JSON.parse(evt.data) as Message;
           if (msg.st === null) {
