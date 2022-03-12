@@ -53,11 +53,11 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
     <BoardView board={{ ...emptyBoard(), a: 2236928, p: false }} klass="half" />
     <BoardView board={{ ...emptyBoard(), b: 6336, p: false }} klass="half" />
     <p>A game by John Scarne.</p>
+    <button onClick={close}>Play</button>
     <p>
       <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
-      <a href="https://pcarrier.com/teeko">archives</a>.
+      <a href="https://pcarrier.com/teeko">archives</a>
     </p>
-    <button onClick={close}>Play</button>
   </div>
 );
