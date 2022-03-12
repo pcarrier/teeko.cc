@@ -5,6 +5,7 @@ import { emptyBoard, Player } from "teeko-cc-common/src/model";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
+    <h1>Teeko</h1>
     <p>Each player has 4 pieces. Blue opens.</p>
     <p>First, place all pieces down, one each turn.</p>
     <p>Then, move one to an empty neighbor each turn:</p>
@@ -48,11 +49,11 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
         { from: 18, to: 24, player: Player.B },
       ]}
     />
-    <p>Win by forming a straight line of 4 or a unit square:</p>
+    <p>Form a straight line of 4 or a unit square to win.</p>
     <BoardView board={{ ...emptyBoard(), a: 2236928, p: false }} klass="half" />
     <BoardView board={{ ...emptyBoard(), b: 6336, p: false }} klass="half" />
+    <p>A game by John Scarne.</p>
     <p>
-      Teeko by John Scarne.{" "}
       <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
       <a href="https://pcarrier.com/teeko">archives</a>.
