@@ -112,7 +112,7 @@ export const Game: FunctionComponent<{
         {board.m.length === 0 ? null : <button onClick={undo}>Undo</button>}
         {board.a !== 0 ? (
           <button onClick={() => moveToBoard(emptyBoard())}>
-            {won ? "New game" : "Concede"}
+            {won ? "New game" : "Reset"}
           </button>
         ) : (
           <></>
