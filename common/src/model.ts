@@ -124,3 +124,25 @@ export function computeDrop(board: Board, pos: number) {
   else b = result;
   return { a, b, m, p };
 }
+
+export function computeUndo(board: Board) {
+  let { a, b, m: om, p } = board;
+  const wasA = om.length % 2 === 1;
+  const m = om.slice(0, -1);
+  const last = om.length > 0 ? om[m.length] : undefined;
+  if (last === undefined) return;
+
+  const target = wasA ? a : b;
+  if (Array.isArray(last)) {
+    const [to, from] = last;
+    const result = (target & ~(1 << from)) | (1 << to);
+    if (wasA) a = result;
+    else b = result;
+    return { a, b, m, p };
+  } else {
+    const result = target & ~(1 << last);
+    if (wasA) a = result;
+    else b = result;
+    return { a, b, m, p };
+  }
+}

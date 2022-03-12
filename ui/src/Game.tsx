@@ -5,7 +5,7 @@ import Sockette from "sockette";
 import {
   Board,
   computeDrop,
-  computeMove,
+  computeMove, computeUndo,
   emptyBoard,
   Message,
   WINNING_POSITIONS,
@@ -80,26 +80,8 @@ export const Game: FunctionComponent<{
   }
 
   function undo() {
-    let { a, b, m: om, p } = board;
-    const wasA = om.length % 2 === 1;
-    const m = om.slice(0, -1);
-    const last = om.length > 0 ? om[m.length] : undefined;
-    if (last === undefined) return;
-
-    const target = wasA ? a : b;
-    if (Array.isArray(last)) {
-      const [to, from] = last;
-      const result = (target & ~(1 << from)) | (1 << to);
-      if (wasA) a = result;
-      else b = result;
-      console.log({ a, b, m, p });
-      moveToBoard({ a, b, m, p });
-    } else {
-      const result = target & ~(1 << last);
-      if (wasA) a = result;
-      else b = result;
-      moveToBoard({ a, b, m, p });
-    }
+    const after = computeUndo(board);
+    if (after) moveToBoard(after);
   }
 
   const won = WINNING_POSITIONS.has(board.a) || WINNING_POSITIONS.has(board.b);
@@ -123,9 +105,7 @@ export const Game: FunctionComponent<{
           <></>
         )}
         <button
-          onClick={() =>
-            (window.location.href = "https://discord.gg/KEj9brTRS6")
-          }
+          onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
         >
           Discord
         </button>

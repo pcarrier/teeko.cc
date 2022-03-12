@@ -29,3 +29,7 @@ ws/bundle.js: ws/index.ts common/src/model.ts
 deploy-ws: ws/bundle.js
 	rsync --archive ws/bundle.js horse:/data/ws.teeko.cc/
 	ssh horse doas systemctl restart teeko-ws
+
+.PHONY: ws
+ws:
+	deno run --allow-net ws/index.ts
