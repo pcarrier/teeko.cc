@@ -8,6 +8,7 @@ import { emptyBoard } from "teeko-cc-common/src/model";
 import { Game } from "./Game";
 import { Help } from "./Help.tsx";
 import { OnlineBar } from "./OnlineBar.tsx";
+import { nanoid } from "nanoid";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -39,6 +40,15 @@ export const App: FunctionComponent = () => {
   );
 
   let initial = emptyBoard();
+
+  function getPill() {
+    const oldPill = localStorage.getItem("pill");
+    if (oldPill !== undefined) return oldPill;
+    const newPill = nanoid();
+    localStorage.setItem("pill", oldPill);
+    return newPill;
+  }
+  const pill = getPill();
 
   const stored = localStorage.getItem("board");
   if (stored) {
@@ -76,6 +86,7 @@ export const App: FunctionComponent = () => {
       />
       <Game
         initial={initial}
+        pill={pill}
         roomPath={wsPath}
         showHelp={() => setShowHelp(true)}
         setPop={setPop}

@@ -16,11 +16,12 @@ import { OnlineStatus } from "./App.tsx";
 
 export const Game: FunctionComponent<{
   initial: Board;
+  pill: string;
   roomPath?: string;
   showHelp: () => void;
   setPop: (count: number | undefined) => void;
   setOnlineStatus: (status: OnlineStatus) => void;
-}> = ({ initial, roomPath, showHelp, setPop, setOnlineStatus }) => {
+}> = ({ initial, roomPath, pill, showHelp, setPop, setOnlineStatus }) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
 
@@ -31,23 +32,26 @@ export const Game: FunctionComponent<{
 
   useEffect(() => {
     if (roomPath) {
-      const sockette = new Sockette(`wss://ws.teeko.cc/room/${roomPath}`, {
-        onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
-        onreconnect: offline,
-        onclose: offline,
-        onmessage: (evt: MessageEvent) => {
-          const msg = JSON.parse(evt.data) as Message;
-          if (msg.st === null) {
-            ws?.send(JSON.stringify({ st: { board } } as Message));
-          }
-          if (msg.st?.board) {
-            moveToBoard(msg.st.board, false);
-          }
-          if (msg.pop !== undefined) {
-            setPop(msg.pop);
-          }
-        },
-      });
+      const sockette = new Sockette(
+        `wss://ws.teeko.cc/room/${roomPath}?pill=${pill}`,
+        {
+          onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
+          onreconnect: offline,
+          onclose: offline,
+          onmessage: (evt: MessageEvent) => {
+            const msg = JSON.parse(evt.data) as Message;
+            if (msg.st === null) {
+              ws?.send(JSON.stringify({ st: { board } } as Message));
+            }
+            if (msg.st?.board) {
+              moveToBoard(msg.st.board, false);
+            }
+            if (msg.pop !== undefined) {
+              setPop(msg.pop);
+            }
+          },
+        }
+      );
       setWs(sockette);
       return () => {
         sockette.close();
