@@ -7,10 +7,10 @@ export enum Player {
 }
 
 export type Board = {
-  a: number;
-  b: number;
-  m: (number | [number, number])[];
-  p: boolean;
+  a: number; // Where blue has pieces (bitset)
+  b: number; // Where red has pieces (bitset)
+  m: (number | [number, number])[]; // Actions, either drop or move
+  p: boolean; // Playing or not
 };
 
 export function emptyBoard(): Board {
@@ -145,4 +145,9 @@ export function computeUndo(board: Board) {
     else b = result;
     return { a, b, m, p };
   }
+}
+
+export function computeReset(board: Board) {
+  let { p } = board;
+  return { a: 0, b: 0, m: [], p };
 }

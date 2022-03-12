@@ -1,8 +1,6 @@
 import { FunctionComponent, h } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useEffect, useState } from "preact/hooks";
-
-import { historyPush, setHash } from "./utils.ts";
 import { useEvent } from "./useEvent.ts";
 import { emptyBoard } from "teeko-cc-common/src/model";
 import { Game } from "./Game";
@@ -71,7 +69,7 @@ export const App: FunctionComponent = () => {
   useEvent("popstate", updateWsPath);
 
   function jump(location: string | undefined) {
-    historyPush(location ? `/${location}` : "/");
+    history.pushState({}, null, location ? `/${location}` : "/");
     updateWsPath();
   }
 

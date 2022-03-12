@@ -5,8 +5,9 @@ import Sockette from "sockette";
 import {
   Board,
   computeDrop,
-  computeMove, computeUndo,
-  emptyBoard,
+  computeMove,
+  computeReset,
+  computeUndo,
   Message,
   WINNING_POSITIONS,
 } from "teeko-cc-common/src/model";
@@ -84,8 +85,6 @@ export const Game: FunctionComponent<{
     if (after) moveToBoard(after);
   }
 
-  const won = WINNING_POSITIONS.has(board.a) || WINNING_POSITIONS.has(board.b);
-
   return (
     <>
       <BoardView
@@ -96,9 +95,20 @@ export const Game: FunctionComponent<{
         showStatus={true}
       />
       <p class="buttons">
-        <button onClick={undo} disabled={board.m.length === 0}>Undo</button>
-        <button onClick={() => moveToBoard(emptyBoard())} disabled={board.a === 0}>{won ? "New game" : "Reset"}</button>
-        <button onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}>Discord</button>
+        <button onClick={undo} disabled={board.m.length === 0}>
+          Undo
+        </button>
+        <button
+          onClick={() => moveToBoard(computeReset(board))}
+          disabled={board.a === 0}
+        >
+          Reset
+        </button>
+        <button
+          onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
+        >
+          Discord
+        </button>
         <button onClick={showHelp}>Help</button>
       </p>
     </>

@@ -191,15 +191,6 @@ export const OnlineBar: FunctionComponent<{
     if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
   }, [hasCopied]);
 
-  const title = wsPath ? (
-    <>
-      <span class="board">Board </span>
-      {decodeURI(wsPath)}
-    </>
-  ) : (
-    <span class="board">Offline board</span>
-  );
-
   function submitJoin() {
     setJoining(false);
     jump(nextRoom || randomRoom());
@@ -272,8 +263,10 @@ export const OnlineBar: FunctionComponent<{
           <h1 class="offline">
             <span className="deemph">Local game</span>
           </h1>
-          {/*<button onClick={() => setMatching(true)}>{isMatching ? <>{spinner} Matching…</> : 'Matched'}</button>*/}
-          <button onClick={() => setJoining(true)}>Online</button>
+          <button onClick={() => setMatching(true)}>
+            {isMatching ? <>{spinner} Matching…</> : "Matched"}
+          </button>
+          <button onClick={() => setJoining(true)}>Friends</button>
         </>
       )}
     </div>
