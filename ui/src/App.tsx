@@ -32,7 +32,18 @@ export const App: FunctionComponent = () => {
     }
   });
 
-  const [showHelp, setShowHelp] = useState<boolean>(false);
+  function getPillOrHelp() {
+    const oldPill = localStorage.getItem("pill");
+    console.log(oldPill);
+    if (oldPill)
+      return [oldPill, false];
+    const newPill = nanoid();
+    localStorage.setItem("pill", newPill);
+    return [newPill, true];
+  }
+  const [pill, startWithHelp] = getPillOrHelp();
+
+  const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
   const [wsPath, setWsPath] = useState<string | undefined>(undefined);
   const [pop, setPop] = useState<number | undefined>(undefined);
   const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
@@ -40,15 +51,6 @@ export const App: FunctionComponent = () => {
   );
 
   let initial = emptyBoard();
-
-  function getPill() {
-    const oldPill = localStorage.getItem("pill");
-    if (oldPill !== undefined) return oldPill;
-    const newPill = nanoid();
-    localStorage.setItem("pill", oldPill);
-    return newPill;
-  }
-  const pill = getPill();
 
   const stored = localStorage.getItem("board");
   if (stored) {

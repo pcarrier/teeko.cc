@@ -57,6 +57,6 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
       <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
       <a href="https://pcarrier.com/teeko">archives</a>.
     </p>
-    <button onClick={close}>Close</button>
+    <button onClick={close}>Play</button>
   </div>
 );
