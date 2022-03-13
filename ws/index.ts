@@ -135,7 +135,7 @@ function attemptAction(
   room.clients.forEach((sockets, pill) => {
     const state = customize(room, pill);
     sockets.forEach((s) => {
-      sendState(state, s);
+      if (s !== from) sendState(state, s);
     });
   });
 }
