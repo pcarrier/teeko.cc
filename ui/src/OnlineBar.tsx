@@ -290,7 +290,7 @@ export const OnlineBar: FunctionComponent<{
               {spinner} Matching…
             </button>
           ) : (
-            <button onClick={() => setMatching(true)}>Random match</button>
+            <button onClick={() => setMatching(true)}>Find player</button>
           )}
           <button
             onClick={() => {
@@ -298,7 +298,7 @@ export const OnlineBar: FunctionComponent<{
               setJoining(true);
             }}
           >
-            Friends
+            Play with friends
           </button>
         </>
       )}
