@@ -136,7 +136,10 @@ const roomPrefix = "/room/";
 
 function connectedToLobby(socket: WebSocket) {
   const waiting = serverState.waiting;
-  if (waiting !== undefined) {
+  if (waiting === undefined) {
+    serverState.waiting = socket;
+    sendMessage("Player looking for a match");
+  } else {
     const join = randomRoom();
     try {
       waiting.send(JSON.stringify({ join }));
@@ -152,9 +155,6 @@ function connectedToLobby(socket: WebSocket) {
       console.log();
     }
     sendMessage("Players matched");
-  } else {
-    serverState.waiting = socket;
-    sendMessage("Player looking for a match");
   }
 }
 
