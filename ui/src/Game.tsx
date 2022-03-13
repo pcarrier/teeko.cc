@@ -108,12 +108,12 @@ export const Game: FunctionComponent<{
         showStatus={true}
       />
       <p class="buttons">
-        <button onClick={undo} disabled={board.m.length === 0}>
+        <button onClick={undo} disabled={board.m.length === 0 || !board.p}>
           Undo
         </button>
         <button
           onClick={() => moveToBoard(computeReset(board))}
-          disabled={board.a === 0}
+          disabled={board.a === 0 || !board.p}
         >
           Reset
         </button>

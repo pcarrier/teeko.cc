@@ -106,7 +106,8 @@ function attemptAction(
   if (
     actions !== 0 &&
     room.state !== null &&
-    actions !== room.state.board.m.length + 1
+    actions !== room.state.board.m.length + 1 &&
+    actions !== room.state.board.m.length - 1
   ) {
     console.log(
       `Dropped moving from ${JSON.stringify(room.state)} to ${actions} actions`
