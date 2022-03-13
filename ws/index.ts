@@ -1,7 +1,7 @@
 import { Message, State } from "../common/src/model.ts";
 import { randomRoom } from "../common/src/utils.ts";
 
-const sendMessage: (content: string) => void = (() => {
+const notifyChannel: (content: string) => void = (() => {
   const url = Deno.env.get("DISCORD_WEBHOOK");
   if (!url) return (content) => console.log("fake Discord", content);
   return async function sendToDiscord(content: string) {
@@ -28,12 +28,12 @@ type Room = {
   timeout?: number;
 };
 
-type Server = {
-  waiting: WebSocket | undefined;
+type ServerState = {
+  waiting: [string, WebSocket[]] | undefined;
   rooms: Map<string, Room>;
 };
 
-const serverState: Server = {
+const serverState: ServerState = {
   waiting: undefined,
   rooms: new Map(),
 };
@@ -134,36 +134,51 @@ function closeInRoom(ctx: Context) {
 
 const roomPrefix = "/room/";
 
-function connectedToLobby(socket: WebSocket) {
-  const waiting = serverState.waiting;
-  if (waiting === undefined) {
-    serverState.waiting = socket;
-    sendMessage("Player looking for a match");
+function connectedToLobby(pill: string | undefined, socket: WebSocket) {
+  if (!pill) {
+    console.log("Lobby connection failed, no pill");
+    return;
+  }
+  if (serverState.waiting === undefined) {
+    serverState.waiting = [pill, [socket]];
+    notifyChannel("Player looking for a match");
   } else {
+    const [otherPill, otherSockets] = serverState.waiting;
+    if (otherPill === pill) {
+      serverState.waiting[1].push(socket);
+      return;
+    }
+
     let join: string;
     do {
       join = randomRoom();
     } while (serverState.rooms.has(join));
     try {
-      waiting.send(JSON.stringify({ join }));
+      otherSockets.forEach((s) => s.send(JSON.stringify({ join })));
     } catch (e) {
-      serverState.waiting = socket;
+      console.log("Failure matching", e.message || e.type || e);
+      serverState.waiting = [pill, [socket]];
       return;
     }
     try {
       socket.send(JSON.stringify({ join }));
-      waiting.close();
+      otherSockets.forEach((s) => s.close());
       socket.close();
     } catch (e) {
-      console.log();
+      console.log("Failure closing", e.message || e.type || e);
     }
-    sendMessage("Players matched");
+    notifyChannel("Players matched");
   }
 }
 
 function closeInLobby(socket: WebSocket) {
-  if (serverState.waiting === socket) {
-    serverState.waiting = undefined;
+  if (!serverState.waiting) return;
+  if (serverState.waiting[1].includes(socket)) {
+    serverState.waiting[1] = serverState.waiting[1].filter((s) => s !== socket);
+    if (serverState.waiting[1].length === 0) {
+      notifyChannel("Player no longer waiting.");
+      serverState.waiting = undefined;
+    }
   }
 }
 
@@ -188,14 +203,14 @@ async function main() {
           };
           socket.onopen = () => connectedToRoom(ctx);
           socket.onmessage = (m) => roomMessage(ctx, m.data);
-          socket.onclose = (e) => closeInRoom(ctx);
+          socket.onclose = () => closeInRoom(ctx);
           socket.onerror = (e) => handleError(e);
 
           await evt.respondWith(response);
         } else if (path === "/lobby") {
           const { socket, response } = Deno.upgradeWebSocket(evt.request);
 
-          socket.onopen = () => connectedToLobby(socket);
+          socket.onopen = () => connectedToLobby(pill, socket);
           socket.onclose = () => closeInLobby(socket);
           socket.onerror = (e) => handleError(e);
 
