@@ -115,7 +115,8 @@ function attemptAction(
   }
   switch (actions) {
     case 0:
-      room.p1 = room.p2 = undefined;
+      room.p1 = undefined;
+      room.p2 = undefined;
       break;
     case 1:
       room.p1 = pill;

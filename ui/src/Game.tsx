@@ -73,7 +73,6 @@ export const Game: FunctionComponent<{
   }, [roomPath]);
 
   function moveToBoard(board: Board, propagate = true) {
-    if (roomPath && board.a !== 0) board.p = !board.p;
     setBoard(board);
     if (!roomPath) {
       localStorage.setItem("board", JSON.stringify(board));
@@ -85,16 +84,19 @@ export const Game: FunctionComponent<{
 
   function move(from: number, to: number) {
     const after = computeMove(board, from, to);
+    if (roomPath) after.p = false;
     if (after) moveToBoard(after);
   }
 
   function drop(pos: number) {
     const after = computeDrop(board, pos);
+    if (roomPath) after.p = false;
     if (after) moveToBoard(after);
   }
 
   function undo() {
     const after = computeUndo(board);
+    if (roomPath) after.p = false;
     if (after) moveToBoard(after);
   }
 
