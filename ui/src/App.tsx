@@ -1,16 +1,17 @@
 import { FunctionComponent, h } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { IntlProvider } from "preact-localization";
-import { useEvent } from "./useEvent.ts";
-import { Board, emptyBoard, Message } from "teeko-cc-common/src/model";
+import { useEffect, useState } from "preact/hooks";
+import { IntlProvider } from "preact-i18n";
+import { useEvent } from "./useEvent.js";
+import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
-import { Help } from "./Help.tsx";
-import { OnlineBar } from "./OnlineBar.tsx";
+import { Help } from "./Help.jsx";
+import { OnlineBar } from "./OnlineBar.jsx";
 import { nanoid } from "nanoid";
-import dictionaries from "./translations.json";
-import { wsUrl } from "./env.ts";
+import { wsUrl } from "./env.js";
 import Sockette from "sockette";
+
+import definitions from "./translations.json";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -27,16 +28,18 @@ export const App: FunctionComponent = () => {
     },
   });
 
-  useEffect(async () => {
-    if (needsRefresh) {
-      await updateServiceWorker(true);
-      setNeedsRefresh(false);
-    }
+  useEffect(() => {
+    (async () => {
+      if (needsRefresh) {
+        await updateServiceWorker(true);
+        setNeedsRefresh(false);
+      }
+    })();
   });
 
   const langs = navigator.languages.map((l) => l.split("-")[0]) || "en";
-  const lang = langs.find((l) => l in dictionaries);
-  const dictionary = dictionaries[lang];
+  const lang = langs.find((l) => l in definitions) as string;
+  const definition = (definitions as any)[lang];
 
   const [pill, startWithHelp] = (() => {
     const oldPill = localStorage.getItem("pill");
@@ -140,7 +143,7 @@ export const App: FunctionComponent = () => {
 
   function jump(location: string | undefined) {
     setJoining(false);
-    history.pushState({}, null, location ? `/${location}` : "/");
+    history.pushState({}, "", location ? `/${location}` : "/");
     updateWsPath();
   }
 
@@ -153,7 +156,7 @@ export const App: FunctionComponent = () => {
   }
 
   return (
-    <IntlProvider dictionary={dictionary}>
+    <IntlProvider definition={definition}>
       {showHelp ? (
         <Help close={() => setShowHelp(false)} />
       ) : (

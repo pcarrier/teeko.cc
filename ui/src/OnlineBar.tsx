@@ -1,8 +1,8 @@
 import { FunctionComponent, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { Localizer, Text } from "preact-localization";
-import { OnlineStatus } from "./App.tsx";
-import { randomRoom } from "teeko-cc-common/src/utils.ts";
+import { Localizer, Text } from "preact-i18n";
+import { OnlineStatus } from "./App.jsx";
+import { randomRoom } from "teeko-cc-common/src/utils.js";
 
 const spinner = (
   <svg
@@ -176,13 +176,13 @@ const spinner = (
 
 export const OnlineBar: FunctionComponent<{
   roomPath?: string;
-  jump: (path: string) => void;
+  jump: (path?: string) => void;
   pop: number | undefined;
   onlineStatus: OnlineStatus;
   isJoining: boolean;
-  setJoining: (boolean) => void;
+  setJoining: (joining: boolean) => void;
   isMatching: boolean;
-  setMatching: (boolean) => void;
+  setMatching: (matching: boolean) => void;
 }> = ({
   roomPath,
   jump,
@@ -225,10 +225,9 @@ export const OnlineBar: FunctionComponent<{
             <input
               type="text"
               value={nextRoom}
+              // @ts-ignore
               placeholder={<Text id="onlineBar.boardNameInput" />}
-              onInput={(e: FormEvent<HTMLFormElement>) =>
-                setNextRoom(e.target.value)
-              }
+              onInput={(e: Event) => setNextRoom((e.target as any).value)}
               onKeyUp={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();

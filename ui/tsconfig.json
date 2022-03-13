@@ -5,12 +5,12 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": false,
-    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Node",
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -20,6 +20,6 @@
     "types": ["vite/client", "vite-plugin-pwa/client"],
     "composite": true
   },
-  "include": ["src"],
+  "include": ["src/**/*.tsx?", "src/**/*.json"],
   "references": [{ "path": "../common" }]
 }

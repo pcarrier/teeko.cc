@@ -1,9 +1,9 @@
 import classnames from "classnames";
 import { FunctionComponent, h } from "preact";
-import { Text } from "preact-localization";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { Text } from "preact-i18n";
+import { useRef, useState } from "preact/hooks";
 
-import { Rect, useRect } from "./useRect.ts";
+import { Rect, useRect } from "./useRect.js";
 
 import {
   Board,
@@ -105,15 +105,14 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const ourPieces = !p || win ? new Set<number>() : t === 0 ? aPieces : bPieces;
 
-  useEffect(() => {
-    if (selected === undefined || !ourPieces.has(selected)) {
-      setSelected(undefined);
-    }
-  }, [selected, t]);
+  if (selected !== undefined && !ourPieces.has(selected)) {
+    setSelected(undefined);
+  }
 
   const movable = new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
+
   const neighborsOfSelected =
     selected === undefined
       ? new Set<number>()
@@ -386,7 +385,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </g>
 
         <g>
-          {dragState && dragTurn === t && (
+          {dragState && selected && (
             <Piece
               dummy
               key="dummy"

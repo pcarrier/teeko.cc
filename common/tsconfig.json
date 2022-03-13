@@ -4,13 +4,9 @@
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "Node",
-    "noEmit": true,
-    "composite": true
+    "composite": true,
+    "outDir": "dist",
+    "resolveJsonModule": true
   },
-  "include": ["src"],
-  "references": [
-    {
-      "path": "../common"
-    }
-  ]
+  "include": ["src"]
 }

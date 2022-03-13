@@ -1,5 +1,6 @@
 import { useRef } from "preact/hooks";
-import { useStateRef } from "./useStateRef.ts";
+
+import { useStateRef } from "./useStateRef.js";
 
 export type Position = {
   x: number;

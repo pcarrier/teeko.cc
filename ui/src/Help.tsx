@@ -1,7 +1,7 @@
 import { FunctionComponent, h } from "preact";
-import { Text } from "preact-localization";
+import { Text } from "preact-i18n";
 import { BoardView } from "./BoardView";
-import { emptyBoard, Player } from "teeko-cc-common/src/model";
+import { emptyBoard, Player } from "teeko-cc-common/src/model.js";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">

@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.1.7",
+    "@types/preact-i18n": "^2.3.1",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "eslint": "^8.10.0",
@@ -22,8 +23,9 @@
   },
   "dependencies": {
     "classnames": "^2.3.1",
+    "nanoid": "^3.3.1",
     "preact": "^10.6.6",
-    "preact-localization": "^0.0.2",
+    "preact-i18n": "^2.4.0-preactx",
     "sockette": "^2.0.6",
     "teeko-cc-common": "file:../common"
   }
