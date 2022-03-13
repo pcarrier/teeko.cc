@@ -290,7 +290,7 @@ export const OnlineBar: FunctionComponent<{
               {spinner} Matching…
             </button>
           ) : (
-            <button onClick={() => setMatching(true)}>Matched</button>
+            <button onClick={() => setMatching(true)}>Random match</button>
           )}
           <button
             onClick={() => {
