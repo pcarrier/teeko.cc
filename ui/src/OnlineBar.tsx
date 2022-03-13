@@ -1,5 +1,6 @@
 import { FunctionComponent } from "preact";
 import { MutableRef, useEffect, useState } from "preact/hooks";
+import { Text, Localizer } from "preact-localization";
 import { OnlineStatus } from "./App.tsx";
 import Sockette from "sockette";
 import { Message } from "teeko-cc-common/src/model.ts";
@@ -238,26 +239,34 @@ export const OnlineBar: FunctionComponent<{
     <div class="onlineBar">
       {isJoining ? (
         <>
-          <button onClick={() => setJoining(false)}>Cancel</button>
-          <input
-            type="text"
-            value={nextRoom}
-            placeholder="Board name (optional)"
-            onInput={(e: FormEvent<HTMLFormElement>) =>
-              setNextRoom(e.target.value)
-            }
-            onKeyUp={(e) => {
-              if (e.keyCode === 13) {
-                e.preventDefault();
-                submitJoin();
+          <button onClick={() => setJoining(false)}>
+            <Text id="onlineBar.cancel" />
+          </button>
+          <Localizer>
+            <input
+              type="text"
+              value={nextRoom}
+              placeholder={<Text id="onlineBar.boardNameInput" />}
+              onInput={(e: FormEvent<HTMLFormElement>) =>
+                setNextRoom(e.target.value)
               }
-            }}
-          />
-          <button onClick={() => submitJoin(nextRoom)}>Join</button>
+              onKeyUp={(e) => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  submitJoin();
+                }
+              }}
+            />
+          </Localizer>
+          <button onClick={() => submitJoin(nextRoom)}>
+            <Text id="onlineBar.join" />
+          </button>
         </>
       ) : wsPath ? (
         <>
-          <button onClick={() => jump()}>Leave</button>
+          <button onClick={() => jump()}>
+            <Text id="onlineBar.leave" />
+          </button>
           <h1>
             <span class="deemph">
               <span
@@ -275,24 +284,38 @@ export const OnlineBar: FunctionComponent<{
           </h1>
           <p className="pop">
             {!pop ? null : pop === 1 ? (
-              <span className="alone">alone</span>
+              <span className="alone">
+                <Text id="onlineBar.alone" />
+              </span>
             ) : (
-              <span>{pop}P</span>
+              <span>
+                <Text id="onlineBar.pop" fields={{ pop }} />
+              </span>
             )}
           </p>
-          <button onClick={share}>{hasCopied ? "Copied!" : "Invite"}</button>
+          <button onClick={share}>
+            {hasCopied ? (
+              <Text id="onlineBar.copied" />
+            ) : (
+              <Text id="onlineBar.invite" />
+            )}
+          </button>
         </>
       ) : (
         <>
           <h1 class="offline">
-            <span className="deemph">Local board</span>
+            <span className="deemph">
+              <Text id="onlineBar.local" />
+            </span>
           </h1>
           {isMatching ? (
             <button onClick={() => setMatching(false)}>
-              {spinner} Matching…
+              {spinner} <Text id="onlineBar.matching" />
             </button>
           ) : (
-            <button onClick={() => setMatching(true)}>Matched</button>
+            <button onClick={() => setMatching(true)}>
+              <Text id="onlineBar.matched" />
+            </button>
           )}
           <button
             onClick={() => {
@@ -300,7 +323,7 @@ export const OnlineBar: FunctionComponent<{
               setJoining(true);
             }}
           >
-            Friends
+            <Text id="onlineBar.friends" />
           </button>
         </>
       )}

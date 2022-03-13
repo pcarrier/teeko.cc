@@ -1,5 +1,6 @@
 import { FunctionComponent, h } from "preact";
 import { MutableRef, useEffect, useState } from "preact/hooks";
+import { Text } from "preact-localization";
 import Sockette from "sockette";
 
 import {
@@ -109,20 +110,22 @@ export const Game: FunctionComponent<{
       />
       <p class="buttons">
         <button onClick={undo} disabled={board.m.length === 0}>
-          Undo
+          <Text id="game.undo" />
         </button>
         <button
           onClick={() => moveToBoard(computeReset(board))}
           disabled={board.a === 0}
         >
-          Reset
+          <Text id="game.reset" />
         </button>
         <button
           onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
         >
-          Discord
+          <Text id="game.discord" />
         </button>
-        <button onClick={showHelp}>Help</button>
+        <button onClick={showHelp}>
+          <Text id="game.help" />
+        </button>
       </p>
     </>
   );

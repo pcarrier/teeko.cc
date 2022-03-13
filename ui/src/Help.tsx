@@ -1,14 +1,20 @@
 import { FunctionComponent, h } from "preact";
-
+import { Text } from "preact-localization";
 import { BoardView } from "./BoardView";
 import { emptyBoard, Player } from "teeko-cc-common/src/model";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
     <h1>Teeko</h1>
-    <p>Each player has 4 pieces. Blue opens.</p>
-    <p>First, place all pieces down, one each turn.</p>
-    <p>Then, move one to an empty neighbor each turn:</p>
+    <p>
+      <Text id="help.open" />
+    </p>
+    <p>
+      <Text id="help.drop" />
+    </p>
+    <p>
+      <Text id="help.move" />
+    </p>
     <BoardView
       board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
       klass="half"
@@ -49,15 +55,29 @@ export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
         { from: 18, to: 24, player: Player.B },
       ]}
     />
-    <p>Form a straight line of 4 or a unit square to win.</p>
+    <p>
+      <Text id="help.win" />
+    </p>
     <BoardView board={{ ...emptyBoard(), a: 2236928, p: false }} klass="half" />
     <BoardView board={{ ...emptyBoard(), b: 6336, p: false }} klass="half" />
-    <p>A game by John Scarne.</p>
-    <button onClick={close}>Play</button>
     <p>
-      <a href="https://en.wikipedia.org/wiki/Teeko">Wikipedia</a>,{" "}
-      <a href="https://github.com/pcarrier/teeko.cc">code</a>,{" "}
-      <a href="https://pcarrier.com/teeko">archives</a>
+      <Text id="help.credits" />
+    </p>
+    <button onClick={close}>
+      <Text id="help.close" />
+    </button>
+    <p>
+      <a href="https://en.wikipedia.org/wiki/Teeko">
+        <Text id="help.wiki" />
+      </a>
+      ,{" "}
+      <a href="https://github.com/pcarrier/teeko.cc">
+        <Text id="help.code" />
+      </a>
+      ,{" "}
+      <a href="https://pcarrier.com/teeko">
+        <Text id="help.archives" />
+      </a>
     </p>
   </div>
 );

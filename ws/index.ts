@@ -134,7 +134,10 @@ function attemptAction(
         }
         room.p2 = pill;
       }
-    } else if (pill !== currentPlayer) {
+    } else if (
+      (room.state === null || actions !== room.state.board.m.length - 1) &&
+      pill !== currentPlayer
+    ) {
       console.log(
         `Blocking action from ${pill}, not current player ${currentPlayer}`
       );

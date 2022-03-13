@@ -1,0 +1,92 @@
+{
+  "en": {
+    "help": {
+      "open": "Each player has 4 pieces. Blue opens.",
+      "drop": "First, drop all pieces, one each turn.",
+      "move": "Then, move one to an empty neighbor each turn:",
+      "win": "Form a line of 4 or a unit square to win.",
+      "credits": "A game by John Scarne.",
+      "close": "Play",
+      "wiki": "Wikipedia",
+      "code": "code",
+      "archives": "archives"
+    },
+    "onlineBar": {
+      "local": "Local board",
+      "matched": "Find a player",
+      "matching": "Finding…",
+      "friends": "Friends",
+      "cancel": "Cancel",
+      "boardNameInput": "Board name (optional)",
+      "join": "Join",
+      "leave": "Leave",
+      "invite": "Invite",
+      "copied": "Copied!",
+      "alone": "alone",
+      "pop": "{{pop}}P"
+    },
+    "game": {
+      "undo": "Undo",
+      "reset": "Reset",
+      "discord": "Discord",
+      "help": "Help"
+    },
+    "status": {
+      "aWin": "Teeko! Blue won.",
+      "bWin": "Teeko! Red won.",
+      "aDrop": "Blue drops piece {{piece}}/4…",
+      "bDrop": "Red drops piece {{piece}}/4…",
+      "aMoveFrom": "Blue moves from…",
+      "bMoveFrom": "Red moves from…",
+      "aMoveTo": "Blue moves to…",
+      "bMoveTo": "Red moves to…",
+      "aMove": "Blue moves…",
+      "bMove": "Red moves…"
+    }
+  },
+  "fr": {
+    "help": {
+      "open": "Chaque joueur a 4 pièces. Bleu commence.",
+      "drop": "D'abord, posez toutes les pièces, une par tour.",
+      "move": "Ensuite, bougez une pièce vers une case voisine chaque tour :",
+      "win": "Formez une ligne de 4 ou un petit carré pour gagner.",
+      "credits": "Un jeu de John Scarne.",
+      "close": "Jouer",
+      "wiki": "Wikipédia",
+      "code": "code",
+      "archives": "archives"
+    },
+    "onlineBar": {
+      "local": "Plateau local",
+      "matched": "Chercher un joueur",
+      "matching": "Recherche…",
+      "friends": "Amis",
+      "cancel": "Renoncer",
+      "boardNameInput": "Nom de plateau (optionnel)",
+      "join": "Rejoindre",
+      "leave": "Sortir",
+      "invite": "Inviter",
+      "copied": "Copié !",
+      "alone": "seul",
+      "pop": "{{pop}}J"
+    },
+    "game": {
+      "undo": "Annuler",
+      "reset": "Table rase",
+      "discord": "Discord",
+      "help": "Aide"
+    },
+    "status": {
+      "aWin": "Teeko ! Bleu gagne.",
+      "bWin": "Teeko ! Rouge gagne.",
+      "aDrop": "Bleu pose la pièce {{piece}}/4…",
+      "bDrop": "Rouge pose la pièce {{piece}}/4…",
+      "aMoveFrom": "Bleu bouge de…",
+      "bMoveFrom": "Rouge bouge de…",
+      "aMoveTo": "Bleu bouge vers…",
+      "bMoveTo": "Rouge bouge vers…",
+      "aMove": "Bleu bouge…",
+      "bMove": "Rouge bouge…"
+    }
+  }
+}

@@ -23,7 +23,7 @@
   "dependencies": {
     "classnames": "^2.3.1",
     "preact": "^10.6.6",
-    "preact-router": "^4.0.1",
+    "preact-localization": "^0.0.2",
     "sockette": "^2.0.6",
     "teeko-cc-common": "file:../common"
   }

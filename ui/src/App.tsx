@@ -1,12 +1,14 @@
 import { FunctionComponent, h } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { IntlProvider } from "preact-localization";
 import { useEvent } from "./useEvent.ts";
 import { emptyBoard } from "teeko-cc-common/src/model";
 import { Game } from "./Game";
 import { Help } from "./Help.tsx";
 import { OnlineBar } from "./OnlineBar.tsx";
 import { nanoid } from "nanoid";
+import dictionaries from "./translations.json";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -30,6 +32,10 @@ export const App: FunctionComponent = () => {
     }
   });
 
+  const langs = navigator.languages.map((l) => l.split("-")[0]) || "en";
+  const lang = langs.find((l) => l in dictionaries);
+  const dictionary = dictionaries[lang];
+
   function getPillOrHelp() {
     const oldPill = localStorage.getItem("pill");
     if (oldPill) return [oldPill, false];
@@ -37,6 +43,7 @@ export const App: FunctionComponent = () => {
     localStorage.setItem("pill", newPill);
     return [newPill, true];
   }
+
   const [pill, startWithHelp] = getPillOrHelp();
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
@@ -75,27 +82,31 @@ export const App: FunctionComponent = () => {
     updateWsPath();
   }
 
-  if (showHelp) return <Help close={() => setShowHelp(false)} />;
-
   return (
-    <>
-      <OnlineBar
-        pill={pill}
-        wsPath={wsPath}
-        pop={pop}
-        jump={jump}
-        onlineStatus={onlineStatus}
-        resetBoard={resetBoard}
-      />
-      <Game
-        initial={initial}
-        pill={pill}
-        roomPath={wsPath}
-        showHelp={() => setShowHelp(true)}
-        setPop={setPop}
-        setOnlineStatus={setOnlineStatus}
-        resetBoard={resetBoard}
-      />
-    </>
+    <IntlProvider dictionary={dictionary}>
+      {showHelp ? (
+        <Help close={() => setShowHelp(false)} />
+      ) : (
+        <>
+          <OnlineBar
+            pill={pill}
+            wsPath={wsPath}
+            pop={pop}
+            jump={jump}
+            onlineStatus={onlineStatus}
+            resetBoard={resetBoard}
+          />
+          <Game
+            initial={initial}
+            pill={pill}
+            roomPath={wsPath}
+            showHelp={() => setShowHelp(true)}
+            setPop={setPop}
+            setOnlineStatus={setOnlineStatus}
+            resetBoard={resetBoard}
+          />
+        </>
+      )}
+    </IntlProvider>
   );
 };
