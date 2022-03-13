@@ -141,7 +141,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
   }
   if (serverState.waiting === undefined) {
     serverState.waiting = [pill, [socket]];
-    notifyChannel("Player looking for a match");
+    notifyChannel("Player waiting for a match.");
   } else {
     const [otherPill, otherSockets] = serverState.waiting;
     if (otherPill === pill) {
@@ -167,7 +167,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
     } catch (e) {
       console.log("Failure closing", e.message || e.type || e);
     }
-    notifyChannel("Players matched");
+    notifyChannel("Players matched!");
   }
 }
 
