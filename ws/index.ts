@@ -109,7 +109,7 @@ function roomMessage(ctx: Context, data: string) {
       setState(room, msg.st, ctx.socket);
     }
   } catch (e) {
-    console.log("roomMessage error", e);
+    console.log("roomMessage error", e.message);
   }
 }
 
