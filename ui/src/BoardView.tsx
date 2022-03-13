@@ -153,7 +153,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
   }
 
-  const activePlayer = t === 0 ? "Blue" : "Red";
+  const alreadyPlayed = t === 0 ? aPieces.size : bPieces.size;
 
   const status = showStatus ? (
     <p class={classnames("status", { playing: board.p, win })}>
@@ -161,11 +161,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         <Text id="status.aWin" />
       ) : bWin ? (
         <Text id="status.bWin" />
-      ) : ourPieces.size < 4 ? (
+      ) : alreadyPlayed < 4 ? (
         t === 0 ? (
-          <Text id="status.aDrop" fields={{ piece: ourPieces.size + 1 }} />
+          <Text id="status.aDrop" fields={{ piece: alreadyPlayed + 1 }} />
         ) : (
-          <Text id="status.bDrop" fields={{ piece: ourPieces.size + 1 }} />
+          <Text id="status.bDrop" fields={{ piece: alreadyPlayed + 1 }} />
         )
       ) : board.p ? (
         selected === undefined ? (
