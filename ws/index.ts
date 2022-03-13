@@ -113,24 +113,30 @@ function attemptAction(
     );
     return abort();
   }
-  switch (actions) {
-    case 0:
-      room.p1 = undefined;
-      room.p2 = undefined;
-      break;
-    case 1:
-      room.p1 = pill;
-      break;
-    case 2:
-      if (room.p1 !== pill) room.p2 = pill;
-      else return abort();
-      break;
-    default:
-      const currentPlayer = actions % 2 === 0 ? room.p2 : room.p1;
-      if (currentPlayer !== undefined && pill !== currentPlayer) {
-        console.log(`Blocking action from ${pill}, not current player`);
-        return abort();
+  if (actions === 0) {
+    room.p1 = undefined;
+    room.p2 = undefined;
+  } else {
+    const p1Playing = actions % 2 === 1;
+    const currentPlayer = p1Playing ? room.p1 : room.p2;
+    if (currentPlayer === undefined) {
+      if (p1Playing) {
+        if (room.p2 === pill) {
+          console.log(`${pill} already took P2`);
+          return abort();
+        }
+        room.p1 = pill;
+      } else {
+        if (room.p1 === pill) {
+          console.log(`${pill} already took P1`);
+          return abort();
+        }
+        room.p2 = pill;
       }
+    } else if (pill !== currentPlayer) {
+      console.log(`Blocking action from ${pill}, not current player`);
+      return abort();
+    }
   }
   room.state = state;
   room.clients.forEach((sockets, pill) => {
