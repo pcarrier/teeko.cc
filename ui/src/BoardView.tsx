@@ -162,9 +162,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         ? `Teeko! Red won.`
         : dropping
         ? `${activePlayer} drops piece ${ourPieces.size + 1} out of 4…`
-        : selected === undefined
-        ? `${activePlayer} moves from…`
-        : `${activePlayer} moves to…`}
+        : board.p
+        ? selected === undefined
+          ? `${activePlayer} moves from…`
+          : `${activePlayer} moves to…`
+        : `${activePlayer} moves…`}
     </p>
   ) : (
     <></>

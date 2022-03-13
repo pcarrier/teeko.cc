@@ -126,9 +126,11 @@ function attemptAction(
       else return abort();
       break;
     default:
-      const currentPlayer = actions % 2 === 0 ? room.p2 : room.p1;
+      const currentPlayer = actions % 2 === 1 ? room.p1 : room.p2;
       if (pill !== currentPlayer) {
-        console.log(`Blocking action from ${pill}, not current player`);
+        console.log(
+          `Blocking action from ${pill}, not current player (${currentPlayer}`
+        );
         return abort();
       }
   }
@@ -159,7 +161,7 @@ function connectedToRoom(ctx: Context) {
   }
   sockets.push(ctx.socket);
   sendPop(room);
-  sendState(room.state, ctx.socket);
+  sendState(customize(room, ctx.pill), ctx.socket);
 }
 
 function roomMessage(ctx: Context, data: string) {
