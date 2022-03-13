@@ -1,11 +1,8 @@
-import { FunctionComponent } from "preact";
-import { MutableRef, useEffect, useState } from "preact/hooks";
-import { Text, Localizer } from "preact-localization";
+import { FunctionComponent, h } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import { Localizer, Text } from "preact-localization";
 import { OnlineStatus } from "./App.tsx";
-import Sockette from "sockette";
-import { Message } from "teeko-cc-common/src/model.ts";
 import { randomRoom } from "teeko-cc-common/src/utils.ts";
-import { wsUrl } from "./env.ts";
 
 const spinner = (
   <svg
@@ -178,59 +175,41 @@ const spinner = (
 );
 
 export const OnlineBar: FunctionComponent<{
-  pill: string;
-  wsPath?: string;
+  roomPath?: string;
   jump: (path: string) => void;
   pop: number | undefined;
   onlineStatus: OnlineStatus;
-  resetBoard: MutableRef<() => void | undefined>;
-}> = ({ pill, wsPath, jump, pop, onlineStatus, resetBoard }) => {
+  isJoining: boolean;
+  setJoining: (boolean) => void;
+  isMatching: boolean;
+  setMatching: (boolean) => void;
+}> = ({
+  roomPath,
+  jump,
+  pop,
+  onlineStatus,
+  isJoining,
+  setJoining,
+  isMatching,
+  setMatching,
+}) => {
   const [hasCopied, setHasCopied] = useState(false);
-  const [isJoining, setJoining] = useState(false);
-  const [isMatching, setMatching] = useState(false);
   const [nextRoom, setNextRoom] = useState();
 
   useEffect(() => {
     if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
   }, [hasCopied]);
 
-  useEffect(() => {
-    if (isMatching) {
-      const url = wsUrl("lobby", pill);
-      const sockette = new Sockette(url, {
-        onmessage: (evt: MessageEvent) => {
-          const msg = JSON.parse(evt.data) as Message;
-          if (msg.join) {
-            resetBoard.current?.();
-            jump(msg.join);
-          }
-        },
-        onclose: () => {
-          setMatching(false);
-        },
-      });
-      return () => {
-        sockette.close();
-        setMatching(false);
-      };
-    }
-  }, [isMatching]);
-
-  function submitJoin() {
-    setJoining(false);
-    jump(nextRoom || randomRoom());
-  }
-
   function share() {
     if (navigator.share)
       navigator.share({
-        title: `teeko.cc (${wsPath})`,
+        title: `teeko.cc (${roomPath})`,
         text: "Teeko?",
-        url: `https://teeko.cc/${wsPath}`,
+        url: `https://teeko.cc/${roomPath}`,
       });
     else {
       navigator.clipboard
-        .writeText(`Teeko? https://teeko.cc/${wsPath}`)
+        .writeText(`Teeko? https://teeko.cc/${roomPath}`)
         .then(() => setHasCopied(true));
     }
   }
@@ -253,16 +232,16 @@ export const OnlineBar: FunctionComponent<{
               onKeyUp={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  submitJoin();
+                  jump(nextRoom || randomRoom());
                 }
               }}
             />
           </Localizer>
-          <button onClick={() => submitJoin(nextRoom)}>
+          <button onClick={() => jump(nextRoom || randomRoom())}>
             <Text id="onlineBar.join" />
           </button>
         </>
-      ) : wsPath ? (
+      ) : roomPath ? (
         <>
           <button onClick={() => jump()}>
             <Text id="onlineBar.leave" />
@@ -280,7 +259,7 @@ export const OnlineBar: FunctionComponent<{
               </span>{" "}
               Board{" "}
             </span>
-            {decodeURI(wsPath)}
+            {decodeURI(roomPath)}
           </h1>
           <p className="pop">
             {!pop ? null : pop === 1 ? (
