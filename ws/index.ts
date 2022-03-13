@@ -188,7 +188,7 @@ function closeInRoom(ctx: Context) {
     room.clients.delete(ctx.pill);
   }
   if (room.clients.size === 0)
-    room.timeout = setTimeout(() => closeRoom(room), 600_000);
+    room.timeout = setTimeout(() => closeRoom(room), 3600_000);
   else sendPop(room);
 }
 
