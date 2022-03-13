@@ -34,8 +34,8 @@
     "status": {
       "aWin": "Teeko! Blue won.",
       "bWin": "Teeko! Red won.",
-      "aDrop": "Blue drops piece {{piece}}/4…",
-      "bDrop": "Red drops piece {{piece}}/4…",
+      "aDrop": "Blue drops piece {{piece}} out of 4…",
+      "bDrop": "Red drops piece {{piece}} out of 4…",
       "aMoveFrom": "Blue moves from…",
       "bMoveFrom": "Red moves from…",
       "aMoveTo": "Blue moves to…",
@@ -79,8 +79,8 @@
     "status": {
       "aWin": "Teeko ! Bleu gagne.",
       "bWin": "Teeko ! Rouge gagne.",
-      "aDrop": "Bleu pose la pièce {{piece}}/4…",
-      "bDrop": "Rouge pose la pièce {{piece}}/4…",
+      "aDrop": "Bleu pose la pièce {{piece}} sur 4…",
+      "bDrop": "Rouge pose la pièce {{piece}} sur 4…",
       "aMoveFrom": "Bleu bouge de…",
       "bMoveFrom": "Rouge bouge de…",
       "aMoveTo": "Bleu bouge vers…",
