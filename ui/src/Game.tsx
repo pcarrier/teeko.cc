@@ -74,9 +74,7 @@ export const Game: FunctionComponent<{
 
   function moveToBoard(board: Board, propagate = true) {
     setBoard(board);
-    if (!roomPath) {
-      localStorage.setItem("board", JSON.stringify(board));
-    }
+    localStorage.setItem("board", JSON.stringify(board));
     if (propagate && ws) {
       ws.send(JSON.stringify({ st: { board } } as Message));
     }
