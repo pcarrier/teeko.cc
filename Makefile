@@ -32,4 +32,4 @@ deploy-ws: ws/bundle.js
 
 .PHONY: ws
 ws:
-	deno run --allow-net ws/index.ts
+	deno run --allow-net --allow-env ws/index.ts

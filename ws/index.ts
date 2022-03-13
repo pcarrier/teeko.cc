@@ -1,6 +1,24 @@
 import { Message, State } from "../common/src/model.ts";
 import { randomRoom } from "../common/src/utils.ts";
 
+const sendMessage: (content: string) => void = (() => {
+  const url = Deno.env.get("DISCORD_WEBHOOK");
+  if (!url) return (content) => console.log("fake Discord", content);
+  return async function sendToDiscord(content: string) {
+    try {
+      await fetch(url, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content }),
+      });
+    } catch (e) {
+      console.log("Discord error", e);
+    }
+  };
+})();
+
 type RoomState = State;
 
 type Room = {
@@ -124,6 +142,7 @@ function connectedToLobby(socket: WebSocket) {
       waiting.send(JSON.stringify({ join }));
     } catch (e) {
       serverState.waiting = socket;
+      return;
     }
     try {
       socket.send(JSON.stringify({ join }));
@@ -132,8 +151,10 @@ function connectedToLobby(socket: WebSocket) {
     } catch (e) {
       console.log();
     }
+    sendMessage("Players matched");
   } else {
     serverState.waiting = socket;
+    sendMessage("Player looking for a match");
   }
 }
 
