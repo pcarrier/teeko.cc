@@ -24,6 +24,8 @@ type RoomState = State;
 type Room = {
   path: string;
   clients: Map<string | undefined, WebSocket[]>;
+  p1: string | undefined;
+  p2: string | undefined;
   state: RoomState | null;
   timeout?: number;
 };
@@ -67,15 +69,50 @@ function sendPop(room: Room) {
   );
 }
 
-function sendState(room: Room, socket: WebSocket) {
-  socket.send(JSON.stringify({ st: room.state }));
+function sendState(state: RoomState, socket: WebSocket) {
+  socket.send(JSON.stringify({ st: state }));
 }
 
-function setState(room: Room, state: RoomState, from: WebSocket) {
+function canPlay(room: Room, pill: string): boolean {
+  if (room.p1 === undefined) return true;
+  if (room.p2 === undefined) return !(room.p1 === pill);
+  return room.state.board.m.length % 2 === 0 ? room.p1 === pill : room.p2 === pill;
+}
+
+function customize(room: Room, pill: string): RoomState {
+  const board = room.state.board;
+  const p = canPlay(room, pill);
+  return { board: {...board, p} };
+}
+
+function maybeSetState(room: Room, state: RoomState, from: WebSocket, pill: string) {
+  const board = state.board;
+  const actions = board.m.length;
+  if (actions !== 0 && (room.state !== null && actions !== room.state.board.m.length + 1)) {
+    console.log(`Dropped moving from ${JSON.stringify(room.state)} to ${actions} actions`;
+    return;
+  }
+  switch actions {
+  case 0:
+    room.p1 = room.p2 = undefined;
+    break;
+  case 1:
+    room.p1 = pill;
+    break;
+  case 2:
+    room.p2 = pill;
+    break;
+  default:
+    const currentPlayer = actions % 2 === 0 ? room.p1 : room.p2;
+    if (pill !== currentPlayer) {
+      console.log(`Blocking action from ${pill}, not current player`);
+    }
+  }
   room.state = state;
-  room.clients.forEach((sockets) => {
+  room.clients.entries().forEach(([pill, sockets]) => {
+    const state = customize(room, pill);
     sockets.forEach((socket) => {
-      if (socket !== from) sendState(room, socket);
+      if (socket !== from) sendState(state, socket);
     });
   });
 }
@@ -106,7 +143,8 @@ function roomMessage(ctx: Context, data: string) {
   try {
     const msg = JSON.parse(data) as Message;
     if (msg.st) {
-      setState(room, msg.st, ctx.socket);
+      const board = msg.st.board;
+      maybeSetState(room, msg.st, ctx.socket, ctx.pill);
     }
   } catch (e) {
     console.log("roomMessage error", e.message);
