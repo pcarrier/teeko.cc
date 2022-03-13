@@ -140,7 +140,10 @@ function connectedToLobby(socket: WebSocket) {
     serverState.waiting = socket;
     sendMessage("Player looking for a match");
   } else {
-    const join = randomRoom();
+    let join: string;
+    do {
+      join = randomRoom();
+    } while (serverState.rooms.has(join));
     try {
       waiting.send(JSON.stringify({ join }));
     } catch (e) {
@@ -159,7 +162,6 @@ function connectedToLobby(socket: WebSocket) {
 }
 
 function closeInLobby(socket: WebSocket) {
-  console.log("closeInLobby");
   if (serverState.waiting === socket) {
     serverState.waiting = undefined;
   }
