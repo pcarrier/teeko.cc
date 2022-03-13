@@ -38,15 +38,13 @@ export const App: FunctionComponent = () => {
   const lang = langs.find((l) => l in dictionaries);
   const dictionary = dictionaries[lang];
 
-  function getPillOrHelp() {
+  const [pill, startWithHelp] = (() => {
     const oldPill = localStorage.getItem("pill");
     if (oldPill) return [oldPill, false];
     const newPill = nanoid();
     localStorage.setItem("pill", newPill);
     return [newPill, true];
-  }
-
-  const [pill, startWithHelp] = getPillOrHelp();
+  })();
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
 
