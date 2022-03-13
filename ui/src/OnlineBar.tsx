@@ -1,5 +1,5 @@
 import { FunctionComponent } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { MutableRef, useEffect, useState } from "preact/hooks";
 import { OnlineStatus } from "./App.tsx";
 import Sockette from "sockette";
 import { Message } from "teeko-cc-common/src/model.ts";
@@ -182,7 +182,8 @@ export const OnlineBar: FunctionComponent<{
   jump: (path: string) => void;
   pop: number | undefined;
   onlineStatus: OnlineStatus;
-}> = ({ pill, wsPath, jump, pop, onlineStatus }) => {
+  resetBoard: MutableRef<() => void | undefined>;
+}> = ({ pill, wsPath, jump, pop, onlineStatus, resetBoard }) => {
   const [hasCopied, setHasCopied] = useState(false);
   const [isJoining, setJoining] = useState(false);
   const [isMatching, setMatching] = useState(false);
@@ -199,6 +200,7 @@ export const OnlineBar: FunctionComponent<{
         onmessage: (evt: MessageEvent) => {
           const msg = JSON.parse(evt.data) as Message;
           if (msg.join) {
+            resetBoard.current?.();
             jump(msg.join);
           }
         },

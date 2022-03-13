@@ -1,5 +1,5 @@
 import { FunctionComponent, h } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { MutableRef, useEffect, useState } from "preact/hooks";
 import Sockette from "sockette";
 
 import {
@@ -8,6 +8,7 @@ import {
   computeMove,
   computeReset,
   computeUndo,
+  emptyBoard,
   Message,
   WINNING_POSITIONS,
 } from "teeko-cc-common/src/model";
@@ -23,9 +24,20 @@ export const Game: FunctionComponent<{
   showHelp: () => void;
   setPop: (count: number | undefined) => void;
   setOnlineStatus: (status: OnlineStatus) => void;
-}> = ({ initial, roomPath, pill, showHelp, setPop, setOnlineStatus }) => {
+  resetBoard: MutableRef<() => void | undefined>;
+}> = ({
+  initial,
+  roomPath,
+  pill,
+  showHelp,
+  setPop,
+  setOnlineStatus,
+  resetBoard,
+}) => {
   const [board, setBoard] = useState(initial);
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
+
+  resetBoard.current = () => setBoard(emptyBoard());
 
   function offline() {
     setOnlineStatus(OnlineStatus.OFFLINE);

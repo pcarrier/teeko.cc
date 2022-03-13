@@ -1,6 +1,6 @@
 import { FunctionComponent, h } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useEvent } from "./useEvent.ts";
 import { emptyBoard } from "teeko-cc-common/src/model";
 import { Game } from "./Game";
@@ -46,6 +46,7 @@ export const App: FunctionComponent = () => {
   const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
     OnlineStatus.OFFLINE
   );
+  const resetBoard = useRef<() => void | undefined>(undefined);
 
   let initial = emptyBoard();
 
@@ -83,6 +84,7 @@ export const App: FunctionComponent = () => {
         pop={pop}
         jump={jump}
         onlineStatus={onlineStatus}
+        resetBoard={resetBoard}
       />
       <Game
         initial={initial}
@@ -91,6 +93,7 @@ export const App: FunctionComponent = () => {
         showHelp={() => setShowHelp(true)}
         setPop={setPop}
         setOnlineStatus={setOnlineStatus}
+        resetBoard={resetBoard}
       />
     </>
   );
