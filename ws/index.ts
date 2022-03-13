@@ -80,8 +80,8 @@ function canPlay(room: Room, pill: string | undefined): boolean {
   if (room.p1 === undefined) return true;
   if (room.p2 === undefined) return room.p1 !== pill;
   return room.state.board.m.length % 2 === 0
-    ? room.p1 === pill
-    : room.p2 === pill;
+    ? room.p2 === undefined || room.p2 === pill
+    : room.p1 === undefined || room.p1 === pill;
 }
 
 function customize(room: Room, pill: string | undefined): RoomState | null {
@@ -98,7 +98,7 @@ function attemptAction(
   pill: string | undefined
 ) {
   function abort() {
-    sendState(room.state, from);
+    sendState(customize(room, pill), from);
   }
 
   const board = state.board;
@@ -126,11 +126,9 @@ function attemptAction(
       else return abort();
       break;
     default:
-      const currentPlayer = actions % 2 === 1 ? room.p1 : room.p2;
-      if (pill !== currentPlayer) {
-        console.log(
-          `Blocking action from ${pill}, not current player (${currentPlayer}`
-        );
+      const currentPlayer = actions % 2 === 0 ? room.p2 : room.p1;
+      if (currentPlayer !== undefined && pill !== currentPlayer) {
+        console.log(`Blocking action from ${pill}, not current player`);
         return abort();
       }
   }
@@ -138,7 +136,7 @@ function attemptAction(
   room.clients.forEach((sockets, pill) => {
     const state = customize(room, pill);
     sockets.forEach((s) => {
-      if (s !== from) sendState(state, s);
+      sendState(state, s);
     });
   });
 }

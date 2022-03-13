@@ -150,5 +150,5 @@ export function computeUndo(board: Board) {
 
 export function computeReset(board: Board) {
   let { p } = board;
-  return { a: 0, b: 0, m: [], p };
+  return { a: 0, b: 0, m: [], p: true };
 }
