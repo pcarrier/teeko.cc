@@ -113,8 +113,8 @@ function roomMessage(ctx: Context, data: string) {
   }
 }
 
-function handleError(evt: Event | ErrorEvent) {
-  console.log("WS error", evt);
+function handleError(e: Event | ErrorEvent) {
+  console.log("WS error", e instanceof ErrorEvent ? e.message : e.type);
 }
 
 function closeInRoom(ctx: Context) {
