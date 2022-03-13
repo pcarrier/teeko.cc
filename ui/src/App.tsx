@@ -32,7 +32,6 @@ export const App: FunctionComponent = () => {
 
   function getPillOrHelp() {
     const oldPill = localStorage.getItem("pill");
-    console.log(oldPill);
     if (oldPill) return [oldPill, false];
     const newPill = nanoid();
     localStorage.setItem("pill", newPill);
