@@ -155,7 +155,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const activePlayer = t === 0 ? "Blue" : "Red";
 
   const status = showStatus ? (
-    <p>
+    <p class={classnames("status", { playing: board.p })}>
       {aWin
         ? `Teeko! Blue won.`
         : bWin
