@@ -159,6 +159,7 @@ function connectedToLobby(socket: WebSocket) {
 }
 
 function closeInLobby(socket: WebSocket) {
+  console.log("closeInLobby");
   if (serverState.waiting === socket) {
     serverState.waiting = undefined;
   }
