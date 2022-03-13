@@ -1,10 +1,10 @@
 import { FunctionComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { OnlineStatus } from "./App.tsx";
-
-function randomRoom() {
-  return Math.floor(Math.random() * 100000).toString();
-}
+import Sockette from "sockette";
+import { Message } from "teeko-cc-common/src/model.ts";
+import { randomRoom } from "teeko-cc-common/src/utils.ts";
+import { wsUrl } from "./env.ts";
 
 const spinner = (
   <svg
@@ -177,11 +177,12 @@ const spinner = (
 );
 
 export const OnlineBar: FunctionComponent<{
+  pill: string;
   wsPath?: string;
   jump: (path: string) => void;
   pop: number | undefined;
   onlineStatus: OnlineStatus;
-}> = ({ wsPath, jump, pop, onlineStatus }) => {
+}> = ({ pill, wsPath, jump, pop, onlineStatus }) => {
   const [hasCopied, setHasCopied] = useState(false);
   const [isJoining, setJoining] = useState(false);
   const [isMatching, setMatching] = useState(false);
@@ -190,6 +191,27 @@ export const OnlineBar: FunctionComponent<{
   useEffect(() => {
     if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
   }, [hasCopied]);
+
+  useEffect(() => {
+    if (isMatching) {
+      const url = wsUrl("lobby", pill);
+      const sockette = new Sockette(url, {
+        onmessage: (evt: MessageEvent) => {
+          const msg = JSON.parse(evt.data) as Message;
+          if (msg.join) {
+            jump(msg.join);
+          }
+        },
+        onclose: () => {
+          setMatching(false);
+        },
+      });
+      return () => {
+        sockette.close();
+        setMatching(false);
+      };
+    }
+  }, [isMatching]);
 
   function submitJoin() {
     setJoining(false);
@@ -263,10 +285,21 @@ export const OnlineBar: FunctionComponent<{
           <h1 class="offline">
             <span className="deemph">Local game</span>
           </h1>
-          <button onClick={() => setMatching(true)}>
-            {isMatching ? <>{spinner} Matching…</> : "Matched"}
+          {isMatching ? (
+            <button onClick={() => setMatching(false)}>
+              {spinner} Matching…
+            </button>
+          ) : (
+            <button onClick={() => setMatching(true)}>Matched</button>
+          )}
+          <button
+            onClick={() => {
+              setMatching(false);
+              setJoining(true);
+            }}
+          >
+            Friends
           </button>
-          <button onClick={() => setJoining(true)}>Friends</button>
         </>
       )}
     </div>

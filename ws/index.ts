@@ -1,27 +1,30 @@
 import { Message, State } from "../common/src/model.ts";
+import { randomRoom } from "../common/src/utils.ts";
 
 type RoomState = State;
 
-interface Room {
+type Room = {
   path: string;
   clients: Map<string | undefined, WebSocket[]>;
   state: RoomState | null;
   timeout?: number;
-}
+};
 
-interface Server {
+type Server = {
+  waiting: WebSocket | undefined;
   rooms: Map<string, Room>;
-}
+};
 
 const serverState: Server = {
+  waiting: undefined,
   rooms: new Map(),
 };
 
-interface Context {
+type Context = {
   pill: string | undefined;
   socket: WebSocket;
   roomPath: string;
-}
+};
 
 function getRoom(ctx: Context): Room {
   const path = ctx.roomPath;
@@ -64,7 +67,7 @@ function closeRoom(room: Room) {
   console.log(`Closed room ${room.path}`);
 }
 
-function handleConnected(ctx: Context) {
+function connectedToRoom(ctx: Context) {
   const room = getRoom(ctx);
   if (room.timeout) {
     clearTimeout(room.timeout);
@@ -80,7 +83,7 @@ function handleConnected(ctx: Context) {
   sendState(room, ctx.socket);
 }
 
-function handleMessage(ctx: Context, data: string) {
+function roomMessage(ctx: Context, data: string) {
   const room = getRoom(ctx);
   try {
     const msg = JSON.parse(data) as Message;
@@ -88,15 +91,15 @@ function handleMessage(ctx: Context, data: string) {
       setState(room, msg.st, ctx.socket);
     }
   } catch (e) {
-    console.log(`handleMessage error ${e}`);
+    console.log("roomMessage error", e);
   }
 }
 
-function handleError(ctx: Context, evt: Event | ErrorEvent) {
-  console.log(`WS error ${evt instanceof ErrorEvent ? evt.message : evt.type}`);
+function handleError(evt: Event | ErrorEvent) {
+  console.log("WS error", evt);
 }
 
-function handleClose(ctx: Context, evt: CloseEvent) {
+function closeInRoom(ctx: Context) {
   const room = getRoom(ctx);
   const forPill = room.clients.get(ctx.pill);
   if (!forPill) return;
@@ -112,6 +115,33 @@ function handleClose(ctx: Context, evt: CloseEvent) {
 }
 
 const roomPrefix = "/room/";
+
+function connectedToLobby(socket: WebSocket) {
+  const waiting = serverState.waiting;
+  if (waiting !== undefined) {
+    const join = randomRoom();
+    try {
+      waiting.send(JSON.stringify({ join }));
+    } catch (e) {
+      serverState.waiting = socket;
+    }
+    try {
+      socket.send(JSON.stringify({ join }));
+      waiting.close();
+      socket.close();
+    } catch (e) {
+      console.log();
+    }
+  } else {
+    serverState.waiting = socket;
+  }
+}
+
+function closeInLobby(socket: WebSocket) {
+  if (serverState.waiting === socket) {
+    serverState.waiting = undefined;
+  }
+}
 
 async function main() {
   for await (const conn of Deno.listen({ port: 8081 })) {
@@ -132,10 +162,18 @@ async function main() {
             socket,
             roomPath: path.substring(roomPrefix.length),
           };
-          socket.onopen = () => handleConnected(ctx);
-          socket.onmessage = (m) => handleMessage(ctx, m.data);
-          socket.onclose = (e) => handleClose(ctx, e);
-          socket.onerror = (e) => handleError(ctx, e);
+          socket.onopen = () => connectedToRoom(ctx);
+          socket.onmessage = (m) => roomMessage(ctx, m.data);
+          socket.onclose = (e) => closeInRoom(ctx);
+          socket.onerror = (e) => handleError(e);
+
+          await evt.respondWith(response);
+        } else if (path === "/lobby") {
+          const { socket, response } = Deno.upgradeWebSocket(evt.request);
+
+          socket.onopen = () => connectedToLobby(socket);
+          socket.onclose = () => closeInLobby(socket);
+          socket.onerror = (e) => handleError(e);
 
           await evt.respondWith(response);
         } else {

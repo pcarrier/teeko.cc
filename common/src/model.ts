@@ -88,6 +88,7 @@ export type State = {
 };
 
 export type Message = {
+  join?: string;
   pop?: number;
   st?: State;
 };

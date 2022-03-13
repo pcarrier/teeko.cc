@@ -78,6 +78,7 @@ export const App: FunctionComponent = () => {
   return (
     <>
       <OnlineBar
+        pill={pill}
         wsPath={wsPath}
         pop={pop}
         jump={jump}

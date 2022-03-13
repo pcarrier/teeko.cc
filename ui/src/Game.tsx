@@ -14,6 +14,7 @@ import {
 
 import { BoardView } from "./BoardView";
 import { OnlineStatus } from "./App.tsx";
+import { wsUrl } from "./env.ts";
 
 export const Game: FunctionComponent<{
   initial: Board;
@@ -32,11 +33,8 @@ export const Game: FunctionComponent<{
   }
 
   useEffect(() => {
-    const live = window.location.hostname === "teeko.cc";
-    const url = live
-      ? `wss://ws.teeko.cc/room/${roomPath}?pill=${pill}`
-      : `ws://${window.location.hostname}:8081/room/${roomPath}?pill=${pill}`;
     if (roomPath) {
+      const url = wsUrl(`room/${roomPath}`, pill);
       const sockette = new Sockette(url, {
         onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
         onreconnect: offline,
@@ -63,8 +61,10 @@ export const Game: FunctionComponent<{
   }, [roomPath]);
 
   function moveToBoard(board: Board, propagate = true) {
-    localStorage.setItem("board", JSON.stringify(board));
     setBoard(board);
+    if (!roomPath) {
+      localStorage.setItem("board", JSON.stringify(board));
+    }
     if (propagate && ws) {
       ws.send(JSON.stringify({ st: { board } } as Message));
     }
