@@ -57,6 +57,8 @@ export const App: FunctionComponent = () => {
     }
   }
 
+  if (!initial.p && !wsPath) initial.p = true;
+
   function updateWsPath() {
     setWsPath(
       window.location.pathname.length < 2
