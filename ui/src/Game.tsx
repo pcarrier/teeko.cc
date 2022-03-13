@@ -73,6 +73,7 @@ export const Game: FunctionComponent<{
   }, [roomPath]);
 
   function moveToBoard(board: Board, propagate = true) {
+    if (roomPath) board.p = !board.p;
     setBoard(board);
     if (!roomPath) {
       localStorage.setItem("board", JSON.stringify(board));

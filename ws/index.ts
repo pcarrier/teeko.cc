@@ -24,6 +24,8 @@ type RoomState = State;
 type Room = {
   path: string;
   clients: Map<string | undefined, WebSocket[]>;
+  p1: string | undefined;
+  p2: string | undefined;
   state: RoomState | null;
   timeout?: number;
 };
@@ -54,6 +56,8 @@ function getRoom(ctx: Context): Room {
     path,
     clients: new Map(),
     state: null,
+    p1: undefined,
+    p2: undefined,
   };
   serverState.rooms.set(path, created);
   console.log(`Opened room ${path}`);
@@ -63,19 +67,75 @@ function getRoom(ctx: Context): Room {
 function sendPop(room: Room) {
   const pop = room.clients.size;
   room.clients.forEach((sockets) =>
-    sockets.forEach((socket) => socket.send(JSON.stringify({ pop })))
+    sockets.forEach((s) => s.send(JSON.stringify({ pop })))
   );
 }
 
-function sendState(room: Room, socket: WebSocket) {
-  socket.send(JSON.stringify({ st: room.state }));
+function sendState(state: RoomState | null, socket: WebSocket) {
+  socket.send(JSON.stringify({ st: state }));
 }
 
-function setState(room: Room, state: RoomState, from: WebSocket) {
+function canPlay(room: Room, pill: string | undefined): boolean {
+  if (room.state === null) return true;
+  if (room.p1 === undefined) return true;
+  if (room.p2 === undefined) return room.p1 !== pill;
+  return room.state.board.m.length % 2 === 0
+    ? room.p1 === pill
+    : room.p2 === pill;
+}
+
+function customize(room: Room, pill: string | undefined): RoomState | null {
+  const state = room.state;
+  if (state === null) return state;
+  const p = canPlay(room, pill);
+  return { board: { ...state.board, p } };
+}
+
+function attemptAction(
+  room: Room,
+  state: RoomState,
+  from: WebSocket,
+  pill: string | undefined
+) {
+  function abort() {
+    sendState(room.state, from);
+  }
+
+  const board = state.board;
+  const actions = board.m.length;
+  if (
+    actions !== 0 &&
+    room.state !== null &&
+    actions !== room.state.board.m.length + 1
+  ) {
+    console.log(
+      `Dropped moving from ${JSON.stringify(room.state)} to ${actions} actions`
+    );
+    return abort();
+  }
+  switch (actions) {
+    case 0:
+      room.p1 = room.p2 = undefined;
+      break;
+    case 1:
+      room.p1 = pill;
+      break;
+    case 2:
+      if (room.p1 !== pill) room.p2 = pill;
+      else return abort();
+      break;
+    default:
+      const currentPlayer = actions % 2 === 0 ? room.p2 : room.p1;
+      if (pill !== currentPlayer) {
+        console.log(`Blocking action from ${pill}, not current player`);
+        return abort();
+      }
+  }
   room.state = state;
-  room.clients.forEach((sockets) => {
-    sockets.forEach((socket) => {
-      if (socket !== from) sendState(room, socket);
+  room.clients.forEach((sockets, pill) => {
+    const state = customize(room, pill);
+    sockets.forEach((s) => {
+      sendState(state, s);
     });
   });
 }
@@ -98,7 +158,7 @@ function connectedToRoom(ctx: Context) {
   }
   sockets.push(ctx.socket);
   sendPop(room);
-  sendState(room, ctx.socket);
+  sendState(room.state, ctx.socket);
 }
 
 function roomMessage(ctx: Context, data: string) {
@@ -106,7 +166,7 @@ function roomMessage(ctx: Context, data: string) {
   try {
     const msg = JSON.parse(data) as Message;
     if (msg.st) {
-      setState(room, msg.st, ctx.socket);
+      attemptAction(room, msg.st, ctx.socket, ctx.pill);
     }
   } catch (e) {
     console.log("roomMessage error", e.message);
@@ -128,7 +188,7 @@ function closeInRoom(ctx: Context) {
     room.clients.delete(ctx.pill);
   }
   if (room.clients.size === 0)
-    room.timeout = setTimeout(() => closeRoom(room), 60_000);
+    room.timeout = setTimeout(() => closeRoom(room), 600_000);
   else sendPop(room);
 }
 

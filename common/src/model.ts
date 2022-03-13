@@ -9,7 +9,7 @@ export enum Player {
 export type Board = {
   a: number; // Where blue has pieces (bitset)
   b: number; // Where red has pieces (bitset)
-  m: (number | [number, number])[]; // Actions, either drop or move
+  m: Array<number | [number, number]>; // Actions, either drop or move
   p: boolean; // Playing or not
 };
 
@@ -23,7 +23,7 @@ export function emptyBoard(): Board {
 }
 
 export function pieces(n: number): Set<number> {
-  const result = [];
+  const result: Array<number> = [];
   for (let i = 0; i < SLOTS; i++) {
     if (n & 1) result.push(i);
     n >>= 1;
