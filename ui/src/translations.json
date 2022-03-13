@@ -4,7 +4,7 @@
       "open": "Each player has 4 pieces. Blue opens.",
       "drop": "First, drop all pieces, one each turn.",
       "move": "Then, move one to an empty neighbor each turn:",
-      "win": "Form a line of 4 or a unit square to win.",
+      "win": "Form a line of 4 or a small square to win.",
       "credits": "A game by John Scarne.",
       "close": "Play",
       "wiki": "Wikipedia",
