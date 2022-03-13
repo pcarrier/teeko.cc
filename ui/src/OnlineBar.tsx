@@ -285,7 +285,7 @@ export const OnlineBar: FunctionComponent<{
       ) : (
         <>
           <h1 class="offline">
-            <span className="deemph">Local game</span>
+            <span className="deemph">Local board</span>
           </h1>
           {isMatching ? (
             <button onClick={() => setMatching(false)}>
