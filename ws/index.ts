@@ -80,8 +80,8 @@ function canPlay(room: Room, pill: string | undefined): boolean {
   if (room.p1 === undefined) return true;
   if (room.p2 === undefined) return room.p1 !== pill;
   return room.state.board.m.length % 2 === 0
-    ? room.p2 === undefined || room.p2 === pill
-    : room.p1 === undefined || room.p1 === pill;
+    ? room.p1 === undefined || room.p1 === pill
+    : room.p2 === undefined || room.p2 === pill;
 }
 
 function customize(room: Room, pill: string | undefined): RoomState | null {
@@ -135,7 +135,9 @@ function attemptAction(
         room.p2 = pill;
       }
     } else if (pill !== currentPlayer) {
-      console.log(`Blocking action from ${pill}, not current player`);
+      console.log(
+        `Blocking action from ${pill}, not current player ${currentPlayer}`
+      );
       return abort();
     }
   }
