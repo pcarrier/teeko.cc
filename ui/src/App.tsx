@@ -116,9 +116,6 @@ export const App: FunctionComponent = () => {
             jump(msg.join);
           }
         },
-        onclose: () => {
-          setMatching(false);
-        },
       });
       return () => {
         sockette.close();
