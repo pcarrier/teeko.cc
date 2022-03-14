@@ -25,6 +25,12 @@
       "alone": "alone",
       "pop": "{{pop}}P"
     },
+    "game": {
+      "undo": "Undo",
+      "reset": "Reset",
+      "discord": "Discord",
+      "help": "Help"
+    },
     "status": {
       "aWin": "Teeko! Blue won.",
       "bWin": "Teeko! Red won.",
@@ -63,6 +69,12 @@
       "copied": "Copiado!",
       "alone": "solo",
       "pop": "{{pop}}J"
+    },
+    "game": {
+      "undo": "Deshacer",
+      "reset": "Reiniciar",
+      "discord": "Discord",
+      "help": "Ayuda"
     },
     "status": {
       "aWin": "Teeko! Azul ganó.",
@@ -103,6 +115,12 @@
       "alone": "seul",
       "pop": "{{pop}}J"
     },
+    "game": {
+      "undo": "Annuler",
+      "reset": "Table rase",
+      "discord": "Discord",
+      "help": "Aide"
+    },
     "status": {
       "aWin": "Teeko ! Bleu gagne.",
       "bWin": "Teeko ! Rouge gagne.",
@@ -142,6 +160,12 @@
       "alone": "sozinho",
       "pop": "{{pop}}J"
     },
+    "game": {
+      "undo": "Desfazer",
+      "reset": "Recomeçar",
+      "discord": "Discord",
+      "help": "Ajuda"
+    },
     "status": {
       "aWin": "Teeko! Azul ganhou.",
       "bWin": "Teeko! Vermelho ganhou.",
@@ -180,6 +204,12 @@
       "copied": "拷贝！",
       "alone": "单独",
       "pop": "{{pop}}P"
+    },
+    "game": {
+      "undo": "撤销",
+      "reset": "重置",
+      "discord": "Discord",
+      "help": "帮助"
     },
     "status": {
       "aWin": "Teeko! 蓝方获胜.",
