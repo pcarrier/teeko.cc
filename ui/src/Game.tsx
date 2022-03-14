@@ -36,7 +36,7 @@ export const Game: FunctionComponent<{
   }
 
   return (
-    <>
+    <div class="game">
       <BoardView
         board={board}
         drop={drop}
@@ -63,6 +63,6 @@ export const Game: FunctionComponent<{
           <Text id="game.help" />
         </button>
       </p>
-    </>
+    </div>
   );
 };
