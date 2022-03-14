@@ -12,4 +12,5 @@ Contributions more than welcome. Translations in [the dictionaries](ui/src/trans
 - cheapsteak
 - Daniel Prata Almeida
 - Bastien Chanot
+- Andon Tchechmedjiev
 - Your name here :)
