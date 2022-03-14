@@ -2,7 +2,7 @@
   "en": {
     "help": {
       "open": "Each player has 4 pieces. Blue opens.",
-      "drop": "First, drop all pieces, one each turn.",
+      "place": "First, place all pieces, one each turn.",
       "move": "Then, move one to an empty neighbor each turn:",
       "win": "Form a line of 4 or a small square to win.",
       "credits": "Teeko by John Scarne.",
@@ -34,8 +34,8 @@
     "status": {
       "aWin": "Teeko! Blue won.",
       "bWin": "Teeko! Red won.",
-      "aDrop": "Blue drops piece {{piece}} out of 4…",
-      "bDrop": "Red drops piece {{piece}} out of 4…",
+      "aDrop": "Blue places piece {{piece}} out of 4…",
+      "bDrop": "Red places piece {{piece}} out of 4…",
       "aMoveFrom": "Blue moves from…",
       "bMoveFrom": "Red moves from…",
       "aMoveTo": "Blue moves to…",
@@ -47,7 +47,7 @@
   "fr": {
     "help": {
       "open": "Chaque joueur a 4 pièces. Bleu commence.",
-      "drop": "D'abord, posez toutes les pièces, une par tour.",
+      "place": "D'abord, posez toutes les pièces, une par tour.",
       "move": "Ensuite, bougez une pièce vers une position voisine chaque tour :",
       "win": "Formez une ligne de 4 ou un petit carré pour gagner.",
       "credits": "Teeko par John Scarne.",

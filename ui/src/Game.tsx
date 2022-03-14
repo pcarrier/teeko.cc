@@ -3,7 +3,7 @@ import { Text } from "preact-i18n";
 
 import {
   Board,
-  computeDrop,
+  computePlace,
   computeMove,
   computeReset,
   computeUndo,
@@ -23,8 +23,8 @@ export const Game: FunctionComponent<{
     if (after) moveToBoard(after);
   }
 
-  function drop(pos: number) {
-    const after = computeDrop(board, pos);
+  function place(pos: number) {
+    const after = computePlace(board, pos);
     if (roomPath) after.p = false;
     if (after) moveToBoard(after);
   }
@@ -39,7 +39,7 @@ export const Game: FunctionComponent<{
     <div class="game">
       <BoardView
         board={board}
-        drop={drop}
+        place={place}
         move={move}
         klass="full"
         showStatus={true}

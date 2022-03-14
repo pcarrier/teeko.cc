@@ -112,7 +112,7 @@ export function computeMove(board: Board, from: number, to: number) {
   return { a, b, m, p };
 }
 
-export function computeDrop(board: Board, pos: number) {
+export function computePlace(board: Board, pos: number) {
   let { a, b, m, p } = board;
   const t = m.length % 2;
   const isA = t === 0;

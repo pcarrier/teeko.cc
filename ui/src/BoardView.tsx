@@ -39,7 +39,7 @@ type BoardArrow = {
 
 type BoardViewAttrs = {
   board: Board;
-  drop?: (position: number) => void;
+  place?: (position: number) => void;
   move?: (from: number, to: number) => void;
   klass?: string;
   showStatus?: boolean;
@@ -83,7 +83,7 @@ export const BoardBackground = (
 
 export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   board,
-  drop,
+  place,
   move,
   klass,
   showStatus,
@@ -122,11 +122,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           )
         );
 
-  const dropping = p && !win && ourPieces.size < 4;
+  const placing = p && !win && ourPieces.size < 4;
 
   const validTargets: Set<number> = win
     ? new Set()
-    : dropping
+    : placing
     ? emptySlots
     : selected === undefined
     ? movable
@@ -140,8 +140,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
       move?.(selected, position);
       setSelected(undefined);
     } else {
-      if (dropping) {
-        if (emptySlots.has(position)) drop?.(position);
+      if (placing) {
+        if (emptySlots.has(position)) place?.(position);
       } else {
         if (!win && movable.has(position)) {
           setSelected(position);
@@ -259,7 +259,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
             />
           ) : (
             <circle
-              key="ldrop"
+              key="lplace"
               r={LAST_ACTION_RADIUS}
               cx={lastAction % 5}
               cy={Math.floor(lastAction / 5)}
@@ -299,8 +299,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 "bg",
                 releasePos === pos
                   ? "release"
-                  : (dropping || selected !== undefined) &&
-                    validTargets.has(pos)
+                  : (placing || selected !== undefined) && validTargets.has(pos)
                   ? "target"
                   : undefined,
                 t === 0 ? "A" : "B"
@@ -331,7 +330,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </g>
 
         <g>
-          {!dropping &&
+          {!placing &&
             selected === undefined &&
             [...validTargets].map((pos) => (
               <circle
