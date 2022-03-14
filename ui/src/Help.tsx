@@ -21,7 +21,7 @@ export const Help: FunctionComponent<{
       <Text id="help.open" />
     </p>
     <p>
-      <Text id="help.drop" />
+      <Text id="help.place" />
     </p>
     <p>
       <Text id="help.move" />
