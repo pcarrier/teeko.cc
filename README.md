@@ -11,4 +11,5 @@ Contributions more than welcome. Translations in [the dictionaries](ui/src/trans
 - Guillaume Ardaud
 - Chang Wang
 - Daniel Prata Almeida
+- Bastien Chanot
 - Your name here :)
