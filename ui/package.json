@@ -5,7 +5,7 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "tsc && eslint . && prettier -c .",
+    "lint": "tsc --build && eslint . && prettier -c .",
     "lint:fix": "prettier -w ."
   },
   "devDependencies": {
