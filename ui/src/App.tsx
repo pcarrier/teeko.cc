@@ -30,7 +30,7 @@ export const App: FunctionComponent = () => {
 
   if (needsRefresh) {
     setNeedsRefresh(false);
-    updateServiceWorker(false);
+    updateServiceWorker(true);
   }
 
   const [lang, setLang] = useState(
