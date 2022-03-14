@@ -28,14 +28,10 @@ export const App: FunctionComponent = () => {
     },
   });
 
-  useEffect(() => {
-    (async () => {
-      if (needsRefresh) {
-        setNeedsRefresh(false);
-        await updateServiceWorker(true);
-      }
-    })();
-  });
+  if (needsRefresh) {
+    setNeedsRefresh(false);
+    updateServiceWorker(false);
+  }
 
   const [lang, setLang] = useState(
     (() => {
@@ -84,6 +80,7 @@ export const App: FunctionComponent = () => {
   }
 
   const [board, setBoard] = useState<Board>(initial);
+
   function moveToBoard(board: Board, propagate = true) {
     setBoard(board);
     localStorage.setItem("board", JSON.stringify(board));
