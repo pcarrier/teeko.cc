@@ -254,9 +254,8 @@ export const OnlineBar: FunctionComponent<{
                     : "color:#f00"
                 }
               >
-                ⬤
-              </span>{" "}
-              Board{" "}
+                ⬤{" "}
+              </span>
             </span>
             {decodeURI(roomPath)}
           </h1>

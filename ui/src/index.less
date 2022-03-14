@@ -80,7 +80,7 @@ button:hover:enabled {
 }
 
 button:disabled {
-  color: shade(@boardColor, 75%);
+  color: @boardColor;
   border: 1px solid shade(@boardColor, 75%);
 }
 
@@ -92,11 +92,8 @@ input {
   width: 100%;
 }
 
-.board {
-  touch-action: none;
-}
-
 .board.full {
+  touch-action: none;
   width: @boardWidth;
   max-width: @maxBoardWidth;
 }
