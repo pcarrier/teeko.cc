@@ -11,6 +11,12 @@ import {
 
 import { BoardView } from "./BoardView";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
+import { faRotateLeft } from "@fortawesome/free-solid-svg-icons/faRotateLeft";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+
 export const Game: FunctionComponent<{
   board: Board;
   roomPath?: string;
@@ -46,21 +52,21 @@ export const Game: FunctionComponent<{
       />
       <p class="buttons">
         <button onClick={undo} disabled={board.m.length === 0}>
-          <Text id="game.undo" />
+          <FontAwesomeIcon icon={faRotateLeft} />
         </button>
         <button
           onClick={() => moveToBoard(computeReset(board))}
           disabled={board.a === 0}
         >
-          <Text id="game.reset" />
+          <FontAwesomeIcon icon={faTrash} />
         </button>
         <button
           onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
         >
-          <Text id="game.discord" />
+          <FontAwesomeIcon icon={faDiscord} />
         </button>
         <button onClick={showHelp}>
-          <Text id="game.help" />
+          <FontAwesomeIcon icon={faQuestion} />
         </button>
       </p>
     </div>
