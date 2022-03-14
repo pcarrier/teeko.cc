@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 import { faRotateLeft } from "@fortawesome/free-solid-svg-icons/faRotateLeft";
-import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons/faTrashCan";
 
 export const Game: FunctionComponent<{
   board: Board;
@@ -58,7 +58,7 @@ export const Game: FunctionComponent<{
           onClick={() => moveToBoard(computeReset(board))}
           disabled={board.a === 0}
         >
-          <FontAwesomeIcon icon={faTrash} />
+          <FontAwesomeIcon icon={faTrashCan} />
         </button>
         <button
           onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
