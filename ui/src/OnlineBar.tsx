@@ -1,4 +1,4 @@
-import { FunctionComponent, h } from "preact";
+import { FunctionComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { Localizer, Text } from "preact-i18n";
 import { OnlineStatus } from "./App.jsx";

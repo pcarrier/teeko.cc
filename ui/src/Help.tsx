@@ -1,4 +1,4 @@
-import { FunctionComponent, h } from "preact";
+import { FunctionComponent } from "preact";
 import { Text } from "preact-i18n";
 import { BoardView } from "./BoardView";
 import { emptyBoard, Player } from "teeko-cc-common/src/model.js";

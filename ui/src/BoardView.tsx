@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { FunctionComponent, h } from "preact";
+import { FunctionComponent } from "preact";
 import { Text } from "preact-i18n";
 import { useRef, useState } from "preact/hooks";
 

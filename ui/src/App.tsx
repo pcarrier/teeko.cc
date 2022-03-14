@@ -1,4 +1,4 @@
-import { FunctionComponent, h } from "preact";
+import { FunctionComponent } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useEffect, useState } from "preact/hooks";
 import { IntlProvider } from "preact-i18n";
