@@ -31,7 +31,7 @@ export const Game: FunctionComponent<{
 
   function undo() {
     const after = computeUndo(board);
-    if (roomPath) after.p = false;
+    if (roomPath) after.p = !after.p;
     if (after) moveToBoard(after);
   }
 

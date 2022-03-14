@@ -58,7 +58,8 @@ h1 {
 }
 
 button,
-input {
+input,
+select {
   font-size: 100%;
   background-color: transparent;
   color: @strong;
@@ -67,6 +68,11 @@ input {
   padding: 0.5em 1em;
   margin: 1em 0.5em;
   font-size: 10pt;
+}
+
+select {
+  margin: 1em;
+  padding: 0.5em;
 }
 
 button:hover:enabled {
@@ -238,4 +244,9 @@ p.banner button {
 
 .status.win {
   color: @bColor;
+}
+
+.langSelector {
+  position: absolute;
+  right: 0;
 }

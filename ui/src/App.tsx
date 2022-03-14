@@ -37,8 +37,20 @@ export const App: FunctionComponent = () => {
     })();
   });
 
-  const langs = navigator.languages.map((l) => l.split("-")[0]) || "en";
-  const lang = langs.find((l) => l in definitions) as string;
+  const [lang, setLang] = useState(
+    (() => {
+      const oldLang = localStorage.getItem("lang");
+      if (oldLang) return oldLang;
+      const preferred = navigator.languages.map((l) => l.split("-")[0]);
+      return preferred.find((l) => l in definitions) || "en";
+    })()
+  );
+
+  function moveToLang(lang: string) {
+    localStorage.setItem("lang", lang);
+    setLang(lang);
+  }
+
   const definition = (definitions as any)[lang];
 
   const [pill, startWithHelp] = (() => {
@@ -72,6 +84,13 @@ export const App: FunctionComponent = () => {
   }
 
   const [board, setBoard] = useState<Board>(initial);
+  function moveToBoard(board: Board, propagate = true) {
+    setBoard(board);
+    localStorage.setItem("board", JSON.stringify(board));
+    if (propagate && ws) {
+      ws.send(JSON.stringify({ st: { board } } as Message));
+    }
+  }
 
   if (!board.p && !roomPath) board.p = true;
 
@@ -147,18 +166,15 @@ export const App: FunctionComponent = () => {
     updateWsPath();
   }
 
-  function moveToBoard(board: Board, propagate = true) {
-    setBoard(board);
-    localStorage.setItem("board", JSON.stringify(board));
-    if (propagate && ws) {
-      ws.send(JSON.stringify({ st: { board } } as Message));
-    }
-  }
-
   return (
     <IntlProvider definition={definition}>
       {showHelp ? (
-        <Help close={() => setShowHelp(false)} />
+        <Help
+          close={() => setShowHelp(false)}
+          lang={lang}
+          moveToLang={moveToLang}
+          langs={Object.keys(definitions)}
+        />
       ) : (
         <>
           <OnlineBar

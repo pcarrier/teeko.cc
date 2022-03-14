@@ -3,8 +3,20 @@ import { Text } from "preact-i18n";
 import { BoardView } from "./BoardView";
 import { emptyBoard, Player } from "teeko-cc-common/src/model.js";
 
-export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
+export const Help: FunctionComponent<{
+  close: () => void;
+  lang: string;
+  moveToLang: (lang: string) => void;
+  langs: Array<string>;
+}> = ({ close, lang, moveToLang, langs }) => (
   <div class="help">
+    <select class="langSelector" onchange={(e) => moveToLang(e.target.value)}>
+      {langs.map((l) => (
+        <option value={l} selected={l === lang}>
+          {l}
+        </option>
+      ))}
+    </select>
     <p>
       <Text id="help.open" />
     </p>
