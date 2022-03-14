@@ -12,7 +12,7 @@
       "archives": "archives"
     },
     "onlineBar": {
-      "local": "Local board",
+      "local": "Local",
       "matched": "Find a player",
       "matching": "Finding…",
       "friends": "Friends",
@@ -51,7 +51,7 @@
       "archives": "archivos"
     },
     "onlineBar": {
-      "local": "Tablero local",
+      "local": "Local",
       "matched": "Buscar un jugador",
       "matching": "Buscando…",
       "friends": "Amigos",
@@ -90,7 +90,7 @@
       "archives": "archives"
     },
     "onlineBar": {
-      "local": "Plateau local",
+      "local": "Local",
       "matched": "Chercher un joueur",
       "matching": "Recherche…",
       "friends": "Amis",
@@ -129,7 +129,7 @@
       "archives": "archives"
     },
     "onlineBar": {
-      "local": "Tabuleiro local",
+      "local": "Local",
       "matched": "Procurar jogador",
       "matching": "Procurando…",
       "friends": "Amigos",
@@ -168,7 +168,7 @@
       "archives": "档案"
     },
     "onlineBar": {
-      "local": "本地居于棋盘",
+      "local": "本地",
       "matched": "寻找对手",
       "matching": "寻找中…",
       "friends": "朋友",
