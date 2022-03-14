@@ -103,7 +103,7 @@
     },
     "onlineBar": {
       "local": "Tabuleiro local",
-      "matched": "Procurar um jogador",
+      "matched": "Procurar jogador",
       "matching": "Procurando…",
       "friends": "Amigos",
       "cancel": "Cancelar",
