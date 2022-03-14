@@ -246,16 +246,14 @@ export const OnlineBar: FunctionComponent<{
             <Text id="onlineBar.leave" />
           </button>
           <h1>
-            <span class="deemph">
-              <span
-                style={
-                  onlineStatus === OnlineStatus.ONLINE
-                    ? "color:#0f0"
-                    : "color:#f00"
-                }
-              >
-                ⬤{" "}
-              </span>
+            <span
+              style={
+                onlineStatus === OnlineStatus.ONLINE
+                  ? "color:#0f0"
+                  : "color:#f00"
+              }
+            >
+              ⬤{" "}
             </span>
             {decodeURI(roomPath)}
           </h1>
@@ -281,9 +279,7 @@ export const OnlineBar: FunctionComponent<{
       ) : (
         <>
           <h1 class="offline">
-            <span className="deemph">
-              <Text id="onlineBar.local" />
-            </span>
+            <Text id="onlineBar.local" />
           </h1>
           {isMatching ? (
             <button onClick={() => setMatching(false)}>
