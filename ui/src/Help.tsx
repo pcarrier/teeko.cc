@@ -5,7 +5,6 @@ import { emptyBoard, Player } from "teeko-cc-common/src/model.js";
 
 export const Help: FunctionComponent<{ close: () => void }> = ({ close }) => (
   <div class="help">
-    <h1>Teeko</h1>
     <p>
       <Text id="help.open" />
     </p>
