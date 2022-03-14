@@ -13,7 +13,7 @@ export const Help: FunctionComponent<{
     <select class="langSelector" onchange={(e) => moveToLang(e.target.value)}>
       {langs.map((l) => (
         <option value={l} selected={l === lang}>
-          {l}
+          {l.toUpperCase()}
         </option>
       ))}
     </select>
