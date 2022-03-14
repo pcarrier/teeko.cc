@@ -9,7 +9,7 @@ Contributions more than welcome. Translations in [the dictionaries](ui/src/trans
 - Pierre Carrier
 - Zhenya Savchenko
 - Guillaume Ardaud
-- Chang Wang
+- cheapsteak
 - Daniel Prata Almeida
 - Bastien Chanot
 - Your name here :)
