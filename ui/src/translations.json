@@ -91,9 +91,9 @@
   },
   "fr": {
     "help": {
-      "open": "Chaque joueur a 4 pièces. Bleu commence.",
-      "place": "D'abord, posez toutes les pièces, une par tour.",
-      "move": "Ensuite, bougez une pièce vers une position voisine chaque tour :",
+      "open": "Chaque joueur a 4 pions. Bleu commence.",
+      "place": "D'abord, posez tous les pions, un par tour.",
+      "move": "Ensuite, bougez un pion vers une position voisine chaque tour :",
       "win": "Formez une ligne de 4 ou un petit carré pour gagner.",
       "credits": "Teeko par John Scarne.",
       "close": "Jouer",
@@ -124,8 +124,8 @@
     "status": {
       "aWin": "Teeko ! Bleu gagne.",
       "bWin": "Teeko ! Rouge gagne.",
-      "aDrop": "Bleu pose la pièce {{piece}} sur 4…",
-      "bDrop": "Rouge pose la pièce {{piece}} sur 4…",
+      "aDrop": "Bleu pose le pion {{piece}} sur 4…",
+      "bDrop": "Rouge pose le pion {{piece}} sur 4…",
       "aMoveFrom": "Bleu bouge de…",
       "bMoveFrom": "Rouge bouge de…",
       "aMoveTo": "Bleu bouge vers…",
