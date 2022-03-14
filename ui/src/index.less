@@ -71,13 +71,14 @@ select {
 }
 
 .onlineBar > input {
-  font-size: 120%;
+  font-size: 100%;
   border: none;
+  width: 100%;
 }
 
 select {
-  margin: 0.5em;
-  padding: 0.5em;
+  margin: 1em;
+  padding: 1em;
 }
 
 button:hover:enabled {
@@ -210,8 +211,6 @@ p.banner button {
 }
 
 .onlineBar h1 {
-  padding: 0.5em 1em;
-  margin: 0.5em;
   text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -219,10 +218,14 @@ p.banner button {
 }
 
 .onlineBar input,
-.onlineBar p.pop,
+.onlineBar .pop,
 .onlineBar h1.offline {
   flex: 1;
   text-align: left;
+}
+
+.onlineBar .pop {
+  margin-left: 0.5em;
 }
 
 .onlineBar h1.offline {

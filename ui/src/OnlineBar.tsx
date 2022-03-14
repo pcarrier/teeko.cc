@@ -257,7 +257,7 @@ export const OnlineBar: FunctionComponent<{
             </span>
             {decodeURI(roomPath)}
           </h1>
-          <p className="pop">
+          <div class="pop">
             {!pop ? null : pop === 1 ? (
               <span className="alone">
                 <Text id="onlineBar.alone" />
@@ -267,7 +267,7 @@ export const OnlineBar: FunctionComponent<{
                 <Text id="onlineBar.pop" fields={{ pop }} />
               </span>
             )}
-          </p>
+          </div>
           <button onClick={share}>
             {hasCopied ? (
               <Text id="onlineBar.copied" />

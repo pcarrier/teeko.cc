@@ -31,8 +31,8 @@ export const App: FunctionComponent = () => {
   useEffect(() => {
     (async () => {
       if (needsRefresh) {
-        await updateServiceWorker(true);
         setNeedsRefresh(false);
+        await updateServiceWorker(true);
       }
     })();
   });
