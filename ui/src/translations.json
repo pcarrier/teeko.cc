@@ -133,5 +133,50 @@
       "aMove": "蓝方移动…",
       "bMove": "方移动…"
     }
+  },
+  "pt": {
+    "help": {
+      "open": "Cada jogador tem 4 peças. Azul começa.",
+      "place": "Primeiro, coloca todas as peças, uma por turno.",
+      "move": "Depois, move uma peça por turno para uma posição vizinha vazia",
+      "win": "Forma uma linha de 4 ou um quadrado pequeno para vencer.",
+      "credits": "Teeko foi inventado por John Scarne.",
+      "close": "Jogar",
+      "wiki": "Wikipedia",
+      "code": "code",
+      "archives": "archives"
+    },
+    "onlineBar": {
+      "local": "Tabuleiro local",
+      "matched": "Procurar um jogador",
+      "matching": "Procurando…",
+      "friends": "Amigos",
+      "cancel": "Cancelar",
+      "boardNameInput": "Nome do tabuleiro (optional)",
+      "join": "Entrar",
+      "leave": "Sair",
+      "invite": "Convidar",
+      "copied": "Copiado!",
+      "alone": "sozinho",
+      "pop": "{{pop}}J"
+    },
+    "game": {
+      "undo": "Desfazer",
+      "reset": "Recomeçar",
+      "discord": "Discord",
+      "help": "Ajuda"
+    },
+    "status": {
+      "aWin": "Teeko! Azul ganhou.",
+      "bWin": "Teeko! Vermelho ganhou.",
+      "aDrop": "Azul coloca a peça {{piece}} de 4…",
+      "bDrop": "Vermelho coloca a peça {{piece}} de 4…",
+      "aMoveFrom": "Azul move de…",
+      "bMoveFrom": "Vermelho move de…",
+      "aMoveTo": "Azul move para…",
+      "bMoveTo": "Vermelho move para…",
+      "aMove": "Azul move…",
+      "bMove": "Vermelho move…"
+    }
   }
 }
