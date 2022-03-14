@@ -5,6 +5,7 @@
     "lint:fix": "prettier -w ."
   },
   "devDependencies": {
+    "eslint-plugin-preact-i18n": "^1.1.0",
     "prettier": "^2.5.1"
   },
   "workspaces": [
