@@ -1,6 +1,9 @@
 @color: #ccc;
+@colorLight: #333;
 @strong: #fff;
+@strongLight: #000;
 @bg: #000;
+@bgLight: #fff;
 @boardColor: #444;
 @selectionColor: #888;
 @link: #04f;
@@ -8,6 +11,8 @@
 @bColor: #f00;
 @aDark: darken(@aColor, 25%);
 @bDark: darken(@bColor, 25%);
+@aLight: lighten(@aColor, 25%);
+@bLight: lighten(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
 @maxBoardWidth: 120mm;
 
@@ -38,8 +43,8 @@ body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: @color;
@@ -139,16 +144,16 @@ input {
   stroke: @bDark;
 }
 
-.board circle.selected {
-  fill: @selectionColor;
-}
-
 .board circle.last.A {
   fill: @aDark;
 }
 
 .board circle.last.B {
   fill: @bDark;
+}
+
+.board circle.selected {
+  fill: @selectionColor;
 }
 
 .board circle.target.A {
@@ -255,4 +260,56 @@ p.banner button {
 
 button {
   height: 3em;
+}
+
+
+@media (prefers-color-scheme: light) {
+  body {
+    color: @colorLight;
+    background-color: @bgLight;
+  }
+
+  h1, button, input, select {
+    color: @strongLight;
+  }
+
+  .board circle.lineMargin {
+    fill: @bgLight;
+  }
+
+  button:disabled {
+    border: 1px solid tint(@boardColor, 50%);
+  }
+
+  .board line.last.A {
+    stroke: @aLight;
+  }
+
+  .board line.last.B {
+    stroke: @bLight;
+  }
+
+  .board circle.last.A {
+    fill: @aLight;
+  }
+
+  .board circle.last.B {
+    fill: @bLight;
+  }
+
+  .board line.arrow.A {
+    stroke: tint(@aColor, 50%);
+  }
+
+  .board line.arrow.B {
+    stroke: tint(@bColor, 50%);
+  }
+
+  .board #arrowheadA {
+    fill: tint(@aColor, 50%);
+  }
+
+  .board #arrowheadB {
+    fill: tint(@bColor, 50%);
+  }
 }

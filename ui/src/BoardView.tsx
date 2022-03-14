@@ -270,7 +270,13 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
         <g>
           {POS_ARRAY.map((pos) => (
-            <circle key={`m${pos}`} r={LINE_MARGIN} cx={x(pos)} cy={y(pos)} />
+            <circle
+              key={`m${pos}`}
+              r={LINE_MARGIN}
+              cx={x(pos)}
+              cy={y(pos)}
+              class="lineMargin"
+            />
           ))}
         </g>
 
