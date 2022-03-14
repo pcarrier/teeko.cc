@@ -112,6 +112,7 @@ export const App: FunctionComponent = () => {
         onmessage: (evt: MessageEvent) => {
           const msg = JSON.parse(evt.data) as Message;
           if (msg.join) {
+            setMatching(false);
             moveToBoard(emptyBoard());
             jump(msg.join);
           }
