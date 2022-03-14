@@ -9,5 +9,6 @@ Contributions more than welcome. Translations in [the dictionaries](ui/src/trans
 - Pierre Carrier
 - Zhenya Savchenko
 - Guillaume Ardaud
+- Chang Wang
 - Daniel Prata Almeida
 - Your name here :)
