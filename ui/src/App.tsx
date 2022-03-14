@@ -1,6 +1,6 @@
 import { FunctionComponent } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { IntlProvider } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
 import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
@@ -33,14 +33,15 @@ export const App: FunctionComponent = () => {
     updateServiceWorker(true);
   }
 
-  const [lang, setLang] = useState(
-    (() => {
-      const oldLang = localStorage.getItem("lang");
-      if (oldLang) return oldLang;
-      const preferred = navigator.languages.map((l) => l.split("-")[0]);
-      return preferred.find((l) => l in definitions) || "en";
-    })()
-  );
+  const audio = useMemo(() => new Audio("/bell.opus"));
+
+  const startLang = useMemo(() => {
+    const oldLang = localStorage.getItem("lang");
+    if (oldLang) return oldLang;
+    const preferred = navigator.languages.map((l) => l.split("-")[0]);
+    return preferred.find((l) => l in definitions) || "en";
+  });
+  const [lang, setLang] = useState(startLang);
 
   function moveToLang(lang: string) {
     localStorage.setItem("lang", lang);
@@ -111,6 +112,7 @@ export const App: FunctionComponent = () => {
           if (msg.join) {
             setMatching(false);
             moveToBoard(emptyBoard());
+            audio.play();
             jump(msg.join);
           }
         },

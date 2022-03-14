@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     preact(),
     VitePWA({
-      includeAssets: ["icon.svg", "robots.txt"],
+      includeAssets: ["icon.svg", "robots.txt", "bell.opus"],
       manifest: {
         name: "Teeko by John Scarne",
         short_name: "Teeko",
