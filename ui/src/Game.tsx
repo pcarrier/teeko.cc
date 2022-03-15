@@ -57,7 +57,7 @@ export const Game: FunctionComponent<{
         <button
           onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
         >
-          <Text id="game.discord" />
+          Discord
         </button>
         <button onClick={showHelp}>
           <Text id="game.help" />

@@ -28,7 +28,6 @@
     "game": {
       "undo": "Върнете се назад",
       "reset": "Нулиране",
-      "discord": "Дискорд",
       "help": "Помощ"
     },
     "status": {
@@ -73,7 +72,6 @@
     "game": {
       "undo": "Undo",
       "reset": "Reset",
-      "discord": "Discord",
       "help": "Help"
     },
     "status": {
@@ -118,7 +116,6 @@
     "game": {
       "undo": "Deshacer",
       "reset": "Reiniciar",
-      "discord": "Discord",
       "help": "Ayuda"
     },
     "status": {
@@ -163,7 +160,6 @@
     "game": {
       "undo": "Annuler",
       "reset": "Table rase",
-      "discord": "Discord",
       "help": "Aide"
     },
     "status": {
@@ -208,7 +204,6 @@
     "game": {
       "undo": "Desfazer",
       "reset": "Recomeçar",
-      "discord": "Discord",
       "help": "Ajuda"
     },
     "status": {
@@ -253,7 +248,6 @@
     "game": {
       "undo": "撤销",
       "reset": "重置",
-      "discord": "Discord",
       "help": "帮助"
     },
     "status": {
