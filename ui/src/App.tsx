@@ -20,29 +20,27 @@ export enum OnlineStatus {
 
 export const App: FunctionComponent = () => {
   const {
-    needRefresh: [needsRefresh, setNeedsRefresh],
+    needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      r && setInterval(() => r.update(), 10_000);
+      r && setInterval(() => r.update(), 10 * 1000);
     },
   });
 
-  useEffect(() => {
-    if (needsRefresh) {
-      setNeedsRefresh(false);
-      updateServiceWorker(true).then(() => console.log("Updated SW"));
-    }
-  });
+  if (needRefresh) {
+    setNeedRefresh(false);
+    updateServiceWorker(false);
+  }
 
-  const audio = useMemo(() => new Audio("/bell.opus"));
+  const audio = useMemo(() => new Audio("/bell.opus"), undefined);
 
   const startLang = useMemo(() => {
     const oldLang = localStorage.getItem("lang");
     if (oldLang) return oldLang;
     const preferred = navigator.languages.map((l) => l.split("-")[0]);
     return preferred.find((l) => l in definitions) || "en";
-  });
+  }, undefined);
   const [lang, setLang] = useState(startLang);
 
   function moveToLang(lang: string) {
