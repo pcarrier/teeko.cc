@@ -28,10 +28,12 @@ export const App: FunctionComponent = () => {
     },
   });
 
-  if (needsRefresh) {
-    setNeedsRefresh(false);
-    updateServiceWorker(true);
-  }
+  useEffect(() => {
+    if (needsRefresh) {
+      setNeedsRefresh(false);
+      updateServiceWorker(true).then(() => console.log("Updated SW"));
+    }
+  });
 
   const audio = useMemo(() => new Audio("/bell.opus"));
 
