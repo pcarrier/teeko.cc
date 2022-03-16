@@ -7,11 +7,11 @@ import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
 import { OnlineBar } from "./OnlineBar.jsx";
-import { nanoid } from "nanoid";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
 
 import definitions from "./translations.json";
+import { randomID } from "./random";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -53,7 +53,7 @@ export const App: FunctionComponent = () => {
   const [pill, startWithHelp] = (() => {
     const oldPill = localStorage.getItem("pill");
     if (oldPill) return [oldPill, false];
-    const newPill = nanoid();
+    const newPill = randomID();
     localStorage.setItem("pill", newPill);
     return [newPill, true];
   })();

@@ -1,5 +1,10 @@
+import { customAlphabet } from "https://deno.land/x/nanoid/mod.ts";
 import { Message, State } from "../common/src/model.ts";
-import { randomRoom } from "../common/src/utils.ts";
+
+export const randomID = customAlphabet(
+  "0123456789abcdefghijklmnopqrstuvwxyz",
+  8
+);
 
 const notifyChannel: (content: string) => void = (() => {
   const url = Deno.env.get("DISCORD_WEBHOOK");
@@ -214,7 +219,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
   }
   if (serverState.waiting === undefined) {
     serverState.waiting = [pill, [socket]];
-    notifyChannel(`${pill} waiting for a match.`);
+    notifyChannel(`\`${pill}\` waiting for a match.`);
   } else {
     const [otherPill, otherSockets] = serverState.waiting;
     if (otherPill === pill) {
@@ -224,7 +229,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
 
     let join: string;
     do {
-      join = randomRoom();
+      join = randomID();
     } while (serverState.rooms.has(join));
     try {
       otherSockets.forEach((s) => s.send(JSON.stringify({ join })));
@@ -243,7 +248,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
     } catch (e) {
       console.log(`Failure closing ${pill}`, e.message || e.type || e);
     }
-    notifyChannel(`Players ${pill} and ${otherPill} matched!`);
+    notifyChannel(`\`${pill}\` and \`${otherPill}\` matched!`);
   }
 }
 
@@ -252,7 +257,7 @@ function closeInLobby(pill: string | undefined, socket: WebSocket) {
   if (serverState.waiting[1].includes(socket)) {
     serverState.waiting[1] = serverState.waiting[1].filter((s) => s !== socket);
     if (serverState.waiting[1].length === 0) {
-      notifyChannel(`Player ${pill} no longer waiting.`);
+      notifyChannel(`\`${pill}\` no longer waiting.`);
       serverState.waiting = undefined;
     }
   }

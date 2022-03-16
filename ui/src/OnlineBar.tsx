@@ -2,8 +2,8 @@ import { FunctionComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { Localizer, Text } from "preact-i18n";
 import { OnlineStatus } from "./App.jsx";
-import { randomRoom } from "teeko-cc-common/src/utils.js";
 import { spinner } from "./Spinner";
+import { randomID } from "./random";
 
 export const OnlineBar: FunctionComponent<{
   roomPath?: string;
@@ -62,12 +62,12 @@ export const OnlineBar: FunctionComponent<{
               onKeyUp={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  jump(nextRoom || randomRoom());
+                  jump(nextRoom || randomID());
                 }
               }}
             />
           </Localizer>
-          <button onClick={() => jump(nextRoom || randomRoom())}>
+          <button onClick={() => jump(nextRoom || randomID())}>
             <Text id="onlineBar.join" />
           </button>
         </>
