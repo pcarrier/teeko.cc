@@ -52,7 +52,7 @@ export const App: FunctionComponent = () => {
 
   const [pill, startWithHelp] = (() => {
     const oldPill = localStorage.getItem("pill");
-    if (oldPill) return [oldPill, false];
+    if (oldPill?.length === 8) return [oldPill, false];
     const newPill = randomID();
     localStorage.setItem("pill", newPill);
     return [newPill, true];
