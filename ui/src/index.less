@@ -15,6 +15,7 @@
 @bLight: lighten(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
 @maxBoardWidth: 120mm;
+@maxHalfBoardWidth: 60mm;
 
 * {
   box-sizing: border-box;
@@ -105,13 +106,13 @@ input {
 
 .board.full {
   touch-action: none;
-  width: @boardWidth;
+  width: @boardWidth / 2;
   max-width: @maxBoardWidth;
 }
 
 .board.half {
-  max-width: @maxBoardWidth / 2;
   width: 50%;
+  max-width: @maxHalfBoardWidth;
 }
 
 .board line.bg {
