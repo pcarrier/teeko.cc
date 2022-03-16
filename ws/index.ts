@@ -214,7 +214,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
   }
   if (serverState.waiting === undefined) {
     serverState.waiting = [pill, [socket]];
-    notifyChannel("Player waiting for a match.");
+    notifyChannel(`${pill} waiting for a match.`);
   } else {
     const [otherPill, otherSockets] = serverState.waiting;
     if (otherPill === pill) {
@@ -229,7 +229,10 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
     try {
       otherSockets.forEach((s) => s.send(JSON.stringify({ join })));
     } catch (e) {
-      console.log("Failure matching", e.message || e.type || e);
+      console.log(
+        `Failure matching ${pill} with ${otherPill}`,
+        e.message || e.type || e
+      );
       serverState.waiting = [pill, [socket]];
       return;
     }
@@ -238,18 +241,18 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
       otherSockets.forEach((s) => s.close());
       socket.close();
     } catch (e) {
-      console.log("Failure closing", e.message || e.type || e);
+      console.log(`Failure closing ${pill}`, e.message || e.type || e);
     }
-    notifyChannel("Players matched!");
+    notifyChannel(`Players ${pill} and ${otherPill} matched!`);
   }
 }
 
-function closeInLobby(socket: WebSocket) {
+function closeInLobby(pill: string | undefined, socket: WebSocket) {
   if (!serverState.waiting) return;
   if (serverState.waiting[1].includes(socket)) {
     serverState.waiting[1] = serverState.waiting[1].filter((s) => s !== socket);
     if (serverState.waiting[1].length === 0) {
-      notifyChannel("Player no longer waiting.");
+      notifyChannel(`Player ${pill} no longer waiting.`);
       serverState.waiting = undefined;
     }
   }
@@ -284,7 +287,7 @@ async function main() {
           const { socket, response } = Deno.upgradeWebSocket(evt.request);
 
           socket.onopen = () => connectedToLobby(pill, socket);
-          socket.onclose = () => closeInLobby(socket);
+          socket.onclose = () => closeInLobby(pill, socket);
           socket.onerror = (e) => handleError(e);
 
           await evt.respondWith(response);
