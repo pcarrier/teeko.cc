@@ -8,7 +8,7 @@ export default defineConfig({
     VitePWA({
       includeAssets: ["icon.svg", "robots.txt", "bell.opus"],
       manifest: {
-        name: "Teeko by John Scarne",
+        name: "Teeko",
         short_name: "Teeko",
         theme_color: "#000000",
         icons: [
