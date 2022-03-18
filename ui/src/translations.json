@@ -133,7 +133,7 @@
   },
   "fr": {
     "help": {
-      "open": "Chaque joueur a 4 pions. Bleu commence.",
+      "open": "Chaque joueuse·r a 4 pions. Bleu commence.",
       "place": "D'abord, posez tous les pions, un par tour.",
       "move": "Ensuite, bougez un pion vers un voisin libre chaque tour :",
       "win": "Formez une ligne de 4 ou un petit carré pour gagner.",
@@ -145,7 +145,7 @@
     },
     "onlineBar": {
       "local": "Local",
-      "matched": "Chercher un joueur",
+      "matched": "Chercher joueuse·r",
       "matching": "Recherche…",
       "friends": "Amis",
       "cancel": "Renoncer",
