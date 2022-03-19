@@ -45,21 +45,23 @@ export const Game: FunctionComponent<{
         showStatus={true}
       />
       <p class="buttons">
-        <button onClick={undo} disabled={board.m.length === 0}>
+        <button id="undo" onClick={undo} disabled={board.m.length === 0}>
           <Text id="game.undo" />
         </button>
         <button
+          id="reset"
           onClick={() => moveToBoard(computeReset(board))}
           disabled={board.a === 0}
         >
           <Text id="game.reset" />
         </button>
         <button
+          id="discord"
           onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
         >
           Discord
         </button>
-        <button onClick={showHelp}>
+        <button id="help" onClick={showHelp}>
           <Text id="game.help" />
         </button>
       </p>

@@ -49,7 +49,7 @@ export const OnlineBar: FunctionComponent<{
     <div class="onlineBar">
       {isJoining ? (
         <>
-          <button onClick={() => setJoining(false)}>
+          <button id="cancelJoin" onClick={() => setJoining(false)}>
             <Text id="onlineBar.cancel" />
           </button>
           <Localizer>
@@ -67,13 +67,13 @@ export const OnlineBar: FunctionComponent<{
               }}
             />
           </Localizer>
-          <button onClick={() => jump(nextRoom || randomID())}>
+          <button id="join" onClick={() => jump(nextRoom || randomID())}>
             <Text id="onlineBar.join" />
           </button>
         </>
       ) : roomPath ? (
         <>
-          <button onClick={() => jump()}>
+          <button id="leave" onClick={() => jump()}>
             <Text id="onlineBar.leave" />
           </button>
           <h1>
@@ -99,7 +99,7 @@ export const OnlineBar: FunctionComponent<{
               </span>
             )}
           </div>
-          <button onClick={share}>
+          <button id="share" onClick={share}>
             {hasCopied ? (
               <Text id="onlineBar.copied" />
             ) : (
@@ -113,15 +113,16 @@ export const OnlineBar: FunctionComponent<{
             <Text id="onlineBar.local" />
           </h1>
           {isMatching ? (
-            <button onClick={() => setMatching(false)}>
+            <button id="cancelMatch" onClick={() => setMatching(false)}>
               {spinner} <Text id="onlineBar.matching" />
             </button>
           ) : (
-            <button onClick={() => setMatching(true)}>
+            <button id="match" onClick={() => setMatching(true)}>
               <Text id="onlineBar.matched" />
             </button>
           )}
           <button
+            id="friends"
             onClick={() => {
               setMatching(false);
               setJoining(true);
