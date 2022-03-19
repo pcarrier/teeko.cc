@@ -1,7 +1,7 @@
 import classnames from "classnames";
 import { FunctionComponent } from "preact";
 import { Text } from "preact-i18n";
-import { useRef, useState } from "preact/hooks";
+import { useMemo, useRef, useState } from "preact/hooks";
 
 import { Rect, useRect } from "./useRect.js";
 
@@ -9,7 +9,6 @@ import {
   Board,
   DELTA_TO_DIRECTIONS,
   DIRECTION_TO_DELTAS,
-  pieces,
   Player,
   SIZE,
   SLOTS,
@@ -19,6 +18,7 @@ import {
   WINNING_POSITIONS,
   x,
   y,
+  pieces,
 } from "../../common/src/model";
 import {
   LARGE_CROWN_RADIUS,
@@ -47,7 +47,7 @@ type BoardViewAttrs = {
 };
 
 export const BoardBackground = (
-  <g>
+  <g class="bg">
     {[0, 1, 2, 3].map((x) =>
       [0, 1, 2, 3].map((y) => (
         <>
@@ -94,10 +94,12 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const { a, b, m, p } = board;
   const t = m.length % 2;
-  const aPieces = pieces(a);
-  const bPieces = pieces(b);
-  const emptySlots = new Set(
-    POS_ARRAY.filter((x) => !aPieces.has(x) && !bPieces.has(x))
+  const aPieces = useMemo(() => pieces(a), [a]);
+  const bPieces = useMemo(() => pieces(b), [b]);
+  const allPieces = useMemo(() => pieces(a | b), [a, b]);
+  const emptySlots = useMemo(
+    () => new Set(POS_ARRAY.filter((x) => !allPieces.has(x))),
+    [a, b]
   );
   const aWin = WINNING_POSITIONS.has(a);
   const bWin = WINNING_POSITIONS.has(b);
@@ -113,12 +115,12 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
 
-  const neighborsOfSelected =
+  const emptyNeighborsOfSelected =
     selected === undefined
       ? new Set<number>()
       : new Set(
           [...pieces(NEIGHS_BY_POSITION[selected])].filter(
-            (x) => !aPieces.has(x) && !bPieces.has(x)
+            (x) => !allPieces.has(x)
           )
         );
 
@@ -130,7 +132,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     ? emptySlots
     : selected === undefined
     ? movable
-    : neighborsOfSelected;
+    : emptyNeighborsOfSelected;
 
   function click(position: number) {
     if (!p) return;
@@ -210,9 +212,29 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         SIZE * Math.round(Math.floor(selected / SIZE) + dragState.y)
       : undefined;
   const releasePos =
-    dragPos && (selected === dragPos || neighborsOfSelected.has(dragPos))
+    dragPos && (selected === dragPos || emptyNeighborsOfSelected.has(dragPos))
       ? dragPos
       : selected;
+
+  const drawableArrows = useMemo(() => {
+    const result = arrows === undefined ? [] : [...arrows];
+    if (releasePos !== selected && releasePos !== undefined)
+      result.push({
+        from: selected,
+        to: releasePos,
+        player: t === 0 ? Player.A : Player.B,
+      });
+    else if (!placing && dragPos === undefined && selected !== null) {
+      emptyNeighborsOfSelected.forEach((to) =>
+        result.push({
+          from: selected,
+          to,
+          player: t === 0 ? Player.A : Player.B,
+        })
+      );
+    }
+    return result;
+  }, [arrows, selected, releasePos, dragPos]);
 
   return (
     <>
@@ -315,7 +337,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </g>
 
         <g>
-          {arrows?.map(({ from, to, player }) => {
+          {drawableArrows.map(({ from, to, player }) => {
             const deltas = DIRECTION_TO_DELTAS[DELTA_TO_DIRECTIONS[to - from]];
             const x1 = x(from);
             const y1 = y(from);
@@ -376,7 +398,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 }}
                 dragEnd={(position) => {
                   setDragState(undefined);
-                  if (t === dragTurn && neighborsOfSelected.has(position))
+                  if (t === dragTurn && emptyNeighborsOfSelected.has(position))
                     click(position);
                   else setSelected(undefined);
                 }}
