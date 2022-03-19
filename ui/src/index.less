@@ -84,6 +84,11 @@ select {
   padding: 1em;
 }
 
+select option {
+  color: @color;
+  background-color: @bg;
+}
+
 button:hover:enabled {
   background-color: @boardColor;
 }
@@ -252,7 +257,7 @@ button {
 
 /*
 @media (prefers-color-scheme: light) {
-  html, body {
+  html, body, select option {
     color: @colorLight;
     background-color: @bgLight;
   }
