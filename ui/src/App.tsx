@@ -9,6 +9,7 @@ import { Help } from "./Help.jsx";
 import { OnlineBar } from "./OnlineBar.jsx";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
+import { setUserVars } from "@fullstory/browser";
 
 import definitions from "./translations.json";
 import { randomID } from "./random";
@@ -50,13 +51,21 @@ export const App: FunctionComponent = () => {
 
   const definition = (definitions as any)[lang];
 
-  const [pill, startWithHelp] = (() => {
+  const [pill, startWithHelp] = useMemo(() => {
     const oldPill = localStorage.getItem("pill");
-    if (oldPill?.length === 8) return [oldPill, false];
+    if (oldPill?.length === 8) {
+      setUserVars({
+        displayName: oldPill,
+      });
+      return [oldPill, false];
+    }
     const newPill = randomID();
     localStorage.setItem("pill", newPill);
+    setUserVars({
+      displayName: newPill,
+    });
     return [newPill, true];
-  })();
+  }, undefined);
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
 
