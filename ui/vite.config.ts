@@ -10,6 +10,7 @@ export default defineConfig({
       manifest: {
         name: "Teeko",
         short_name: "Teeko",
+        background_color: "#000000",
         theme_color: "#000000",
         icons: [
           {
