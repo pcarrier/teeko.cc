@@ -57,6 +57,7 @@ export const OnlineBar: FunctionComponent<{
               type="text"
               value={nextRoom}
               placeholder={<Text id="onlineBar.boardNameInput" />}
+              maxlength="256"
               onInput={(e: Event) => setNextRoom((e.target as any).value)}
               onKeyUp={(e) => {
                 if (e.keyCode === 13) {

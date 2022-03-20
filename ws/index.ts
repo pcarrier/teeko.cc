@@ -164,6 +164,7 @@ function closeRoom(room: Room) {
 }
 
 function connectedToRoom(ctx: Context) {
+  console.log(`${ctx.pill} connected to ${ctx.roomPath}`);
   const room = getRoom(ctx);
   if (room.timeout) {
     clearTimeout(room.timeout);
@@ -196,6 +197,7 @@ function handleError(e: Event | ErrorEvent) {
 }
 
 function closeInRoom(ctx: Context) {
+  console.log(`${ctx.pill} left ${ctx.roomPath}`);
   const room = getRoom(ctx);
   const forPill = room.clients.get(ctx.pill);
   if (!forPill) return;
