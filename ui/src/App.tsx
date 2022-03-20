@@ -20,7 +20,7 @@ export enum OnlineStatus {
 
 export const App: FunctionComponent = () => {
   const {
-    needRefresh: [needRefresh, setNeedRefresh],
+    needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
@@ -29,8 +29,7 @@ export const App: FunctionComponent = () => {
   });
 
   if (needRefresh) {
-    setNeedRefresh(false);
-    updateServiceWorker(false);
+    updateServiceWorker(true);
   }
 
   const audio = useMemo(() => new Audio("/bell.opus"), undefined);
