@@ -1,0 +1,44 @@
+{
+  "help": {
+    "open": "Chaque joueuse·r a 4 pions. Bleu commence.",
+    "place": "D'abord, posez tous les pions, un par tour.",
+    "move": "Ensuite, bougez un pion vers un voisin libre chaque tour :",
+    "win": "Formez une ligne de 4 ou un petit carré pour gagner.",
+    "credits": "Teeko par John Scarne.",
+    "close": "Jouer",
+    "wiki": "Wikipédia",
+    "code": "code",
+    "archives": "archives"
+  },
+  "onlineBar": {
+    "local": "Local",
+    "matched": "Chercher joueuse·r",
+    "matching": "Recherche…",
+    "friends": "Amis",
+    "cancel": "Renoncer",
+    "boardNameInput": "Nom du plateau (optionnel)",
+    "join": "Rejoindre",
+    "leave": "Sortir",
+    "invite": "Inviter",
+    "copied": "Copié !",
+    "alone": "seul",
+    "pop": "{{pop}}J"
+  },
+  "game": {
+    "undo": "Annuler",
+    "reset": "Table rase",
+    "help": "Aide"
+  },
+  "status": {
+    "aWin": "Teeko ! Bleu gagne.",
+    "bWin": "Teeko ! Rouge gagne.",
+    "aDrop": "Bleu pose le pion {{piece}} sur 4…",
+    "bDrop": "Rouge pose le pion {{piece}} sur 4…",
+    "aMoveFrom": "Bleu bouge de…",
+    "bMoveFrom": "Rouge bouge de…",
+    "aMoveTo": "Bleu bouge vers…",
+    "bMoveTo": "Rouge bouge vers…",
+    "aMove": "Bleu bouge…",
+    "bMove": "Rouge bouge…"
+  }
+}

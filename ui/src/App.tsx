@@ -11,7 +11,7 @@ import { wsUrl } from "./env.js";
 import Sockette from "sockette";
 import { setUserVars } from "@fullstory/browser";
 
-import definitions from "./translations.json";
+import definitions from "./translations";
 import { randomID } from "./random";
 
 export enum OnlineStatus {

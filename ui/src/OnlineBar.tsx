@@ -56,7 +56,6 @@ export const OnlineBar: FunctionComponent<{
             <input
               type="text"
               value={nextRoom}
-              // @ts-ignore
               placeholder={<Text id="onlineBar.boardNameInput" />}
               onInput={(e: Event) => setNextRoom((e.target as any).value)}
               onKeyUp={(e) => {
