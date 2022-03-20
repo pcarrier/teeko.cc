@@ -227,10 +227,8 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
       return;
     }
 
-    let join: string;
-    do {
-      join = randomID();
-    } while (serverState.rooms.has(join));
+    const [a, b] = pill < otherPill ? [pill, otherPill] : [otherPill, pill];
+    const join = `${a}-${b}`;
     try {
       otherSockets.forEach((s) => s.send(JSON.stringify({ join })));
     } catch (e) {
