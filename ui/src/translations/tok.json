@@ -1,0 +1,44 @@
+{
+  "help": {
+    "open": "jan ale li jo e ijo tu tu. laso li open.",
+    "place": "tenpo wan la, pana e ijo ale. tenpo wan la, kepeken e ijo wan.",
+    "move": "tenpo tu la, tawa e wan pi wan tenpo:",
+    "win": "Form a line of 4 or a small square to win.",
+    "credits": "Tiko pi jan John Scarne.",
+    "close": "musi",
+    "wiki": "Wikipedia",
+    "code": "code",
+    "archives": "archives"
+  },
+  "onlineBar": {
+    "local": "Local",
+    "matched": "Find a player",
+    "matching": "Finding…",
+    "friends": "Friends",
+    "cancel": "Cancel",
+    "boardNameInput": "Board name (optional)",
+    "join": "Join",
+    "leave": "Leave",
+    "invite": "Invite",
+    "copied": "Copied!",
+    "alone": "alone",
+    "pop": "{{pop}}P"
+  },
+  "game": {
+    "undo": "Undo",
+    "reset": "Reset",
+    "help": "Help"
+  },
+  "status": {
+    "aWin": "Teeko! Blue won.",
+    "bWin": "Teeko! Red won.",
+    "aDrop": "Blue places piece {{piece}} out of 4…",
+    "bDrop": "Red places piece {{piece}} out of 4…",
+    "aMoveFrom": "Blue moves from…",
+    "bMoveFrom": "Red moves from…",
+    "aMoveTo": "Blue moves to…",
+    "bMoveTo": "Red moves to…",
+    "aMove": "Blue moves…",
+    "bMove": "Red moves…"
+  }
+}

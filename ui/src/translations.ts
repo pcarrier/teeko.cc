@@ -3,6 +3,7 @@ import en from "./translations/en.json";
 import es from "./translations/es.json";
 import fr from "./translations/fr.json";
 import pt from "./translations/pt.json";
+import tok from "./translations/tok.json";
 import zh from "./translations/zh.json";
 
 export default {
@@ -11,5 +12,6 @@ export default {
   es,
   fr,
   pt,
+  tok,
   zh,
 };
