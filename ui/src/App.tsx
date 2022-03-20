@@ -51,7 +51,7 @@ export const App: FunctionComponent = () => {
 
   const [pill, startWithHelp] = useMemo(() => {
     const oldPill = localStorage.getItem("pill");
-    if (oldPill !== undefined) {
+    if (oldPill !== null) {
       setUserVars({
         displayName: oldPill,
       });
