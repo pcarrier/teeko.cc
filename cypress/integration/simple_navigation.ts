@@ -1,4 +1,4 @@
-describe("My First Test", () => {
+describe("Simple navigation", () => {
   it("visits teeko.cc", () => {
     cy.visit("http://127.0.0.1:3000");
     cy.contains("Blue opens.");

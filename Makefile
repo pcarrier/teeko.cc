@@ -33,3 +33,7 @@ deploy-ws: ws/bundle.js
 .PHONY: ws
 ws:
 	deno run --allow-net --allow-env ws/index.ts
+
+.PHONY: ui
+ui:
+	cd ui && npm ci && npm start
