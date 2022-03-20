@@ -1,4 +1,4 @@
-import { customAlphabet } from "https://deno.land/x/nanoid/mod.ts";
+import { customAlphabet } from "https://deno.land/x/nanoid@v3.0.0/mod.ts";
 import { Message, State } from "../common/src/model.ts";
 
 export const randomID = customAlphabet(
