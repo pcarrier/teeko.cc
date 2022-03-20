@@ -10,8 +10,7 @@ import { OnlineBar } from "./OnlineBar.jsx";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
 import { setUserVars } from "@fullstory/browser";
-
-import definitions from "./translations";
+import Translations from "./translations";
 import { randomID } from "./random";
 
 export enum OnlineStatus {
@@ -40,7 +39,7 @@ export const App: FunctionComponent = () => {
     const oldLang = localStorage.getItem("lang");
     if (oldLang) return oldLang;
     const preferred = navigator.languages.map((l) => l.split("-")[0]);
-    return preferred.find((l) => l in definitions) || "en";
+    return preferred.find((l) => l in Translations) || "en";
   }, undefined);
   const [lang, setLang] = useState(startLang);
 
@@ -49,7 +48,7 @@ export const App: FunctionComponent = () => {
     setLang(lang);
   }
 
-  const definition = (definitions as any)[lang];
+  const translation = (Translations as any)[lang];
 
   const [pill, startWithHelp] = useMemo(() => {
     const oldPill = localStorage.getItem("pill");
@@ -173,7 +172,7 @@ export const App: FunctionComponent = () => {
   }
 
   return (
-    <IntlProvider definition={definition}>
+    <IntlProvider definition={translation}>
       {showHelp ? (
         <Help
           close={() => setShowHelp(false)}

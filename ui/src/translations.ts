@@ -1,9 +1,9 @@
-import * as bg from "./translations/bg.json";
-import * as en from "./translations/en.json";
-import * as es from "./translations/es.json";
-import * as fr from "./translations/fr.json";
-import * as pt from "./translations/pt.json";
-import * as zh from "./translations/zh.json";
+import bg from "./translations/bg.json";
+import en from "./translations/en.json";
+import es from "./translations/es.json";
+import fr from "./translations/fr.json";
+import pt from "./translations/pt.json";
+import zh from "./translations/zh.json";
 
 export default {
   bg,
