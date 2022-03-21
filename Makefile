@@ -36,4 +36,4 @@ ws:
 
 .PHONY: ui
 ui:
-	cd ui && npm ci && npm start
+	cd ui && npm ci && npm run build && npm start
