@@ -1,33 +1,14 @@
 import classnames from "classnames";
-import { FunctionComponent } from "preact";
-import { Text } from "preact-i18n";
-import { useMemo, useRef, useState } from "preact/hooks";
+import {FunctionComponent} from "preact";
+import {Text} from "preact-i18n";
+import {useMemo, useRef, useState} from "preact/hooks";
 
-import { Rect, useRect } from "./useRect.js";
+import {Rect, useRect} from "./useRect.js";
 
-import {
-  Board,
-  DELTA_TO_DIRECTIONS,
-  DIRECTION_TO_DELTAS,
-  Player,
-  SIZE,
-  SLOTS,
-} from "teeko-cc-common/src/model";
-import {
-  NEIGHS_BY_POSITION,
-  WINNING_POSITIONS,
-  x,
-  y,
-  pieces,
-} from "../../common/src/model";
-import {
-  LARGE_CROWN_RADIUS,
-  LAST_ACTION_RADIUS,
-  LINE_MARGIN, OUT_RADIUS,
-  PIECE_RADIUS,
-  SLOT_RADIUS,
-} from "./sizing";
-import { Piece } from "./Piece";
+import {Board, DELTA_TO_DIRECTIONS, DIRECTION_TO_DELTAS, Player, SIZE, SLOTS,} from "teeko-cc-common/src/model";
+import {NEIGHS_BY_POSITION, pieces, WINNING_POSITIONS, x, y,} from "../../common/src/model";
+import {LARGE_CROWN_RADIUS, LAST_ACTION_RADIUS, LINE_MARGIN, OUT_RADIUS, PIECE_RADIUS, SLOT_RADIUS,} from "./sizing";
+import {Piece} from "./Piece";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
 const OUT_ARRAY = Array.from(Array(8).keys());
@@ -157,40 +138,6 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const alreadyPlayed = t === 0 ? aPieces.size : bPieces.size;
 
-  const status = showStatus ? (
-    <p class={classnames("status", { playing: board.p, win })}>
-      {aWin ? (
-        <Text id="status.aWin" />
-      ) : bWin ? (
-        <Text id="status.bWin" />
-      ) : alreadyPlayed < 4 ? (
-        t === 0 ? (
-          <Text id="status.aDrop" fields={{ piece: alreadyPlayed + 1 }} />
-        ) : (
-          <Text id="status.bDrop" fields={{ piece: alreadyPlayed + 1 }} />
-        )
-      ) : board.p ? (
-        selected === undefined ? (
-          t === 0 ? (
-            <Text id="status.aMoveFrom" />
-          ) : (
-            <Text id="status.bMoveFrom" />
-          )
-        ) : t === 0 ? (
-          <Text id="status.aMoveTo" />
-        ) : (
-          <Text id="status.bMoveTo" />
-        )
-      ) : t === 0 ? (
-        <Text id="status.aMove" />
-      ) : (
-        <Text id="status.bMove" />
-      )}
-    </p>
-  ) : (
-    <></>
-  );
-
   const lastAction =
     board.m.length > 0 ? board.m[board.m.length - 1] : undefined;
 
@@ -238,198 +185,229 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   }, [arrows, selected, releasePos, dragPos]);
 
   return (
-    <>
-      {status}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="-0.5 -0.6 5 5.1"
-        className={classnames("board", klass)}
-        ref={svgRef}
-      >
-        <defs>
-          <marker
-            id="arrowheadA"
-            markerWidth="2"
-            markerHeight="2"
-            refX="1"
-            refY="1"
-            orient="auto"
-          >
-            <polygon points="0 0, 2 1, 0 2" />
-          </marker>
-          <marker
-            id="arrowheadB"
-            markerWidth="2"
-            markerHeight="2"
-            refX="1"
-            refY="1"
-            orient="auto"
-          >
-            <polygon points="0 0, 2 1, 0 2" />
-          </marker>
-        </defs>
-
-        {BoardBackground}
-        <g>
-          {lastAction === undefined ? (
-            <></>
-          ) : Array.isArray(lastAction) ? (
-            <line
-              x1={x(lastAction[0])}
-              y1={y(lastAction[0])}
-              x2={x(lastAction[1])}
-              y2={y(lastAction[1])}
-              class={classnames("last", t === 0 ? "B" : "A")}
-            />
-          ) : (
-            <circle
-              key="lplace"
-              r={LAST_ACTION_RADIUS}
-              cx={lastAction % 5}
-              cy={Math.floor(lastAction / 5)}
-              class={classnames("last", t === 0 ? "B" : "A")}
-            />
-          )}
-        </g>
-
-        <g>
-          {POS_ARRAY.map((pos) => (
-            <circle
-              key={`m${pos}`}
-              r={LINE_MARGIN}
-              cx={x(pos)}
-              cy={y(pos)}
-              class="lineMargin"
-            />
-          ))}
-        </g>
-
-        <g>
-          {selected ? (
-            <circle
-              key="selected"
-              r={LARGE_CROWN_RADIUS}
-              cx={x(selected)}
-              cy={y(selected)}
-              class="selected"
-            />
-          ) : (
-            <></>
-          )}
-        </g>
-
-        <g>
-          {POS_ARRAY.map((pos) => (
-            <circle
-              key={`bg${pos}`}
-              r={SLOT_RADIUS}
-              cx={x(pos)}
-              cy={y(pos)}
-              class={classnames(
-                "bg",
-                releasePos === pos
-                  ? "release"
-                  : (placing || selected !== undefined) && validTargets.has(pos)
-                  ? "target"
-                  : undefined,
-                t === 0 ? "A" : "B"
+      <>
+        {showStatus && (
+            <p class={classnames("status", {playing: board.p, win})}>
+              {aWin ? (
+                  <Text id="status.aWin"/>
+              ) : bWin ? (
+                  <Text id="status.bWin"/>
+              ) : alreadyPlayed < 4 ? (
+                  t === 0 ? (
+                      <Text id="status.aDrop" fields={{piece: alreadyPlayed + 1}}/>
+                  ) : (
+                      <Text id="status.bDrop" fields={{piece: alreadyPlayed + 1}}/>
+                  )
+              ) : board.p ? (
+                  selected === undefined ? (
+                      t === 0 ? (
+                          <Text id="status.aMoveFrom"/>
+                      ) : (
+                          <Text id="status.bMoveFrom"/>
+                      )
+                  ) : t === 0 ? (
+                      <Text id="status.aMoveTo"/>
+                  ) : (
+                      <Text id="status.bMoveTo"/>
+                  )
+              ) : t === 0 ? (
+                  <Text id="status.aMove"/>
+              ) : (
+                  <Text id="status.bMove"/>
               )}
-            />
-          ))}
-        </g>
+            </p>
+        )}
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-0.5 -0.6 5 5.1"
+            className={classnames("board", klass)}
+            ref={svgRef}
+        >
+          <defs>
+            <marker
+                id="arrowheadA"
+                markerWidth="2"
+                markerHeight="2"
+                refX="1"
+                refY="1"
+                orient="auto"
+            >
+              <polygon points="0 0, 2 1, 0 2"/>
+            </marker>
+            <marker
+                id="arrowheadB"
+                markerWidth="2"
+                markerHeight="2"
+                refX="1"
+                refY="1"
+                orient="auto"
+            >
+              <polygon points="0 0, 2 1, 0 2"/>
+            </marker>
+          </defs>
 
-        <g>
-          {drawableArrows.map(({ from, to, player }) => {
-            const deltas = DIRECTION_TO_DELTAS[DELTA_TO_DIRECTIONS[to - from]];
-            const x1 = x(from);
-            const y1 = y(from);
-            return (
-              <line
-                marker-end={`url(#arrowhead${player === Player.A ? "A" : "B"})`}
-                x1={x1}
-                y1={y1}
-                x2={x1 + deltas.dx * 0.8}
-                y2={y1 + deltas.dy * 0.8}
-                class={classnames("arrow", {
-                  A: player === Player.A,
-                  B: player === Player.B,
-                })}
-              />
-            );
-          })}
-        </g>
+          {BoardBackground}
+          <g>
+            {lastAction === undefined ? (
+                <></>
+            ) : Array.isArray(lastAction) ? (
+                <line
+                    x1={x(lastAction[0])}
+                    y1={y(lastAction[0])}
+                    x2={x(lastAction[1])}
+                    y2={y(lastAction[1])}
+                    class={classnames("last", t === 0 ? "B" : "A")}
+                />
+            ) : (
+                <circle
+                    key="lplace"
+                    r={LAST_ACTION_RADIUS}
+                    cx={lastAction % 5}
+                    cy={Math.floor(lastAction / 5)}
+                    class={classnames("last", t === 0 ? "B" : "A")}
+                />
+            )}
+          </g>
 
-        <g>
-          {!placing &&
-            selected === undefined &&
-            [...validTargets].map((pos) => (
-              <circle
-                key={`target${pos}`}
-                r={LARGE_CROWN_RADIUS}
-                cx={x(pos)}
-                cy={y(pos)}
-                class={classnames("target", t === 0 ? "A" : "B")}
-              />
+          <g>
+            {POS_ARRAY.map((pos) => (
+                <circle
+                    key={`m${pos}`}
+                    r={LINE_MARGIN}
+                    cx={x(pos)}
+                    cy={y(pos)}
+                    class="lineMargin"
+                />
             ))}
+          </g>
 
-          {POS_ARRAY.map((pos) => (
-            <circle
-              key={`click${pos}`}
-              r={PIECE_RADIUS}
-              cx={x(pos)}
-              cy={y(pos)}
-              fill="#00000000" // invisible
-              onClick={() => click(pos)}
-            />
-          ))}
-        </g>
+          <g>
+            {selected ? (
+                <circle
+                    key="selected"
+                    r={LARGE_CROWN_RADIUS}
+                    cx={x(selected)}
+                    cy={y(selected)}
+                    class="selected"
+                />
+            ) : (
+                <></>
+            )}
+          </g>
 
-        <g id="out">
-          {showStatus && OUT_ARRAY.slice(allPieces.size).map((i) => {
-            return <circle key={i} cx={.25 + i/2} cy={-0.5} r={OUT_RADIUS} class={classnames("out", i % 2 === 0 ? "A" : "B")} />
-          })}
-        </g>
-        <g>
-          {[...aPieces, ...bPieces].map((pos) => {
-            return (
-              <Piece
-                key={`piece${pos}`}
-                position={pos}
-                aspect={aspect}
-                dragStart={() => {
-                  setSelected(pos);
-                  setDragTurn(t);
-                }}
-                dragMove={({ x, y }) => {
-                  if (t === dragTurn) setDragState({ x, y });
-                }}
-                dragEnd={(position) => {
-                  setDragState(undefined);
-                  if (t === dragTurn && emptyNeighborsOfSelected.has(position))
-                    click(position);
-                  else setSelected(undefined);
-                }}
-                player={aPieces.has(pos) ? Player.A : Player.B}
-                selected={selected === pos && ourPieces.has(selected)}
-                selectable={validTargets.has(pos)}
-                click={() => click(pos)}
-              />
-            );
-          })}
-        </g>
+          <g>
+            {POS_ARRAY.map((pos) => (
+                <circle
+                    key={`bg${pos}`}
+                    r={SLOT_RADIUS}
+                    cx={x(pos)}
+                    cy={y(pos)}
+                    class={classnames(
+                        "bg",
+                        releasePos === pos
+                            ? "release"
+                            : (placing || selected !== undefined) && validTargets.has(pos)
+                                ? "target"
+                                : undefined,
+                        t === 0 ? "A" : "B"
+                    )}
+                />
+            ))}
+          </g>
 
-        <g>
-          {dragState && selected && (
-            <Piece
-              dummy
-              key="dummy"
-              player={t === 0 ? Player.A : Player.B}
-              position={selected}
-              offset={{ x: dragState.x, y: dragState.y }}
-            />
-          )}
-        </g>
-      </svg>
-    </>
+          <g>
+            {drawableArrows.map(({from, to, player}) => {
+              const deltas = DIRECTION_TO_DELTAS[DELTA_TO_DIRECTIONS[to - from]];
+              const x1 = x(from);
+              const y1 = y(from);
+              return (
+                  <line
+                      marker-end={`url(#arrowhead${player === Player.A ? "A" : "B"})`}
+                      x1={x1}
+                      y1={y1}
+                      x2={x1 + deltas.dx * 0.8}
+                      y2={y1 + deltas.dy * 0.8}
+                      class={classnames("arrow", {
+                        A: player === Player.A,
+                        B: player === Player.B,
+                      })}
+                  />
+              );
+            })}
+          </g>
+
+          <g>
+            {!placing &&
+                selected === undefined &&
+                [...validTargets].map((pos) => (
+                    <circle
+                        key={`target${pos}`}
+                        r={LARGE_CROWN_RADIUS}
+                        cx={x(pos)}
+                        cy={y(pos)}
+                        class={classnames("target", t === 0 ? "A" : "B")}
+                    />
+                ))}
+
+            {POS_ARRAY.map((pos) => (
+                <circle
+                    key={`click${pos}`}
+                    r={PIECE_RADIUS}
+                    cx={x(pos)}
+                    cy={y(pos)}
+                    fill="#00000000" // invisible
+                    onClick={() => click(pos)}
+                />
+            ))}
+          </g>
+
+          <g id="out">
+            {showStatus && OUT_ARRAY.slice(allPieces.size).map((i) => {
+              return <circle key={i} cx={.25 + i / 2} cy={-0.5} r={OUT_RADIUS}
+                             class={classnames("out", i % 2 === 0 ? "A" : "B")}/>
+            })}
+          </g>
+          <g>
+            {[...aPieces, ...bPieces].map((pos) => {
+              return (
+                  <Piece
+                      key={`piece${pos}`}
+                      position={pos}
+                      aspect={aspect}
+                      dragStart={() => {
+                        setSelected(pos);
+                        setDragTurn(t);
+                      }}
+                      dragMove={({x, y}) => {
+                        if (t === dragTurn) setDragState({x, y});
+                      }}
+                      dragEnd={(position) => {
+                        setDragState(undefined);
+                        if (t === dragTurn && emptyNeighborsOfSelected.has(position))
+                          click(position);
+                        else setSelected(undefined);
+                      }}
+                      player={aPieces.has(pos) ? Player.A : Player.B}
+                      selected={selected === pos && ourPieces.has(selected)}
+                      selectable={validTargets.has(pos)}
+                      click={() => click(pos)}
+                  />
+              );
+            })}
+          </g>
+
+          <g>
+            {dragState && selected && (
+                <Piece
+                    dummy
+                    key="dummy"
+                    player={t === 0 ? Player.A : Player.B}
+                    position={selected}
+                    offset={{x: dragState.x, y: dragState.y}}
+                />
+            )}
+          </g>
+        </svg>
+      </>
   );
 };
