@@ -239,7 +239,9 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
       )}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="-0.5 -0.5 5 5.1"
+        viewBox={`${-LARGE_CROWN_RADIUS} ${-LARGE_CROWN_RADIUS} ${
+          4 + 2 * LARGE_CROWN_RADIUS
+        } ${4 + 2 * LARGE_CROWN_RADIUS + 2 * OUT_RADIUS}`}
         className={classnames("board", klass)}
         ref={svgRef}
       >
@@ -386,7 +388,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 <circle
                   key={i}
                   cx={0.25 + i / 2}
-                  cy={4.5}
+                  cy={4 + LARGE_CROWN_RADIUS + OUT_RADIUS}
                   r={OUT_RADIUS}
                   class={classnames("out", i % 2 === 0 ? "A" : "B")}
                 />
