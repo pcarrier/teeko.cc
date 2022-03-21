@@ -23,7 +23,7 @@ import {
 import {
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
-  LINE_MARGIN,
+  LINE_MARGIN, OUT_RADIUS,
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
@@ -239,6 +239,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   return (
     <>
+      {status}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="-0.5 -0.6 5 5.1"
@@ -384,8 +385,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </g>
 
         <g id="out">
-          {OUT_ARRAY.slice(allPieces.size).map((i) => {
-            return <circle key={i} cx={.25 + i/2} cy={-0.5} r={SLOT_RADIUS} class={classnames("out", i % 2 === 0 ? "A" : "B")} />
+          {showStatus && OUT_ARRAY.slice(allPieces.size).map((i) => {
+            return <circle key={i} cx={.25 + i/2} cy={-0.5} r={OUT_RADIUS} class={classnames("out", i % 2 === 0 ? "A" : "B")} />
           })}
         </g>
         <g>
@@ -429,7 +430,6 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           )}
         </g>
       </svg>
-      {status}
     </>
   );
 };
