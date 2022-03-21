@@ -12,6 +12,8 @@ export default defineConfig({
         short_name: "Teeko",
         background_color: "#000000",
         theme_color: "#000000",
+        display: "fullscreen",
+        orientation: "portrait",
         icons: [
           {
             src: "/icon-192x192.png",
