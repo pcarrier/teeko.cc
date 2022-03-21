@@ -239,7 +239,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
       )}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="-0.5 -0.6 5 5.1"
+        viewBox="-0.5 -0.5 5 5.1"
         className={classnames("board", klass)}
         ref={svgRef}
       >
@@ -386,7 +386,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 <circle
                   key={i}
                   cx={0.25 + i / 2}
-                  cy={-0.5}
+                  cy={4.5}
                   r={OUT_RADIUS}
                   class={classnames("out", i % 2 === 0 ? "A" : "B")}
                 />
@@ -421,7 +421,6 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
             );
           })}
         </g>
-
         <g>
           {dragState && selected && (
             <Piece
