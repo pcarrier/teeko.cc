@@ -17,7 +17,7 @@ jobs:
         with:
           record: true
           start: npm start
-          wait-on: 'http://127.0.0.1:3000'
+          wait-on: "http://127.0.0.1:3000"
           wait-on-timeout: 120
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
