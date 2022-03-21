@@ -30,6 +30,7 @@ import {
 import { Piece } from "./Piece";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
+const OUT_ARRAY = Array.from(Array(8).keys());
 
 type BoardArrow = {
   from: number;
@@ -240,7 +241,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     <>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="-0.5 -0.5 5 5"
+        viewBox="-0.5 -0.6 5 5.1"
         className={classnames("board", klass)}
         ref={svgRef}
       >
@@ -382,6 +383,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           ))}
         </g>
 
+        <g id="out">
+          {OUT_ARRAY.slice(allPieces.size).map((i) => {
+            return <circle key={i} cx={.25 + i/2} cy={-0.5} r={SLOT_RADIUS} class={classnames("out", i % 2 === 0 ? "A" : "B")} />
+          })}
+        </g>
         <g>
           {[...aPieces, ...bPieces].map((pos) => {
             return (
