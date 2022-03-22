@@ -9,10 +9,10 @@
 @link: #04f;
 @aColor: #04f;
 @bColor: #f00;
-@aDark: darken(@aColor, 25%);
-@bDark: darken(@bColor, 25%);
-@aLight: lighten(@aColor, 25%);
-@bLight: lighten(@bColor, 25%);
+@aDark: shade(@aColor, 25%);
+@bDark: shade(@bColor, 25%);
+@aLight: tint(@aColor, 25%);
+@bLight: tint(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
 @maxBoardWidth: 120mm;
 @maxHalfBoardWidth: 60mm;
@@ -124,10 +124,18 @@ input {
 }
 
 .board circle.out.A {
-  fill: @aColor;
+  fill: shade(@aColor, 50%);
 }
 
 .board circle.out.B {
+  fill: shade(@bColor, 50%);
+}
+
+.board circle.out.active.A {
+  fill: @aColor;
+}
+
+.board circle.out.active.B {
   fill: @bColor;
 }
 
@@ -168,11 +176,11 @@ input {
 }
 
 .board circle.target.A {
-  fill: fade(@aColor, 50%);
+  fill: shade(@aColor, 50%);
 }
 
 .board circle.target.B {
-  fill: fade(@bColor, 50%);
+  fill: shade(@bColor, 50%);
 }
 
 .board .piece.A {
@@ -280,6 +288,14 @@ button {
 
   button:disabled {
     border: 1px solid tint(@boardColor, 50%);
+  }
+
+  .board circle.out.A {
+    fill: TINT(@aColor, 50%);
+  }
+
+  .board circle.out.B {
+    fill: TINT(@bColor, 50%);
   }
 
   .board line.last.A {

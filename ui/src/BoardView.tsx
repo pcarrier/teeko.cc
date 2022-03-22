@@ -390,7 +390,9 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                   cx={0.25 + i / 2}
                   cy={4 + LARGE_CROWN_RADIUS + OUT_RADIUS}
                   r={OUT_RADIUS}
-                  class={classnames("out", i % 2 === 0 ? "A" : "B")}
+                  class={classnames("out", i % 2 === 0 ? "A" : "B", {
+                    active: i === allPieces.size,
+                  })}
                 />
               );
             })}
