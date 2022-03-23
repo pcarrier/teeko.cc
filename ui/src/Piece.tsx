@@ -35,23 +35,30 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
   const x = position % SIZE;
   const y = Math.floor(position / SIZE);
 
-  const { onPointerDown, onPointerMove, onPointerUp, onPointerCancel, state } =
-    useDraggable({
-      onDragStart() {
-        dragStart?.();
-      },
-      onDragMove(delta) {
-        const x = aspect ? delta.x / aspect.width : 0;
-        const y = aspect ? delta.y / aspect.height : 0;
-        dragMove?.({ x, y });
-      },
-      onDragEnd({ delta }) {
-        const dx = aspect ? delta.x / aspect.width : 0;
-        const dy = aspect ? delta.y / aspect.height : 0;
-        const p = Math.round(y + dy) * SIZE + Math.round(x + dx);
-        dragEnd?.(p);
-      },
-    });
+  const {
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+    onClick,
+    state,
+  } = useDraggable({
+    onDragStart() {
+      dragStart?.();
+    },
+    onDragMove(delta) {
+      const x = aspect ? delta.x / aspect.width : 0;
+      const y = aspect ? delta.y / aspect.height : 0;
+      dragMove?.({ x, y });
+    },
+    onDragEnd({ delta }) {
+      const dx = aspect ? delta.x / aspect.width : 0;
+      const dy = aspect ? delta.y / aspect.height : 0;
+      const p = Math.round(y + dy) * SIZE + Math.round(x + dx);
+      dragEnd?.(p);
+    },
+    onClick: click,
+  });
 
   const dxNorm =
     selectable && state.isDragging && aspect ? state.dx / aspect.width : 0;
@@ -65,7 +72,7 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
   return (
     <circle
       key={`p${position}`}
-      onClick={click}
+      onClick={onClick}
       r={dummy ? LARGE_CROWN_RADIUS : PIECE_RADIUS}
       cx={limitToBoard(x + dxNorm + (offset?.x ?? 0))}
       cy={limitToBoard(y + dyNorm + (offset?.y ?? 0))}
