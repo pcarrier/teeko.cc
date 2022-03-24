@@ -66,19 +66,13 @@ button,
 input,
 select {
   appearance: none;
-  font-size: 10pt;
+  font-size: 100%;
   background-color: transparent;
   color: @strong;
   border: 1px solid @boardColor;
   border-radius: 0.5em;
   padding: 0.5em 1em;
   margin: 0.5em;
-}
-
-.titleBar > input {
-  font-size: 100%;
-  border: none;
-  width: 100%;
 }
 
 select {
@@ -246,8 +240,6 @@ input {
   color: @bColor;
 }
 
-.titleBar
-
 .status {
   color: @boardColor;
   margin: 1em 0 0 0;
@@ -296,6 +288,14 @@ button {
 
 .nav > button, .nav > select {
   width: 90%;
+}
+
+.nav > select {
+  font-size: 10pt;
+}
+
+.nav .menu input {
+  border: none;
 }
 
 .nav .menu {
