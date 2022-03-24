@@ -6,7 +6,7 @@ import { useEvent } from "./useEvent.js";
 import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
-import { OnlineBar } from "./OnlineBar.jsx";
+import { TitleBar } from "./TitleBar.tsx";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
 import { setUserVars } from "@fullstory/browser";
@@ -323,9 +323,8 @@ export const App: FunctionComponent = () => {
             />
           ) : (
             <>
-              <OnlineBar
+              <TitleBar
                 roomPath={roomPath}
-                jump={jump}
                 pop={pop}
                 onlineStatus={onlineStatus}
               />

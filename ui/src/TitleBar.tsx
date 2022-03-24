@@ -1,29 +1,17 @@
 import { FunctionComponent } from "preact";
 import { Text } from "preact-i18n";
-import { OnlineStatus } from "./App.jsx";
+import { OnlineStatus } from "./App";
 
-export const OnlineBar: FunctionComponent<{
+export const TitleBar: FunctionComponent<{
   roomPath?: string;
-  jump: (path?: string) => void;
   pop: number | undefined;
   onlineStatus: OnlineStatus;
-}> = ({ roomPath, jump, pop, onlineStatus }) => {
+}> = ({ onlineStatus, roomPath, pop }) => {
   return (
-    <div class="onlineBar">
+    <div class="titleBar">
       {roomPath ? (
         <>
-          <h1>
-            <span
-              style={
-                onlineStatus === OnlineStatus.ONLINE
-                  ? "color:#0f0"
-                  : "color:#f00"
-              }
-            >
-              ⬤{" "}
-            </span>
-            {decodeURI(roomPath)}
-          </h1>
+          <h1>{decodeURI(roomPath)}</h1>
           <div class="pop">
             {!pop ? null : pop === 1 ? (
               <div className="alone">
@@ -34,6 +22,14 @@ export const OnlineBar: FunctionComponent<{
                 <Text id="onlineBar.pop" fields={{ pop }} />
               </div>
             )}
+          </div>
+          <div
+            class="onlineStatus"
+            style={
+              onlineStatus === OnlineStatus.ONLINE ? "color:#0f0" : "color:#f00"
+            }
+          >
+            ⬤{" "}
           </div>
         </>
       ) : (

@@ -74,7 +74,7 @@ select {
   margin: 0.5em;
 }
 
-.onlineBar > input {
+.titleBar > input {
   font-size: 100%;
   border: none;
   width: 100%;
@@ -217,36 +217,35 @@ input {
   fill: shade(@bColor, 50%);
 }
 
-.onlineBar {
+.titleBar {
   display: flex;
   flex-direction: row;
   align-items: baseline;
 }
 
-.onlineBar h1 {
+.titleBar h1 {
   text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  margin-left: 1em;
 }
 
-.onlineBar .pop,
-.onlineBar h1.offline {
+.titleBar .pop,
+.titleBar h1.offline {
   flex: 1;
   text-align: left;
 }
 
-.onlineBar .pop {
+.titleBar .pop {
   margin-left: 0.5em;
 }
 
-.onlineBar h1.offline {
-  margin-left: 1em;
-}
-
-.onlineBar .alone {
+.titleBar .alone {
   color: @bColor;
 }
+
+.titleBar
 
 .status {
   color: @boardColor;
