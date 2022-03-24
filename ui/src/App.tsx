@@ -260,6 +260,15 @@ export const App: FunctionComponent = () => {
                   >
                     <Text id="onlineBar.friends" />
                   </button>
+                  <button
+                    id="discord"
+                    onClick={() => {
+                      setShowMenu(false);
+                      window.open("https://discord.gg/KEj9brTRS6", "_blank");
+                    }}
+                  >
+                    Discord
+                  </button>
                 </>
               )}
             </div>
