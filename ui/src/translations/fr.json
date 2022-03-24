@@ -5,16 +5,13 @@
     "move": "Ensuite, bougez un pion vers un voisin libre chaque tour :",
     "win": "Formez une ligne de 4 ou un petit carré pour gagner :",
     "credits": "Teeko par John Scarne.",
-    "close": "Jouer",
-    "wiki": "Wikipédia",
-    "code": "code",
-    "archives": "archives"
+    "close": "Jouer"
   },
-  "onlineBar": {
+  "titleBar": {
     "local": "Local",
     "matched": "Chercher joueuse·r",
     "matching": "Recherche…",
-    "friends": "Amis",
+    "friends": "Jouer avec des amis",
     "cancel": "Renoncer",
     "boardNameInput": "Nom du plateau (optionnel)",
     "join": "Rejoindre",

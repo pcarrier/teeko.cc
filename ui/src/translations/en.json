@@ -5,16 +5,13 @@
     "move": "Then, move one to an empty neighbor each turn:",
     "win": "Form a line of 4 or a small square to win:",
     "credits": "Teeko by John Scarne.",
-    "close": "Play",
-    "wiki": "Wikipedia",
-    "code": "code",
-    "archives": "archives"
+    "close": "Play"
   },
-  "onlineBar": {
+  "titleBar": {
     "local": "Local",
     "matched": "Find a player",
     "matching": "Finding…",
-    "friends": "Friends",
+    "friends": "Play with friends",
     "cancel": "Cancel",
     "boardNameInput": "Board name (optional)",
     "join": "Join",

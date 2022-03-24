@@ -5,12 +5,9 @@
     "move": "Depois, move uma peça por turno para uma posição vizinha vazia:",
     "win": "Forma uma linha de 4 ou um quadrado pequeno para vencer:",
     "credits": "Teeko foi inventado por John Scarne.",
-    "close": "Jogar",
-    "wiki": "Wikipedia",
-    "code": "code",
-    "archives": "archives"
+    "close": "Jogar"
   },
-  "onlineBar": {
+  "titleBar": {
     "local": "Local",
     "matched": "Procurar jogador",
     "matching": "Procurando…",

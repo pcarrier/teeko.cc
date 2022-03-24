@@ -208,13 +208,15 @@ export const App: FunctionComponent = () => {
             <div className="menu">
               {isJoining ? (
                 <>
-                  <h1>Play with friends</h1>
+                  <h1>
+                    <Text id="titleBar.friends" />
+                  </h1>
                   <div className="joinBar">
                     <Localizer>
                       <input
                         type="text"
                         value={nextRoom}
-                        placeholder={<Text id="onlineBar.boardNameInput" />}
+                        placeholder={<Text id="titleBar.boardNameInput" />}
                         maxLength="256"
                         onInput={(e: Event) =>
                           setNextRoom((e.target as any).value)
@@ -231,7 +233,7 @@ export const App: FunctionComponent = () => {
                       id="join"
                       onClick={() => jump(nextRoom || randomID())}
                     >
-                      <Text id="onlineBar.join" />
+                      <Text id="titleBar.join" />
                     </button>
                   </div>
                 </>
@@ -240,7 +242,7 @@ export const App: FunctionComponent = () => {
                   <h1>Online</h1>
                   {isMatching ? (
                     <button id="cancelMatch" onClick={() => setMatching(false)}>
-                      {spinner} <Text id="onlineBar.matching" />
+                      {spinner} <Text id="titleBar.matching" />
                     </button>
                   ) : (
                     <button
@@ -250,7 +252,7 @@ export const App: FunctionComponent = () => {
                         setMatching(true);
                       }}
                     >
-                      <Text id="onlineBar.matched" />
+                      <Text id="titleBar.matched" />
                     </button>
                   )}
                   <button
@@ -260,7 +262,7 @@ export const App: FunctionComponent = () => {
                       setJoining(true);
                     }}
                   >
-                    <Text id="onlineBar.friends" />
+                    <Text id="titleBar.friends" />
                   </button>
                   <div class="iconBar">
                     <button

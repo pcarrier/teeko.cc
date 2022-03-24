@@ -5,12 +5,9 @@
     "move": "然后， 每回合挪一粒棋子到一个空位：",
     "win": "链接一条4单位长的线即可得胜：",
     "credits": "游戏创始人John Scarne.",
-    "close": "开始游戏",
-    "wiki": "Wikipedia",
-    "code": "代码",
-    "archives": "档案"
+    "close": "开始游戏"
   },
-  "onlineBar": {
+  "titleBar": {
     "local": "本地",
     "matched": "寻找对手",
     "matching": "寻找中…",
@@ -26,8 +23,7 @@
   },
   "game": {
     "undo": "撤销",
-    "reset": "重置",
-    "help": "帮助"
+    "reset": "重置"
   },
   "status": {
     "aWin": "Teeko! 蓝方获胜.",

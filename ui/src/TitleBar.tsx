@@ -15,11 +15,11 @@ export const TitleBar: FunctionComponent<{
           <div class="pop">
             {!pop ? null : pop === 1 ? (
               <div className="alone">
-                <Text id="onlineBar.alone" />
+                <Text id="titleBar.alone" />
               </div>
             ) : (
               <div>
-                <Text id="onlineBar.pop" fields={{ pop }} />
+                <Text id="titleBar.pop" fields={{ pop }} />
               </div>
             )}
           </div>
@@ -35,7 +35,7 @@ export const TitleBar: FunctionComponent<{
       ) : (
         <>
           <h1 class="offline">
-            <Text id="onlineBar.local" />
+            <Text id="titleBar.local" />
           </h1>
         </>
       )}
