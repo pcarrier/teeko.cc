@@ -180,7 +180,7 @@ export const App: FunctionComponent = () => {
             <div className="menu">
               {isJoining ? (
                 <>
-                  <h1>Joining</h1>
+                  <h1>Play with friends</h1>
                   <div className="joinBar">
                     <button id="cancelJoin" onClick={() => setJoining(false)}>
                       <FontAwesomeIcon icon={faClose} />
@@ -225,7 +225,10 @@ export const App: FunctionComponent = () => {
                     <button
                       className="borderless"
                       id="match"
-                      onClick={() => setMatching(true)}
+                      onClick={() => {
+                        setShowMenu(false);
+                        setMatching(true);
+                      }}
                     >
                       <Text id="onlineBar.matched" />
                     </button>
@@ -260,6 +263,7 @@ export const App: FunctionComponent = () => {
               }
             />
           </button>
+          {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
           {!showHelp && (
             <button
