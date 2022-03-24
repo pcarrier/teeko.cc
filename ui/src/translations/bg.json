@@ -9,6 +9,7 @@
   },
   "titleBar": {
     "local": "Местно табло",
+    "online": "Online",
     "matched": "Намерете противник",
     "matching": "Търсене…",
     "friends": "Приятели",

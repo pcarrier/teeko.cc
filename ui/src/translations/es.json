@@ -9,6 +9,7 @@
   },
   "titleBar": {
     "local": "Local",
+    "online": "Online",
     "matched": "Buscar un jugador",
     "matching": "Buscando…",
     "friends": "Amigos",

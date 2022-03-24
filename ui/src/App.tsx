@@ -239,7 +239,9 @@ export const App: FunctionComponent = () => {
                 </>
               ) : (
                 <>
-                  <h1>Online</h1>
+                  <h1>
+                    <Text id="titleBar.online" />
+                  </h1>
                   {isMatching ? (
                     <button id="cancelMatch" onClick={() => setMatching(false)}>
                       {spinner} <Text id="titleBar.matching" />

@@ -9,6 +9,7 @@
   },
   "titleBar": {
     "local": "本地",
+    "online": "Online",
     "matched": "寻找对手",
     "matching": "寻找中…",
     "friends": "朋友",
