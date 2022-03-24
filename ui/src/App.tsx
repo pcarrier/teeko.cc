@@ -249,6 +249,7 @@ export const App: FunctionComponent = () => {
             onclick={() => {
               if (showHelp) setShowHelp(false);
               else if (roomPath) jump(undefined);
+              else if (isJoining) setJoining(false);
               else setShowMenu(!showMenu);
             }}
           >
