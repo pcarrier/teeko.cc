@@ -1,9 +1,9 @@
-import { Position, useDraggable } from "./useDraggable.js";
-import { Rect } from "./useRect.js";
 import { FunctionComponent } from "preact";
 import classnames from "classnames";
-import { LARGE_CROWN_RADIUS, PIECE_RADIUS } from "./sizing";
 import { Player, SIZE } from "teeko-cc-common/src/model.js";
+import { Position, useDraggable } from "./useDraggable.js";
+import { Rect } from "./useRect.js";
+import { LARGE_CROWN_RADIUS, PIECE_RADIUS } from "./sizing";
 
 type PieceAttrs = {
   position: number;
