@@ -1,6 +1,7 @@
 import { FunctionComponent } from "preact";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faCaretLeft } from "@fortawesome/free-solid-svg-icons/faCaretLeft";
+import { faFlag } from "@fortawesome/free-regular-svg-icons/faFlag";
 import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
 
 import {
@@ -9,6 +10,7 @@ import {
   computeMove,
   computeReset,
   computeUndo,
+  WINNING_POSITIONS,
 } from "teeko-cc-common/src/model";
 
 import { BoardView } from "./BoardView";
@@ -37,6 +39,8 @@ export const Game: FunctionComponent<{
     if (after) moveToBoard(after);
   }
 
+  const won = WINNING_POSITIONS.has(board.a) || WINNING_POSITIONS.has(board.b);
+
   return (
     <div class="game">
       <BoardView
@@ -47,15 +51,15 @@ export const Game: FunctionComponent<{
         showStatus={true}
       />
       <p class="buttons">
+        <button id="undo" onClick={undo} disabled={board.m.length === 0}>
+          <FontAwesomeIcon icon={faCaretLeft} />
+        </button>
         <button
           id="reset"
           onClick={() => moveToBoard(computeReset(board))}
           disabled={board.a === 0}
         >
-          <FontAwesomeIcon icon={faBackwardFast} />
-        </button>
-        <button id="undo" onClick={undo} disabled={board.m.length === 0}>
-          <FontAwesomeIcon icon={faCaretLeft} />
+          <FontAwesomeIcon icon={won ? faBackwardFast : faFlag} />
         </button>
       </p>
     </div>

@@ -24,6 +24,7 @@
   "dependencies": {
     "@aduh95/preact-fontawesome": "^0.1.5",
     "@fortawesome/free-brands-svg-icons": "^6.1.1",
+    "@fortawesome/free-regular-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fullstory/browser": "^1.5.1",
     "classnames": "^2.3.1",
