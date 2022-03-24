@@ -1,5 +1,4 @@
 import { FunctionComponent } from "preact";
-import { useEffect, useState } from "preact/hooks";
 import { Text } from "preact-i18n";
 import { OnlineStatus } from "./App.jsx";
 
@@ -9,26 +8,6 @@ export const OnlineBar: FunctionComponent<{
   pop: number | undefined;
   onlineStatus: OnlineStatus;
 }> = ({ roomPath, jump, pop, onlineStatus }) => {
-  const [hasCopied, setHasCopied] = useState(false);
-
-  useEffect(() => {
-    if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
-  }, [hasCopied]);
-
-  function share() {
-    if (navigator.share)
-      navigator.share({
-        title: `teeko.cc (${roomPath})`,
-        text: "Teeko?",
-        url: `https://teeko.cc/${roomPath}`,
-      });
-    else {
-      navigator.clipboard
-        .writeText(`Teeko? https://teeko.cc/${roomPath}`)
-        .then(() => setHasCopied(true));
-    }
-  }
-
   return (
     <div class="onlineBar">
       {roomPath ? (
@@ -56,13 +35,6 @@ export const OnlineBar: FunctionComponent<{
               </div>
             )}
           </div>
-          <button id="share" onClick={share}>
-            {hasCopied ? (
-              <Text id="onlineBar.copied" />
-            ) : (
-              <Text id="onlineBar.invite" />
-            )}
-          </button>
         </>
       ) : (
         <>

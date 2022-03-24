@@ -16,6 +16,8 @@ import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faGlobe } from "@fortawesome/free-solid-svg-icons/faGlobe";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 import { faClose } from "@fortawesome/free-solid-svg-icons/faClose";
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons/faUserPlus";
+import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons/faClipboardCheck";
 import { spinner } from "./Spinner";
 
 export enum OnlineStatus {
@@ -65,7 +67,7 @@ export const App: FunctionComponent = () => {
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
   const [showMenu, setShowMenu] = useState<boolean>(false);
-
+  const [hasCopied, setHasCopied] = useState<boolean>(false);
   const [roomPath, setRoomPath] = useState<string | undefined>(undefined);
   const [nextRoom, setNextRoom] = useState();
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
@@ -172,6 +174,24 @@ export const App: FunctionComponent = () => {
     updateWsPath();
   }
 
+  useEffect(() => {
+    if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
+  }, [hasCopied]);
+
+  function share() {
+    if (navigator.share)
+      navigator.share({
+        title: `teeko.cc (${roomPath})`,
+        text: "Teeko?",
+        url: `https://teeko.cc/${roomPath}`,
+      });
+    else {
+      navigator.clipboard
+        .writeText(`Teeko? https://teeko.cc/${roomPath}`)
+        .then(() => setHasCopied(true));
+    }
+  }
+
   return (
     <IntlProvider definition={translation}>
       <div class="top">
@@ -261,6 +281,15 @@ export const App: FunctionComponent = () => {
               }
             />
           </button>
+          {roomPath !== undefined && (
+            <button id="share" onClick={share}>
+              {hasCopied ? (
+                <FontAwesomeIcon icon={faClipboardCheck} />
+              ) : (
+                <FontAwesomeIcon icon={faUserPlus} />
+              )}
+            </button>
+          )}
           {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
           {!showHelp && (
