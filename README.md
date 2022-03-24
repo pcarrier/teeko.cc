@@ -2,9 +2,7 @@
 
 This is an edition of Teeko published at [teeko.cc](https://teeko.cc).
 
-Contributions more than welcome. Translations in [the dictionaries](ui/src/translations.json).
-
-Teeko archives available at https://pcarrier.com/teeko
+Contributions more than welcome.
 
 ## Contributors
 
@@ -21,3 +19,7 @@ Teeko archives available at https://pcarrier.com/teeko
 
 Start from [a translation file](ui/src/translations/) and change the leaf strings (on the right) to match your language,
 then submit the new file through GitHub or [by E-mail](mailto:pc@rrier.ca).
+
+## Teeko archives
+
+Teeko archives, including code by Guy L. Steele, available at [pcarrier.com](https://pcarrier.com/teeko).
