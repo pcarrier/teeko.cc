@@ -1,7 +1,7 @@
 import { FunctionComponent } from "preact";
 import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { IntlProvider } from "preact-i18n";
+import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
 import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
@@ -13,8 +13,10 @@ import { setUserVars } from "@fullstory/browser";
 import { randomID } from "./random";
 import translations from "./translations";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons/faBars";
+import { faGlobe } from "@fortawesome/free-solid-svg-icons/faGlobe";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
+import { faClose } from "@fortawesome/free-solid-svg-icons/faClose";
+import { spinner } from "./Spinner";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -62,8 +64,10 @@ export const App: FunctionComponent = () => {
   }, undefined);
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const [roomPath, setRoomPath] = useState<string | undefined>(undefined);
+  const [nextRoom, setNextRoom] = useState();
   const [ws, setWs] = useState<Sockette | undefined>(undefined);
   const [pop, setPop] = useState<number | undefined>(undefined);
   const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
@@ -162,6 +166,8 @@ export const App: FunctionComponent = () => {
 
   function jump(location: string | undefined) {
     setJoining(false);
+    setShowMenu(false);
+    setShowHelp(false);
     history.pushState({}, "", location ? `/${location}` : "/");
     updateWsPath();
   }
@@ -170,10 +176,101 @@ export const App: FunctionComponent = () => {
     <IntlProvider definition={translation}>
       <div class="top">
         <div class="nav">
-          <button class="borderless">
-            <FontAwesomeIcon icon={faBars} />
+          {showMenu && (
+            <div className="menu">
+              {isJoining ? (
+                <>
+                  <h1>Joining</h1>
+                  <div className="joinBar">
+                    <button id="cancelJoin" onClick={() => setJoining(false)}>
+                      <FontAwesomeIcon icon={faClose} />
+                    </button>
+                    <Localizer>
+                      <input
+                        type="text"
+                        value={nextRoom}
+                        placeholder={<Text id="onlineBar.boardNameInput" />}
+                        maxLength="256"
+                        onInput={(e: Event) =>
+                          setNextRoom((e.target as any).value)
+                        }
+                        onKeyUp={(e) => {
+                          if (e.keyCode === 13) {
+                            e.preventDefault();
+                            jump(nextRoom || randomID());
+                          }
+                        }}
+                      />
+                    </Localizer>
+                    <button
+                      id="join"
+                      onClick={() => jump(nextRoom || randomID())}
+                    >
+                      <Text id="onlineBar.join" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1>Online</h1>
+                  {isMatching ? (
+                    <button
+                      className="borderless"
+                      id="cancelMatch"
+                      onClick={() => setMatching(false)}
+                    >
+                      {spinner} <Text id="onlineBar.matching" />
+                    </button>
+                  ) : (
+                    <button
+                      className="borderless"
+                      id="match"
+                      onClick={() => setMatching(true)}
+                    >
+                      <Text id="onlineBar.matched" />
+                    </button>
+                  )}
+                  <button
+                    className="borderless"
+                    id="friends"
+                    onClick={() => {
+                      setMatching(false);
+                      setJoining(true);
+                    }}
+                  >
+                    <Text id="onlineBar.friends" />
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+          <button
+            class="borderless"
+            onclick={() => {
+              if (showHelp) setShowHelp(false);
+              else if (roomPath) jump(undefined);
+              else setShowMenu(!showMenu);
+            }}
+          >
+            <FontAwesomeIcon
+              icon={
+                showHelp || showMenu || roomPath !== undefined
+                  ? faClose
+                  : faGlobe
+              }
+            />
           </button>
           <h1>Teeko.cc</h1>
+          {!showHelp && (
+            <button
+              onClick={() => {
+                setShowMenu(false);
+                setShowHelp(true);
+              }}
+            >
+              <FontAwesomeIcon icon={faQuestion} />
+            </button>
+          )}
           <select
             className="langSelector"
             onChange={(e) => moveToLang(e.target.value)}
@@ -184,9 +281,6 @@ export const App: FunctionComponent = () => {
               </option>
             ))}
           </select>
-          <button onclick={() => setShowHelp(true)}>
-            <FontAwesomeIcon icon={faQuestion} />
-          </button>
         </div>
         <div class="main">
           {showHelp ? (
@@ -203,10 +297,6 @@ export const App: FunctionComponent = () => {
                 jump={jump}
                 pop={pop}
                 onlineStatus={onlineStatus}
-                isJoining={isJoining}
-                setJoining={setJoining}
-                isMatching={isMatching}
-                setMatching={setMatching}
               />
               <Game
                 board={board}

@@ -1,31 +1,15 @@
 import { FunctionComponent } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { Localizer, Text } from "preact-i18n";
+import { Text } from "preact-i18n";
 import { OnlineStatus } from "./App.jsx";
-import { spinner } from "./Spinner";
-import { randomID } from "./random";
 
 export const OnlineBar: FunctionComponent<{
   roomPath?: string;
   jump: (path?: string) => void;
   pop: number | undefined;
   onlineStatus: OnlineStatus;
-  isJoining: boolean;
-  setJoining: (joining: boolean) => void;
-  isMatching: boolean;
-  setMatching: (matching: boolean) => void;
-}> = ({
-  roomPath,
-  jump,
-  pop,
-  onlineStatus,
-  isJoining,
-  setJoining,
-  isMatching,
-  setMatching,
-}) => {
+}> = ({ roomPath, jump, pop, onlineStatus }) => {
   const [hasCopied, setHasCopied] = useState(false);
-  const [nextRoom, setNextRoom] = useState();
 
   useEffect(() => {
     if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
@@ -47,35 +31,8 @@ export const OnlineBar: FunctionComponent<{
 
   return (
     <div class="onlineBar">
-      {isJoining ? (
+      {roomPath ? (
         <>
-          <button id="cancelJoin" onClick={() => setJoining(false)}>
-            <Text id="onlineBar.cancel" />
-          </button>
-          <Localizer>
-            <input
-              type="text"
-              value={nextRoom}
-              placeholder={<Text id="onlineBar.boardNameInput" />}
-              maxlength="256"
-              onInput={(e: Event) => setNextRoom((e.target as any).value)}
-              onKeyUp={(e) => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  jump(nextRoom || randomID());
-                }
-              }}
-            />
-          </Localizer>
-          <button id="join" onClick={() => jump(nextRoom || randomID())}>
-            <Text id="onlineBar.join" />
-          </button>
-        </>
-      ) : roomPath ? (
-        <>
-          <button id="leave" onClick={() => jump()}>
-            <Text id="onlineBar.leave" />
-          </button>
           <h1>
             <span
               style={
@@ -90,13 +47,13 @@ export const OnlineBar: FunctionComponent<{
           </h1>
           <div class="pop">
             {!pop ? null : pop === 1 ? (
-              <span className="alone">
+              <div className="alone">
                 <Text id="onlineBar.alone" />
-              </span>
+              </div>
             ) : (
-              <span>
+              <div>
                 <Text id="onlineBar.pop" fields={{ pop }} />
-              </span>
+              </div>
             )}
           </div>
           <button id="share" onClick={share}>
@@ -112,24 +69,6 @@ export const OnlineBar: FunctionComponent<{
           <h1 class="offline">
             <Text id="onlineBar.local" />
           </h1>
-          {isMatching ? (
-            <button id="cancelMatch" onClick={() => setMatching(false)}>
-              {spinner} <Text id="onlineBar.matching" />
-            </button>
-          ) : (
-            <button id="match" onClick={() => setMatching(true)}>
-              <Text id="onlineBar.matched" />
-            </button>
-          )}
-          <button
-            id="friends"
-            onClick={() => {
-              setMatching(false);
-              setJoining(true);
-            }}
-          >
-            <Text id="onlineBar.friends" />
-          </button>
         </>
       )}
     </div>

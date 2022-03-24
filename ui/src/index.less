@@ -220,7 +220,7 @@ input {
 .onlineBar {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: baseline;
 }
 
 .onlineBar h1 {
@@ -230,7 +230,6 @@ input {
   white-space: nowrap;
 }
 
-.onlineBar input,
 .onlineBar .pop,
 .onlineBar h1.offline {
   flex: 1;
@@ -264,6 +263,70 @@ input {
 
 button {
   height: 3em;
+}
+
+.nav {
+  width: @navWidth;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: tint(@bg, 10%);
+}
+
+.nav > h1 {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 12mm;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  text-transform: uppercase;
+}
+
+.top {
+  margin-left: @navWidth;
+  width: calc(100vw - @navWidth);
+  max-width: @maxBoardWidth;
+}
+
+.nav > select,
+.nav > button {
+  width: 95%;
+}
+
+.nav .menu {
+  position: fixed;
+  top: 0;
+  left: @navWidth;
+  right: 0;
+  background-color: tint(@bg, 10%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 30em;
+}
+
+.nav .menu button,
+.nav .menu input {
+  padding: 0.5em;
+}
+
+.joinBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.joinBar input {
+  flex-grow: 1;
+}
+
+.borderless {
+  border: none;
 }
 
 /*
@@ -330,35 +393,3 @@ button {
   }
 }
 */
-
-.nav {
-  width: @navWidth;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: tint(@bg, 10%);
-}
-
-.nav h1 {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-size: 12mm;
-  margin: 0;
-  padding: 0;
-  flex-grow: 1;
-  text-transform: uppercase;
-}
-
-.top {
-  margin-left: @navWidth;
-  width: calc(100vw - @navWidth);
-  max-width: @maxBoardWidth;
-}
-
-.borderless {
-  border: none;
-}
