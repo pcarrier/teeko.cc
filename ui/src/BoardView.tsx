@@ -204,39 +204,45 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     return result;
   }, [arrows, selected, releasePos, dragPos]);
 
+  const status = showStatus && (
+    <p
+      class={classnames("status", t === 0 ? "A" : "B", {
+        playing: board.p,
+        win,
+      })}
+    >
+      {aWin ? (
+        <Text id="status.aWin" />
+      ) : bWin ? (
+        <Text id="status.bWin" />
+      ) : alreadyPlayed < 4 ? (
+        t === 0 ? (
+          <Text id="status.aDrop" fields={{ piece: alreadyPlayed + 1 }} />
+        ) : (
+          <Text id="status.bDrop" fields={{ piece: alreadyPlayed + 1 }} />
+        )
+      ) : board.p ? (
+        selected === undefined ? (
+          t === 0 ? (
+            <Text id="status.aMoveFrom" />
+          ) : (
+            <Text id="status.bMoveFrom" />
+          )
+        ) : t === 0 ? (
+          <Text id="status.aMoveTo" />
+        ) : (
+          <Text id="status.bMoveTo" />
+        )
+      ) : t === 0 ? (
+        <Text id="status.aMove" />
+      ) : (
+        <Text id="status.bMove" />
+      )}
+    </p>
+  );
+
   return (
     <>
-      {showStatus && (
-        <p class={classnames("status", { playing: board.p, win })}>
-          {aWin ? (
-            <Text id="status.aWin" />
-          ) : bWin ? (
-            <Text id="status.bWin" />
-          ) : alreadyPlayed < 4 ? (
-            t === 0 ? (
-              <Text id="status.aDrop" fields={{ piece: alreadyPlayed + 1 }} />
-            ) : (
-              <Text id="status.bDrop" fields={{ piece: alreadyPlayed + 1 }} />
-            )
-          ) : board.p ? (
-            selected === undefined ? (
-              t === 0 ? (
-                <Text id="status.aMoveFrom" />
-              ) : (
-                <Text id="status.bMoveFrom" />
-              )
-            ) : t === 0 ? (
-              <Text id="status.aMoveTo" />
-            ) : (
-              <Text id="status.bMoveTo" />
-            )
-          ) : t === 0 ? (
-            <Text id="status.aMove" />
-          ) : (
-            <Text id="status.bMove" />
-          )}
-        </p>
-      )}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`${-LARGE_CROWN_RADIUS} ${-LARGE_CROWN_RADIUS} ${
@@ -437,6 +443,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           )}
         </g>
       </svg>
+      {status}
     </>
   );
 };

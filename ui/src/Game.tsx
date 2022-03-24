@@ -55,15 +55,6 @@ export const Game: FunctionComponent<{
         >
           <Text id="game.reset" />
         </button>
-        <button
-          id="discord"
-          onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}
-        >
-          Discord
-        </button>
-        <button id="help" onClick={showHelp}>
-          <Text id="game.help" />
-        </button>
       </p>
     </div>
   );

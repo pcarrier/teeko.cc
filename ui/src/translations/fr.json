@@ -26,8 +26,7 @@
   },
   "game": {
     "undo": "Annuler",
-    "reset": "Vider",
-    "help": "Aide"
+    "reset": "Vider"
   },
   "status": {
     "aWin": "Teeko ! Bleu gagne.",

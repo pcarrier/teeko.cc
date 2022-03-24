@@ -12,6 +12,9 @@ import Sockette from "sockette";
 import { setUserVars } from "@fullstory/browser";
 import { randomID } from "./random";
 import translations from "./translations";
+import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons/faBars";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -165,33 +168,56 @@ export const App: FunctionComponent = () => {
 
   return (
     <IntlProvider definition={translation}>
-      {showHelp ? (
-        <Help
-          close={() => setShowHelp(false)}
-          lang={lang}
-          moveToLang={moveToLang}
-          langs={Object.keys(translations)}
-        />
-      ) : (
-        <>
-          <OnlineBar
-            roomPath={roomPath}
-            jump={jump}
-            pop={pop}
-            onlineStatus={onlineStatus}
-            isJoining={isJoining}
-            setJoining={setJoining}
-            isMatching={isMatching}
-            setMatching={setMatching}
-          />
-          <Game
-            board={board}
-            roomPath={roomPath}
-            showHelp={() => setShowHelp(true)}
-            moveToBoard={moveToBoard}
-          />
-        </>
-      )}
+      <div class="top">
+        <div class="nav">
+          <button class="borderless">
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+          <h1>Teeko.cc</h1>
+          <select
+            className="langSelector"
+            onChange={(e) => moveToLang(e.target.value)}
+          >
+            {Object.keys(translations).map((l) => (
+              <option value={l} selected={l === lang}>
+                {l.toUpperCase()}
+              </option>
+            ))}
+          </select>
+          <button onclick={() => setShowHelp(true)}>
+            <FontAwesomeIcon icon={faQuestion} />
+          </button>
+        </div>
+        <div class="main">
+          {showHelp ? (
+            <Help
+              close={() => setShowHelp(false)}
+              lang={lang}
+              moveToLang={moveToLang}
+              langs={Object.keys(translations)}
+            />
+          ) : (
+            <>
+              <OnlineBar
+                roomPath={roomPath}
+                jump={jump}
+                pop={pop}
+                onlineStatus={onlineStatus}
+                isJoining={isJoining}
+                setJoining={setJoining}
+                isMatching={isMatching}
+                setMatching={setMatching}
+              />
+              <Game
+                board={board}
+                roomPath={roomPath}
+                showHelp={() => setShowHelp(true)}
+                moveToBoard={moveToBoard}
+              />
+            </>
+          )}
+        </div>
+      </div>
     </IntlProvider>
   );
 };

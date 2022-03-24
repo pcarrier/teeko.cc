@@ -10,13 +10,6 @@ export const Help: FunctionComponent<{
   langs: Array<string>;
 }> = ({ close, lang, moveToLang, langs }) => (
   <div class="help">
-    <select class="langSelector" onchange={(e) => moveToLang(e.target.value)}>
-      {langs.map((l) => (
-        <option value={l} selected={l === lang}>
-          {l.toUpperCase()}
-        </option>
-      ))}
-    </select>
     <p>
       <Text id="help.open" />
     </p>

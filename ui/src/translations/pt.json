@@ -26,8 +26,7 @@
   },
   "game": {
     "undo": "Desfazer",
-    "reset": "Recomeçar",
-    "help": "Ajuda"
+    "reset": "Recomeçar"
   },
   "status": {
     "aWin": "Teeko! Azul ganhou.",

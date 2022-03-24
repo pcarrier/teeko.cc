@@ -15,10 +15,12 @@
 @bLight: tint(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
 @maxBoardWidth: 120mm;
+@navWidth: 14mm;
 @maxHalfBoardWidth: 60mm;
 
-* {
-  box-sizing: border-box;
+div {
+  margin: 0;
+  padding: 0;
 }
 
 a,
@@ -38,7 +40,6 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  width: 100%;
   user-select: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -63,6 +64,7 @@ h1 {
 button,
 input,
 select {
+  appearance: none;
   font-size: 10pt;
   background-color: transparent;
   color: @strong;
@@ -218,9 +220,7 @@ input {
 .onlineBar {
   display: flex;
   flex-direction: row;
-  align-items: baseline;
-  width: @boardWidth;
-  max-width: @maxBoardWidth;
+  align-items: stretch;
 }
 
 .onlineBar h1 {
@@ -242,7 +242,7 @@ input {
 }
 
 .onlineBar h1.offline {
-  margin-left: 2em;
+  margin-left: 1em;
 }
 
 .onlineBar .alone {
@@ -260,10 +260,6 @@ input {
 
 .status.win {
   color: @bColor;
-}
-
-.langSelector {
-  float: right;
 }
 
 button {
@@ -334,3 +330,35 @@ button {
   }
 }
 */
+
+.nav {
+  width: @navWidth;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: tint(@bg, 10%);
+}
+
+.nav h1 {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 12mm;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  text-transform: uppercase;
+}
+
+.top {
+  margin-left: @navWidth;
+  width: calc(100vw - @navWidth);
+  max-width: @maxBoardWidth;
+}
+
+.borderless {
+  border: none;
+}

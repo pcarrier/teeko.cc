@@ -26,8 +26,7 @@
   },
   "game": {
     "undo": "Deshacer",
-    "reset": "Reiniciar",
-    "help": "Ayuda"
+    "reset": "Reiniciar"
   },
   "status": {
     "aWin": "Teeko! Azul ganó.",
