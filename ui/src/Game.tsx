@@ -1,6 +1,6 @@
 import { FunctionComponent } from "preact";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
-import { faBackward } from "@fortawesome/free-solid-svg-icons/faBackward";
+import { faCaretLeft } from "@fortawesome/free-solid-svg-icons/faCaretLeft";
 import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
 
 import {
@@ -55,7 +55,7 @@ export const Game: FunctionComponent<{
           <FontAwesomeIcon icon={faBackwardFast} />
         </button>
         <button id="undo" onClick={undo} disabled={board.m.length === 0}>
-          <FontAwesomeIcon icon={faBackward} />
+          <FontAwesomeIcon icon={faCaretLeft} />
         </button>
       </p>
     </div>
