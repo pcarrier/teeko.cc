@@ -1,9 +1,10 @@
 @color: #ccc;
-@colorLight: #333;
+// @colorLight: #333;
 @strong: #fff;
-@strongLight: #000;
+// @strongLight: #000;
 @bg: #000;
-@bgLight: #fff;
+@navBg: tint(@bg, 10%);
+// @bgLight: #fff;
 @boardColor: #444;
 @selectionColor: #888;
 @link: #04f;
@@ -11,8 +12,8 @@
 @bColor: #f00;
 @aDark: shade(@aColor, 25%);
 @bDark: shade(@bColor, 25%);
-@aLight: tint(@aColor, 25%);
-@bLight: tint(@bColor, 25%);
+// @aLight: tint(@aColor, 25%);
+// @bLight: tint(@bColor, 25%);
 @boardWidth: min(100%, 75vh);
 @maxBoardWidth: 120mm;
 @navWidth: 14mm;
@@ -273,7 +274,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: tint(@bg, 10%);
+  background-color: @navBg;
   border-right: 1px solid @boardColor;
 }
 
@@ -302,7 +303,7 @@ button {
   top: 0;
   left: @navWidth;
   right: 0;
-  background-color: tint(@bg, 10%);
+  background-color: @navBg;
   display: flex;
   flex-direction: column;
   align-items: stretch;
