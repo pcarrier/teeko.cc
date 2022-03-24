@@ -18,6 +18,9 @@ import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 import { faClose } from "@fortawesome/free-solid-svg-icons/faClose";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons/faUserPlus";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons/faClipboardCheck";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
+import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
+import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { spinner } from "./Spinner";
 
 export enum OnlineStatus {
@@ -192,6 +195,11 @@ export const App: FunctionComponent = () => {
     }
   }
 
+  function openUrl(url: string) {
+    setShowMenu(false);
+    window.open(url, "_blank");
+  }
+
   return (
     <IntlProvider definition={translation}>
       <div class="top">
@@ -231,16 +239,11 @@ export const App: FunctionComponent = () => {
                 <>
                   <h1>Online</h1>
                   {isMatching ? (
-                    <button
-                      className="borderless"
-                      id="cancelMatch"
-                      onClick={() => setMatching(false)}
-                    >
+                    <button id="cancelMatch" onClick={() => setMatching(false)}>
                       {spinner} <Text id="onlineBar.matching" />
                     </button>
                   ) : (
                     <button
-                      className="borderless"
                       id="match"
                       onClick={() => {
                         setShowMenu(false);
@@ -251,7 +254,6 @@ export const App: FunctionComponent = () => {
                     </button>
                   )}
                   <button
-                    className="borderless"
                     id="friends"
                     onClick={() => {
                       setMatching(false);
@@ -260,21 +262,32 @@ export const App: FunctionComponent = () => {
                   >
                     <Text id="onlineBar.friends" />
                   </button>
-                  <button
-                    id="discord"
-                    onClick={() => {
-                      setShowMenu(false);
-                      window.open("https://discord.gg/KEj9brTRS6", "_blank");
-                    }}
-                  >
-                    Discord
-                  </button>
+                  <div class="iconBar">
+                    <button
+                      onClick={() => openUrl("https://discord.gg/KEj9brTRS6")}
+                    >
+                      <FontAwesomeIcon icon={faDiscord} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        openUrl("https://en.wikipedia.org/wiki/Teeko")
+                      }
+                    >
+                      <FontAwesomeIcon icon={faWikipediaW} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        openUrl("https://github.com/pcarrier/teeko.cc")
+                      }
+                    >
+                      <FontAwesomeIcon icon={faGithub} />
+                    </button>
+                  </div>
                 </>
               )}
             </div>
           )}
           <button
-            class="borderless"
             onclick={() => {
               if (showHelp) setShowHelp(false);
               else if (roomPath) jump(undefined);

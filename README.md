@@ -4,6 +4,8 @@ This is an edition of Teeko published at [teeko.cc](https://teeko.cc).
 
 Contributions more than welcome. Translations in [the dictionaries](ui/src/translations.json).
 
+Teeko archives available at https://pcarrier.com/teeko
+
 ## Contributors
 
 - Pierre Carrier

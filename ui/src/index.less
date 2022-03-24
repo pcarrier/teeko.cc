@@ -274,6 +274,7 @@ button {
   flex-direction: column;
   align-items: center;
   background-color: tint(@bg, 10%);
+  border-right: 1px solid @boardColor;
 }
 
 .nav > h1 {
@@ -292,9 +293,8 @@ button {
   max-width: @maxBoardWidth;
 }
 
-.nav > select,
-.nav > button {
-  width: 95%;
+.nav > button, .nav > select {
+  width: 90%;
 }
 
 .nav .menu {
@@ -307,12 +307,25 @@ button {
   flex-direction: column;
   align-items: stretch;
   max-width: 30em;
+  border: 1px solid @boardColor;
+  border-left: none;
+  border-top: none;
 }
 
 .joinBar {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.iconBar {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.iconBar button {
+  flex: 1;
 }
 
 .joinBar input {

@@ -70,18 +70,5 @@ export const Help: FunctionComponent<{
     <button onClick={close}>
       <Text id="help.close" />
     </button>
-    <p>
-      <a href="https://en.wikipedia.org/wiki/Teeko">
-        <Text id="help.wiki" />
-      </a>
-      ,{" "}
-      <a href="https://github.com/pcarrier/teeko.cc">
-        <Text id="help.code" />
-      </a>
-      ,{" "}
-      <a href="https://pcarrier.com/teeko">
-        <Text id="help.archives" />
-      </a>
-    </p>
   </div>
 );
