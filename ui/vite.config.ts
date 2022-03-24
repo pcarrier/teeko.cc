@@ -6,6 +6,9 @@ export default defineConfig({
   plugins: [
     preact(),
     VitePWA({
+      workbox: {
+        sourcemap: true,
+      },
       registerType: "autoUpdate",
       includeAssets: ["icon.svg", "robots.txt", "bell.opus"],
       manifest: {
