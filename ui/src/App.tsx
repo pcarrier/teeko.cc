@@ -294,18 +294,13 @@ export const App: FunctionComponent = () => {
           )}
           <button
             onclick={() => {
-              if (showHelp) setShowHelp(false);
-              else if (roomPath) jump(undefined);
+              if (roomPath) jump(undefined);
               else if (isJoining) setJoining(false);
               else setShowMenu(!showMenu);
             }}
           >
             <FontAwesomeIcon
-              icon={
-                showHelp || showMenu || roomPath !== undefined
-                  ? faClose
-                  : faGlobe
-              }
+              icon={showMenu || roomPath !== undefined ? faClose : faGlobe}
             />
           </button>
           {roomPath !== undefined && (
@@ -320,13 +315,11 @@ export const App: FunctionComponent = () => {
           {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
           <button
-            className={classnames({ invisible: showHelp })}
             onClick={() => {
-              setShowMenu(false);
-              setShowHelp(true);
+              setShowHelp(!showHelp);
             }}
           >
-            <FontAwesomeIcon icon={faQuestion} />
+            <FontAwesomeIcon icon={showHelp ? faClose : faQuestion} />
           </button>
           <select
             className="langSelector"
