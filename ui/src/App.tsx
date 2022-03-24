@@ -182,9 +182,6 @@ export const App: FunctionComponent = () => {
                 <>
                   <h1>Play with friends</h1>
                   <div className="joinBar">
-                    <button id="cancelJoin" onClick={() => setJoining(false)}>
-                      <FontAwesomeIcon icon={faClose} />
-                    </button>
                     <Localizer>
                       <input
                         type="text"
