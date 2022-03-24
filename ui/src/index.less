@@ -1,3 +1,11 @@
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+.slick-dots li.slick-active button:before,
+.slick-dots li button:before {
+  color: @color;
+}
+
 @color: #ccc;
 // @colorLight: #333;
 @strong: #fff;
@@ -87,6 +95,10 @@ select option {
 
 button:hover:enabled {
   background-color: @boardColor;
+}
+
+button.slick-arrow:hover:enabled {
+  background: none;
 }
 
 button:disabled {

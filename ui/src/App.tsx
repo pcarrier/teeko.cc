@@ -22,7 +22,6 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { spinner } from "./Spinner";
-import classnames from "classnames";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -334,12 +333,7 @@ export const App: FunctionComponent = () => {
         </div>
         <div class="main">
           {showHelp ? (
-            <Help
-              close={() => setShowHelp(false)}
-              lang={lang}
-              moveToLang={moveToLang}
-              langs={Object.keys(translations)}
-            />
+            <Help close={() => setShowHelp(false)} />
           ) : (
             <>
               <TitleBar
