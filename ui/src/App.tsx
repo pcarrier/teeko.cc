@@ -22,6 +22,7 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { spinner } from "./Spinner";
+import classnames from "classnames";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -318,16 +319,15 @@ export const App: FunctionComponent = () => {
           )}
           {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
-          {!showHelp && (
-            <button
-              onClick={() => {
-                setShowMenu(false);
-                setShowHelp(true);
-              }}
-            >
-              <FontAwesomeIcon icon={faQuestion} />
-            </button>
-          )}
+          <button
+            className={classnames({ invisible: showHelp })}
+            onClick={() => {
+              setShowMenu(false);
+              setShowHelp(true);
+            }}
+          >
+            <FontAwesomeIcon icon={faQuestion} />
+          </button>
           <select
             className="langSelector"
             onChange={(e) => moveToLang(e.target.value)}
