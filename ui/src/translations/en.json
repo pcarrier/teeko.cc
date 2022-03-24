@@ -22,10 +22,6 @@
     "alone": "alone",
     "pop": "{{pop}}P"
   },
-  "game": {
-    "undo": "Undo",
-    "reset": "Reset"
-  },
   "status": {
     "aWin": "Teeko! Blue won.",
     "bWin": "Teeko! Red won.",

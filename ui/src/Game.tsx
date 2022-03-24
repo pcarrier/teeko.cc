@@ -1,5 +1,7 @@
 import { FunctionComponent } from "preact";
-import { Text } from "preact-i18n";
+import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons/faArrowLeft";
+import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
 
 import {
   Board,
@@ -46,14 +48,14 @@ export const Game: FunctionComponent<{
       />
       <p class="buttons">
         <button id="undo" onClick={undo} disabled={board.m.length === 0}>
-          <Text id="game.undo" />
+          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <button
           id="reset"
           onClick={() => moveToBoard(computeReset(board))}
           disabled={board.a === 0}
         >
-          <Text id="game.reset" />
+          <FontAwesomeIcon icon={faBackwardFast} />
         </button>
       </p>
     </div>

@@ -13,5 +13,8 @@
   "workspaces": [
     "common",
     "ui"
-  ]
+  ],
+  "dependencies": {
+    "@fortawesome/free-regular-svg-icons": "^6.1.1"
+  }
 }

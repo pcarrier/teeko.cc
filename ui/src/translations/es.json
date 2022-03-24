@@ -22,10 +22,6 @@
     "alone": "solo",
     "pop": "{{pop}}J"
   },
-  "game": {
-    "undo": "Deshacer",
-    "reset": "Reiniciar"
-  },
   "status": {
     "aWin": "Teeko! Azul ganó.",
     "bWin": "Teeko! Ganó el rojo.",
