@@ -2,8 +2,8 @@ export const spinner = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="-0.5 -0.5 3 3"
-    width="9pt"
-    height="9pt"
+    width="11pt"
+    height="11pt"
   >
     <circle r="0.35" fill="#0040ff" cx="0" cy="0">
       <animate
