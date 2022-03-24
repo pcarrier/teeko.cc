@@ -407,12 +407,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 dragStart={() => {
                   setSelected(pos);
                   setDragTurn(t);
-                  console.log(`dragStart ${pos} ${t}`);
                 }}
                 dragMove={({ x, y }) => {
-                  console.log(
-                    `dragMove pos=${pos} x=${x} y=${y} t=${t} dragTurn=${dragTurn}`
-                  );
                   if (t === dragTurn) setDragState({ x, y });
                 }}
                 dragEnd={(position) => {
