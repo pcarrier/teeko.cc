@@ -313,13 +313,6 @@ export const App: FunctionComponent = () => {
           )}
           {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
-          <button
-            onClick={() => {
-              setShowHelp(!showHelp);
-            }}
-          >
-            <FontAwesomeIcon icon={showHelp ? faClose : faQuestion} />
-          </button>
           <select
             className="langSelector"
             onChange={(e) => moveToLang(e.target.value)}
@@ -330,6 +323,13 @@ export const App: FunctionComponent = () => {
               </option>
             ))}
           </select>
+          <button
+            onClick={() => {
+              setShowHelp(!showHelp);
+            }}
+          >
+            <FontAwesomeIcon icon={showHelp ? faClose : faQuestion} />
+          </button>
         </div>
         <div class="main">
           {showHelp ? (

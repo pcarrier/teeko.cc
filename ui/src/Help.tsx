@@ -8,7 +8,7 @@ export const Help: FunctionComponent<{
   close: () => void;
 }> = ({ close }) => (
   <div class="help">
-    <Slider dots={true} arrows={false} infinite={true} speed={200}>
+    <Slider dots={true} arrows={true} infinite={true} speed={200}>
       <div>
         <p>
           <Text id="help.open" />
