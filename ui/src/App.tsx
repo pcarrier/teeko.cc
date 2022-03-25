@@ -22,6 +22,7 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { spinner } from "./Spinner";
+import classnames from "classnames";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -300,15 +301,19 @@ export const App: FunctionComponent = () => {
               icon={showMenu || roomPath !== undefined ? faClose : faGlobe}
             />
           </button>
-          {roomPath !== undefined && (
-            <button className="icon" id="share" onClick={share}>
-              {hasCopied ? (
-                <FontAwesomeIcon icon={faClipboardCheck} />
-              ) : (
-                <FontAwesomeIcon icon={faUserPlus} />
-              )}
-            </button>
-          )}
+          <button
+            className={classnames("icon", {
+              invisible: roomPath === undefined,
+            })}
+            id="share"
+            onClick={share}
+          >
+            {hasCopied ? (
+              <FontAwesomeIcon icon={faClipboardCheck} />
+            ) : (
+              <FontAwesomeIcon icon={faUserPlus} />
+            )}
+          </button>
           {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
           <select

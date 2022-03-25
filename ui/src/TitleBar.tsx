@@ -9,7 +9,7 @@ export const TitleBar: FunctionComponent<{
 }> = ({ onlineStatus, roomPath, pop }) => {
   return (
     <div class="titleBar">
-      {roomPath ? (
+      {roomPath && (
         <>
           <h1>{decodeURI(roomPath)}</h1>
           <div class="pop">
@@ -31,12 +31,6 @@ export const TitleBar: FunctionComponent<{
           >
             ⬤{" "}
           </div>
-        </>
-      ) : (
-        <>
-          <h1 class="offline">
-            <Text id="titleBar.local" />
-          </h1>
         </>
       )}
     </div>

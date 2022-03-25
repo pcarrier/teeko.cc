@@ -237,11 +237,9 @@ input {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  margin-left: 1em;
 }
 
-.titleBar .pop,
-.titleBar h1.offline {
+.titleBar .pop {
   flex: 1;
   text-align: left;
 }
@@ -288,7 +286,7 @@ button.icon {
 }
 
 .nav > h1 {
-  font-size: 8mm;
+  font-size: 6mm;
   margin: 0;
   padding: 0;
   flex-grow: 1;
@@ -301,6 +299,10 @@ button.icon {
 
 .nav .menu input {
   border: none;
+}
+
+.nav button, .nav select {
+  margin: 1mm;
 }
 
 .nav .menu {
@@ -337,11 +339,16 @@ button.icon {
   border: none;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .top {
   width: @boardWidth;
   max-width: @maxBoardWidth;
   margin-top: @navHeight;
 }
+
 /*
 @media (prefers-color-scheme: light) {
   html, body, select option {
