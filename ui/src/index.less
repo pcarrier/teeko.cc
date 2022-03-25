@@ -1,6 +1,7 @@
 @import "slick-carousel/slick/slick.css";
 @import "slick-carousel/slick/slick-theme.css";
 
+button.slick-arrow::before,
 .slick-dots button:before,
 .slick-dots button:before {
   color: @strong !important;
@@ -97,6 +98,7 @@ button:hover:enabled {
   background-color: @boardColor;
 }
 
+button.slick-arrow:hover:enabled,
 .slick-dots button:hover:enabled {
   background: none;
 }
@@ -279,6 +281,7 @@ button {
   flex-direction: column;
   align-items: center;
   background-color: @navBg;
+  z-index: 1;
 }
 
 .nav > h1 {
