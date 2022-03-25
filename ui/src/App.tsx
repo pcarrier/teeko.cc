@@ -239,9 +239,6 @@ export const App: FunctionComponent = () => {
                 </>
               ) : (
                 <>
-                  <h1>
-                    <Text id="titleBar.online" />
-                  </h1>
                   {isMatching ? (
                     <button id="cancelMatch" onClick={() => setMatching(false)}>
                       {spinner} <Text id="titleBar.matching" />
@@ -292,6 +289,7 @@ export const App: FunctionComponent = () => {
             </div>
           )}
           <button
+            className="icon"
             onclick={() => {
               if (roomPath) jump(undefined);
               else if (isJoining) setJoining(false);
@@ -303,7 +301,7 @@ export const App: FunctionComponent = () => {
             />
           </button>
           {roomPath !== undefined && (
-            <button id="share" onClick={share}>
+            <button className="icon" id="share" onClick={share}>
               {hasCopied ? (
                 <FontAwesomeIcon icon={faClipboardCheck} />
               ) : (
@@ -324,6 +322,7 @@ export const App: FunctionComponent = () => {
             ))}
           </select>
           <button
+            className="icon"
             onClick={() => {
               setShowHelp(!showHelp);
             }}
