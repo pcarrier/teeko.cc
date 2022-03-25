@@ -23,7 +23,7 @@ button.slick-arrow::before,
 @bDark: shade(@bColor, 25%);
 // @aLight: tint(@aColor, 25%);
 // @bLight: tint(@bColor, 25%);
-@boardWidth: min(100%, 75vh);
+@boardWidth: min(100vw, 75vh);
 @maxBoardWidth: 120mm;
 @maxHalfBoardWidth: 60mm;
 @navHeight: 14mm;
@@ -285,7 +285,6 @@ button.icon {
   flex-direction: row;
   align-items: center;
   background-color: @navBg;
-  z-index: 1;
 }
 
 .nav > h1 {
@@ -294,10 +293,6 @@ button.icon {
   padding: 0;
   flex-grow: 1;
   text-transform: uppercase;
-}
-
-.top {
-  margin-top: @navHeight;
 }
 
 .nav > select {
@@ -318,12 +313,6 @@ button.icon {
   align-items: stretch;
 }
 
-.joinBar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
 .iconBar {
   display: flex;
   flex-direction: row;
@@ -334,6 +323,12 @@ button.icon {
   flex: 1;
 }
 
+.joinBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .joinBar input {
   flex-grow: 1;
 }
@@ -342,9 +337,6 @@ button.icon {
   border: none;
 }
 
-.main {
-  max-width: @maxBoardWidth;
-}
 /*
 @media (prefers-color-scheme: light) {
   html, body, select option {

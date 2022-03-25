@@ -330,25 +330,23 @@ export const App: FunctionComponent = () => {
             <FontAwesomeIcon icon={showHelp ? faClose : faQuestion} />
           </button>
         </div>
-        <div class="main">
-          {showHelp ? (
-            <Help close={() => setShowHelp(false)} />
-          ) : (
-            <>
-              <TitleBar
-                roomPath={roomPath}
-                pop={pop}
-                onlineStatus={onlineStatus}
-              />
-              <Game
-                board={board}
-                roomPath={roomPath}
-                showHelp={() => setShowHelp(true)}
-                moveToBoard={moveToBoard}
-              />
-            </>
-          )}
-        </div>
+        {showHelp ? (
+          <Help close={() => setShowHelp(false)} />
+        ) : (
+          <>
+            <TitleBar
+              roomPath={roomPath}
+              pop={pop}
+              onlineStatus={onlineStatus}
+            />
+            <Game
+              board={board}
+              roomPath={roomPath}
+              showHelp={() => setShowHelp(true)}
+              moveToBoard={moveToBoard}
+            />
+          </>
+        )}
       </div>
     </IntlProvider>
   );
