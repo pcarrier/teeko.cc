@@ -305,6 +305,9 @@ export const App: FunctionComponent = () => {
             <FontAwesomeIcon
               icon={showMenu || roomPath !== undefined ? faClose : faBars}
             />
+            {isMatching && !showMenu && (
+              <div className="buttonSpinner">{spinner}</div>
+            )}
           </button>
           <button
             className={classnames("icon", {
@@ -319,7 +322,6 @@ export const App: FunctionComponent = () => {
               <FontAwesomeIcon icon={faUserPlus} />
             )}
           </button>
-          {isMatching && !showMenu && spinner}
           <h1>Teeko.cc</h1>
           <select
             className="langSelector"
