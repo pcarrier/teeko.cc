@@ -13,7 +13,7 @@ import { setUserVars } from "@fullstory/browser";
 import { randomID } from "./random";
 import translations from "./translations";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons/faGlobe";
+import { faBars } from "@fortawesome/free-solid-svg-icons/faBars";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 import { faClose } from "@fortawesome/free-solid-svg-icons/faClose";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons/faUserPlus";
@@ -206,87 +206,92 @@ export const App: FunctionComponent = () => {
       <div class="top">
         <div class="nav">
           {showMenu && (
-            <div className="menu">
-              {isJoining ? (
-                <>
-                  <h1>
-                    <Text id="titleBar.friends" />
-                  </h1>
-                  <div className="joinBar">
-                    <Localizer>
-                      <input
-                        type="text"
-                        value={nextRoom}
-                        placeholder={<Text id="titleBar.boardNameInput" />}
-                        maxLength="256"
-                        onInput={(e: Event) =>
-                          setNextRoom((e.target as any).value)
-                        }
-                        onKeyUp={(e) => {
-                          if (e.keyCode === 13) {
-                            e.preventDefault();
-                            jump(nextRoom || randomID());
+            <div className="menuContainer">
+              <div className="menu">
+                {isJoining ? (
+                  <>
+                    <h1>
+                      <Text id="titleBar.friends" />
+                    </h1>
+                    <div className="joinBar">
+                      <Localizer>
+                        <input
+                          type="text"
+                          value={nextRoom}
+                          placeholder={<Text id="titleBar.boardNameInput" />}
+                          maxLength="256"
+                          onInput={(e: Event) =>
+                            setNextRoom((e.target as any).value)
                           }
+                          onKeyUp={(e) => {
+                            if (e.keyCode === 13) {
+                              e.preventDefault();
+                              jump(nextRoom || randomID());
+                            }
+                          }}
+                        />
+                      </Localizer>
+                      <button
+                        id="join"
+                        onClick={() => jump(nextRoom || randomID())}
+                      >
+                        <Text id="titleBar.join" />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {isMatching ? (
+                      <button
+                        id="cancelMatch"
+                        onClick={() => setMatching(false)}
+                      >
+                        {spinner} <Text id="titleBar.matching" />
+                      </button>
+                    ) : (
+                      <button
+                        id="match"
+                        onClick={() => {
+                          setShowMenu(false);
+                          setMatching(true);
                         }}
-                      />
-                    </Localizer>
+                      >
+                        <Text id="titleBar.matched" />
+                      </button>
+                    )}
                     <button
-                      id="join"
-                      onClick={() => jump(nextRoom || randomID())}
-                    >
-                      <Text id="titleBar.join" />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {isMatching ? (
-                    <button id="cancelMatch" onClick={() => setMatching(false)}>
-                      {spinner} <Text id="titleBar.matching" />
-                    </button>
-                  ) : (
-                    <button
-                      id="match"
+                      id="friends"
                       onClick={() => {
-                        setShowMenu(false);
-                        setMatching(true);
+                        setMatching(false);
+                        setJoining(true);
                       }}
                     >
-                      <Text id="titleBar.matched" />
+                      <Text id="titleBar.friends" />
                     </button>
-                  )}
-                  <button
-                    id="friends"
-                    onClick={() => {
-                      setMatching(false);
-                      setJoining(true);
-                    }}
-                  >
-                    <Text id="titleBar.friends" />
-                  </button>
-                  <div class="iconBar">
-                    <button
-                      onClick={() => openUrl("https://discord.gg/KEj9brTRS6")}
-                    >
-                      <FontAwesomeIcon icon={faDiscord} />
-                    </button>
-                    <button
-                      onClick={() =>
-                        openUrl("https://en.wikipedia.org/wiki/Teeko")
-                      }
-                    >
-                      <FontAwesomeIcon icon={faWikipediaW} />
-                    </button>
-                    <button
-                      onClick={() =>
-                        openUrl("https://github.com/pcarrier/teeko.cc")
-                      }
-                    >
-                      <FontAwesomeIcon icon={faGithub} />
-                    </button>
-                  </div>
-                </>
-              )}
+                    <div class="iconBar">
+                      <button
+                        onClick={() => openUrl("https://discord.gg/KEj9brTRS6")}
+                      >
+                        <FontAwesomeIcon icon={faDiscord} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          openUrl("https://en.wikipedia.org/wiki/Teeko")
+                        }
+                      >
+                        <FontAwesomeIcon icon={faWikipediaW} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          openUrl("https://github.com/pcarrier/teeko.cc")
+                        }
+                      >
+                        <FontAwesomeIcon icon={faGithub} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
           <button
@@ -298,7 +303,7 @@ export const App: FunctionComponent = () => {
             }}
           >
             <FontAwesomeIcon
-              icon={showMenu || roomPath !== undefined ? faClose : faGlobe}
+              icon={showMenu || roomPath !== undefined ? faClose : faBars}
             />
           </button>
           <button
