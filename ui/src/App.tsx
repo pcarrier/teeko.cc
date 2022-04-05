@@ -32,7 +32,7 @@ export enum OnlineStatus {
 export const App: FunctionComponent = () => {
   useRegisterSW({
     onRegistered(r) {
-      r && setInterval(() => r.update(), 10 * 1000);
+      r && setInterval(() => r.update(), 60 * 1000);
     },
   });
 
