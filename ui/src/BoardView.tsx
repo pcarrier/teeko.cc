@@ -113,7 +113,10 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     setSelected(undefined);
   }
 
-  const movable = new Set(
+
+  const placing = p && !win && ourPieces.size < 4;
+
+  const movable = placing ? new Set() : new Set(
     [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
   );
 
@@ -125,8 +128,6 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
             (x) => !allPieces.has(x)
           )
         );
-
-  const placing = p && !win && ourPieces.size < 4;
 
   const validTargets: Set<number> = win
     ? new Set()
@@ -425,7 +426,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 }}
                 player={aPieces.has(pos) ? Player.A : Player.B}
                 selected={selected === pos && ourPieces.has(selected)}
-                selectable={ourPieces.has(pos)}
+                selectable={!placing && ourPieces.has(pos)}
                 click={() => click(pos)}
               />
             );
