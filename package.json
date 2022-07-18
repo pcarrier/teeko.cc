@@ -6,8 +6,11 @@
     "start": "make -j2 ws ui"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
     "concurrently": "^7.2.2",
     "cypress": "^10.3.0",
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1"
   },
   "workspaces": [
