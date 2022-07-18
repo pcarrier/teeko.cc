@@ -62,7 +62,7 @@ export const App: FunctionComponent = () => {
       });
       return [storedPill, false];
     }
-    const newPill = generateUsername("-");
+    const newPill = generateUsername();
     localStorage.setItem("pill", newPill);
     setUserVars({
       displayName: newPill,
