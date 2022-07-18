@@ -295,7 +295,7 @@ export const App: FunctionComponent = () => {
             </div>
           )}
           <button
-            className="icon"
+            className={classnames("icon", { invisible: showHelp })}
             onclick={() => {
               if (roomPath) jump(undefined);
               else if (isJoining) setJoining(false);
