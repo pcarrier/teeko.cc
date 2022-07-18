@@ -56,7 +56,7 @@ export const App: FunctionComponent = () => {
 
   const storedPill = localStorage.getItem("pill");
   const [pill, startWithHelp] = useMemo(() => {
-    if (storedPill !== null) {
+    if (storedPill !== null && storedPill !== "") {
       setUserVars({
         displayName: storedPill,
       });
@@ -67,7 +67,7 @@ export const App: FunctionComponent = () => {
     setUserVars({
       displayName: newPill,
     });
-    return [newPill, true];
+    return [newPill, storedPill === null];
   }, [storedPill]);
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
