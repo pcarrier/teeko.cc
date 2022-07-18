@@ -1,10 +1,9 @@
 {
   "help": {
     "open": "Each player has 4 pieces. Blue opens.",
-    "place": "First, place all pieces, one each turn.",
-    "move": "Then, each turn, move one to a neighbor:",
+    "turn": "On your turn, place a piece or move one to a neighbor:",
     "win": "Form a line of 4 or a small square to win:",
-    "credits": "Teeko by John Scarne.",
+    "credits": "Derived from Teeko by John Scarne.",
     "close": "Play"
   },
   "titleBar": {
@@ -23,10 +22,12 @@
     "pop": "{{pop}}P"
   },
   "status": {
-    "aWin": "Teeko! Blue won.",
-    "bWin": "Teeko! Red won.",
+    "aWin": "Blue won.",
+    "bWin": "Red won.",
     "aDrop": "Blue places piece {{piece}} out of 4…",
     "bDrop": "Red places piece {{piece}} out of 4…",
+    "aDropMove": "Blue moves or places piece {{piece}} out of 4…",
+    "bDropMove": "Red moves or places piece {{piece}} out of 4…",
     "aMoveFrom": "Blue moves from…",
     "bMoveFrom": "Red moves from…",
     "aMoveTo": "Blue moves to…",

@@ -24,14 +24,12 @@ import {
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
   LINE_MARGIN,
-  OUT_RADIUS,
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
 import { Piece } from "./Piece";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
-const OUT_ARRAY = Array.from(Array(8).keys());
 
 type BoardArrow = {
   from: number;
@@ -113,13 +111,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     setSelected(undefined);
   }
 
-  const placing = p && !win && ourPieces.size < 4;
+  const stillPlacing = p && !win && ourPieces.size < 4;
 
-  const movable = placing
-    ? new Set()
-    : new Set(
-        [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
-      );
+  const movable = new Set(
+    [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
+  );
 
   const emptyNeighborsOfSelected =
     selected === undefined
@@ -132,10 +128,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const validTargets: Set<number> = win
     ? new Set()
-    : placing
-    ? emptySlots
     : selected === undefined
-    ? movable
+    ? new Set([...movable, ...(stillPlacing ? emptySlots : [])])
     : emptyNeighborsOfSelected;
 
   function click(position: number) {
@@ -146,8 +140,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
       move?.(selected, position);
       setSelected(undefined);
     } else {
-      if (placing) {
-        if (emptySlots.has(position)) place?.(position);
+      if (stillPlacing && emptySlots.has(position)) {
+        place?.(position);
       } else {
         if (!win && movable.has(position)) {
           setSelected(position);
@@ -188,13 +182,17 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
 
   const drawableArrows = useMemo(() => {
     const result = arrows === undefined ? [] : [...arrows];
-    if (releasePos !== selected && releasePos !== undefined)
+    if (
+      selected !== undefined &&
+      releasePos !== undefined &&
+      releasePos !== selected
+    )
       result.push({
         from: selected,
         to: releasePos,
         player: t === 0 ? Player.A : Player.B,
       });
-    else if (!placing && dragPos === undefined && selected !== null) {
+    else if (dragPos === undefined && selected !== undefined) {
       emptyNeighborsOfSelected.forEach((to) =>
         result.push({
           from: selected,
@@ -219,9 +217,15 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         <Text id="status.bWin" />
       ) : alreadyPlayed < 4 ? (
         t === 0 ? (
-          <Text id="status.aDrop" fields={{ piece: alreadyPlayed + 1 }} />
+          <Text
+            id={alreadyPlayed === 0 ? "status.aDrop" : "status.aDropMove"}
+            fields={{ piece: alreadyPlayed + 1 }}
+          />
         ) : (
-          <Text id="status.bDrop" fields={{ piece: alreadyPlayed + 1 }} />
+          <Text
+            id={alreadyPlayed === 0 ? "status.bDrop" : "status.bDropMove"}
+            fields={{ piece: alreadyPlayed + 1 }}
+          />
         )
       ) : board.p ? (
         selected === undefined ? (
@@ -249,7 +253,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`${-LARGE_CROWN_RADIUS} ${-LARGE_CROWN_RADIUS} ${
           4 + 2 * LARGE_CROWN_RADIUS
-        } ${4 + 2 * LARGE_CROWN_RADIUS + 2 * OUT_RADIUS}`}
+        } ${4 + 2 * LARGE_CROWN_RADIUS}`}
         className={classnames("board", klass)}
         ref={svgRef}
       >
@@ -334,7 +338,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 "bg",
                 releasePos === pos
                   ? "release"
-                  : (placing || selected !== undefined) && validTargets.has(pos)
+                  : validTargets.has(pos)
                   ? "target"
                   : undefined,
                 t === 0 ? "A" : "B"
@@ -365,17 +369,19 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </g>
 
         <g>
-          {!placing &&
-            selected === undefined &&
-            [...validTargets].map((pos) => (
-              <circle
-                key={`target${pos}`}
-                r={LARGE_CROWN_RADIUS}
-                cx={x(pos)}
-                cy={y(pos)}
-                class={classnames("target", t === 0 ? "A" : "B")}
-              />
-            ))}
+          {selected === undefined &&
+            [...ourPieces].map(
+              (pos) =>
+                validTargets.has(pos) && (
+                  <circle
+                    key={`target${pos}`}
+                    r={LARGE_CROWN_RADIUS}
+                    cx={x(pos)}
+                    cy={y(pos)}
+                    class={classnames("target", t === 0 ? "A" : "B")}
+                  />
+                )
+            )}
 
           {POS_ARRAY.map((pos) => (
             <circle
@@ -389,22 +395,6 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           ))}
         </g>
 
-        <g id="out">
-          {showStatus &&
-            OUT_ARRAY.slice(allPieces.size).map((i) => {
-              return (
-                <circle
-                  key={i}
-                  cx={0.25 + i / 2}
-                  cy={4 + LARGE_CROWN_RADIUS + OUT_RADIUS}
-                  r={OUT_RADIUS}
-                  class={classnames("out", i % 2 === 0 ? "A" : "B", {
-                    active: i === allPieces.size,
-                  })}
-                />
-              );
-            })}
-        </g>
         <g>
           {[...aPieces, ...bPieces].map((pos) => {
             return (
@@ -427,7 +417,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 }}
                 player={aPieces.has(pos) ? Player.A : Player.B}
                 selected={selected === pos && ourPieces.has(selected)}
-                selectable={!placing && ourPieces.has(pos)}
+                selectable={ourPieces.has(pos)}
                 click={() => click(pos)}
               />
             );

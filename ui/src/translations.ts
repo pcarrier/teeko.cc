@@ -6,10 +6,10 @@ import pt from "./translations/pt.json";
 import zh from "./translations/zh.json";
 
 export default {
-  bg,
+  // bg,
   en,
-  es,
+  // es,
   fr,
-  pt,
-  zh,
+  // pt,
+  // zh,
 };

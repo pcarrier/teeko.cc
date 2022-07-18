@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["icon.svg", "robots.txt", "bell.opus"],
       manifest: {
-        name: "Teeko",
-        short_name: "Teeko",
+        name: "kayu",
+        short_name: "kayu",
         background_color: "#000000",
         theme_color: "#000000",
         display: "fullscreen",

@@ -12,10 +12,7 @@ export const Help: FunctionComponent<{
     </p>
     <BoardView board={{ ...emptyBoard(), p: false }} klass="half" />
     <p>
-      <Text id="help.place" />
-    </p>
-    <p>
-      <Text id="help.move" />
+      <Text id="help.turn" />
     </p>
     <BoardView
       board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}

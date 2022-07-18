@@ -186,9 +186,9 @@ export const App: FunctionComponent = () => {
   function share() {
     if (navigator.share)
       navigator.share({
-        title: `teeko.cc (${roomPath})`,
-        text: "Teeko?",
-        url: `https://teeko.cc/${roomPath}`,
+        title: `kayu.teeko.cc (${roomPath})`,
+        text: "kayu?",
+        url: `https://kayu.teeko.cc/${roomPath}`,
       });
     else {
       navigator.clipboard
@@ -338,7 +338,7 @@ export const App: FunctionComponent = () => {
               <FontAwesomeIcon icon={faUserPlus} />
             )}
           </button>
-          <h1>Teeko.cc</h1>
+          <h1>kayu</h1>
           <select
             className="langSelector"
             onChange={(e) => moveToLang(e.target.value)}
