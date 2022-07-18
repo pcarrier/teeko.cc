@@ -113,12 +113,13 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     setSelected(undefined);
   }
 
-
   const placing = p && !win && ourPieces.size < 4;
 
-  const movable = placing ? new Set() : new Set(
-    [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
-  );
+  const movable = placing
+    ? new Set()
+    : new Set(
+        [...ourPieces].filter((pos) => NEIGHS_BY_POSITION[pos] & ~(a | b))
+      );
 
   const emptyNeighborsOfSelected =
     selected === undefined
