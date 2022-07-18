@@ -9,6 +9,7 @@ import { Help } from "./Help.jsx";
 import { TitleBar } from "./TitleBar.tsx";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
+import { generateUsername } from "unique-username-generator";
 import { setUserVars } from "@fullstory/browser";
 import { randomID } from "./random";
 import translations from "./translations";
@@ -53,21 +54,21 @@ export const App: FunctionComponent = () => {
 
   const translation = translations[lang];
 
+  const storedPill = localStorage.getItem("pill");
   const [pill, startWithHelp] = useMemo(() => {
-    const oldPill = localStorage.getItem("pill");
-    if (oldPill !== null) {
+    if (storedPill !== null) {
       setUserVars({
-        displayName: oldPill,
+        displayName: storedPill,
       });
-      return [oldPill, false];
+      return [storedPill, false];
     }
-    const newPill = randomID();
+    const newPill = generateUsername("-");
     localStorage.setItem("pill", newPill);
     setUserVars({
       displayName: newPill,
     });
     return [newPill, true];
-  }, undefined);
+  }, [storedPill]);
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -249,15 +250,30 @@ export const App: FunctionComponent = () => {
                         {spinner} <Text id="titleBar.matching" />
                       </button>
                     ) : (
-                      <button
-                        id="match"
-                        onClick={() => {
-                          setShowMenu(false);
-                          setMatching(true);
-                        }}
-                      >
-                        <Text id="titleBar.matched" />
-                      </button>
+                      <>
+                        <label htmlFor="username">Username:</label>
+                        <input
+                          id="username"
+                          type="text"
+                          value={pill}
+                          maxLength="256"
+                          onInput={(e: Event) => {
+                            localStorage.setItem(
+                              "pill",
+                              (e.target as any).value
+                            );
+                          }}
+                        />
+                        <button
+                          id="match"
+                          onClick={() => {
+                            setShowMenu(false);
+                            setMatching(true);
+                          }}
+                        >
+                          <Text id="titleBar.matched" />
+                        </button>
+                      </>
                     )}
                     <button
                       id="friends"
