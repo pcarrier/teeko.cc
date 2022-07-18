@@ -2,7 +2,7 @@
   "help": {
     "open": "Each player has 4 pieces. Blue opens.",
     "place": "First, place all pieces, one each turn.",
-    "move": "Then, move one to an empty neighbor each turn:",
+    "move": "Then, move one to a neighbor each turn:",
     "win": "Form a line of 4 or a small square to win:",
     "credits": "Teeko by John Scarne.",
     "close": "Play"
