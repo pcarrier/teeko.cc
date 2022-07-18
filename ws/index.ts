@@ -6,8 +6,14 @@ export const randomID = customAlphabet(
   8
 );
 
+const url = Deno.env.get("DISCORD_WEBHOOK");
+const port = (() => {
+  const str = Deno.env.get("PORT");
+  if (str) return parseInt(str);
+  return 8081;
+})();
+
 const notifyChannel: (content: string) => void = (() => {
-  const url = Deno.env.get("DISCORD_WEBHOOK");
   if (!url) return (content) => console.log("fake Discord", content);
   return async function sendToDiscord(content: string) {
     try {
@@ -264,7 +270,7 @@ function closeInLobby(pill: string | undefined, socket: WebSocket) {
 }
 
 async function main() {
-  for await (const conn of Deno.listen({ port: 8081 })) {
+  for await (const conn of Deno.listen({ port })) {
     const httpConn = Deno.serveHttp(conn);
     for await (const evt of httpConn) {
       if (evt.request.headers.get("upgrade") != "websocket") {
