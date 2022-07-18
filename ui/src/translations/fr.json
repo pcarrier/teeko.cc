@@ -2,7 +2,7 @@
   "help": {
     "open": "Chaque joueuse·r a 4 pions. Bleu commence.",
     "place": "D'abord, posez tous les pions, un par tour.",
-    "move": "Ensuite, bougez un pion vers un voisin chaque tour :",
+    "move": "Puis, à chaque tour, bougez un pion vers une case voisine :",
     "win": "Formez une ligne de 4 ou un petit carré pour gagner :",
     "credits": "Teeko par John Scarne.",
     "close": "Jouer"
