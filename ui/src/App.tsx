@@ -352,7 +352,12 @@ export const App: FunctionComponent = () => {
           <button
             className="icon"
             onClick={() => {
-              setShowHelp(!showHelp);
+              if (showHelp) {
+                setShowHelp(false);
+              } else {
+                setShowMenu(false);
+                setShowHelp(true);
+              }
             }}
           >
             <FontAwesomeIcon icon={showHelp ? faClose : faQuestion} />
