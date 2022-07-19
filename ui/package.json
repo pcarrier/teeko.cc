@@ -28,8 +28,6 @@
     "preact": "^10.10.0",
     "preact-i18n": "^2.4.0-preactx",
     "preact-router": "^4.1.0",
-    "react-slick": "^0.29.0",
-    "slick-carousel": "^1.8.1",
     "sockette": "^2.0.6",
     "teeko-cc-common": "file:../common"
   }
