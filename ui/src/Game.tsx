@@ -22,19 +22,19 @@ export const Game: FunctionComponent<{
 }> = ({ board, roomPath, showHelp, moveToBoard }) => {
   function move(from: number, to: number) {
     const after = computeMove(board, from, to);
-    if (roomPath) after.p = false;
+    if (after && roomPath) after.p = false;
     if (after) moveToBoard(after);
   }
 
   function place(pos: number) {
     const after = computePlace(board, pos);
-    if (roomPath) after.p = false;
+    if (after && roomPath) after.p = false;
     if (after) moveToBoard(after);
   }
 
   function undo() {
     const after = computeUndo(board);
-    if (roomPath) after.p = !after.p;
+    if (after && roomPath) after.p = !after.p;
     if (after) moveToBoard(after);
   }
 
