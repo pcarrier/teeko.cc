@@ -84,7 +84,7 @@ select option {
   background-color: @bg;
 }
 
-button:hover:enabled {
+input:hover, select:hover, button:hover:enabled {
   background-color: @boardColor;
 }
 
@@ -258,6 +258,11 @@ button.icon {
   width: 3em;
 }
 
+.buttonsBar button {
+  width: 4em;
+  height: 4em;
+}
+
 .nav {
   display: flex;
   flex-flow: row nowrap;
@@ -276,15 +281,6 @@ button.icon {
 
 .nav > select {
   font-size: 10pt;
-}
-
-.nav .menu input {
-  border: none;
-}
-
-.nav button,
-.nav select {
-  margin: 1mm;
 }
 
 .nav .menuContainer {
