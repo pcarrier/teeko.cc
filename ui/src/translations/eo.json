@@ -1,0 +1,37 @@
+{
+  "help": {
+    "open": "Ĉiu ludanto havas 4 pecojn. Bluo komencas.",
+    "place": "Unue, metu ĉiuj pecoj, unu ĉiuturne.",
+    "move": "Tiam, ĉiuturne, movu unu peco al najbara kvadrato:",
+    "win": "Formu lineon de 4 aŭ malgrandan kvadraton gajni:",
+    "credits": "Teeko de John Scarne.",
+    "close": "Ludi"
+  },
+  "titleBar": {
+    "local": "Loka",
+    "online": "Reta",
+    "matched": "Trovi ludanton",
+    "matching": "Trovanta…",
+    "friends": "Ludi kun amikoj",
+    "cancel": "Malaranĝi",
+    "boardNameInput": "Tabula nomo (nedeviga)",
+    "join": "Enigi",
+    "leave": "Eligi",
+    "invite": "Inviti",
+    "copied": "Kopiis!",
+    "alone": "sola",
+    "pop": "{{pop}}L"
+  },
+  "status": {
+    "aWin": "Teeko! Bluo gajnis.",
+    "bWin": "Teeko! Ruĝo gajnis.",
+    "aDrop": "Bluo metas pecon {{piece}} el 4…",
+    "bDrop": "Ruĝo metas pecon {{piece}} el 4…",
+    "aMoveFrom": "Bluo movas de…",
+    "bMoveFrom": "Ruĝo movas de…",
+    "aMoveTo": "Bluo movas al…",
+    "bMoveTo": "Ruĝo movas al…",
+    "aMove": "Bluo movas…",
+    "bMove": "Ruĝo movas…"
+  }
+}
