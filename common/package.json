@@ -2,14 +2,14 @@
   "name": "teeko-cc-common",
   "private": true,
   "devDependencies": {
-    "prettier": "^2.5.1",
-    "typescript": "^4.6.2"
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.4"
   },
   "scripts": {
     "build": "tsc",
     "lint:fix": "prettier -w ."
   },
   "dependencies": {
-    "nanoid": "^3.3.1"
+    "nanoid": "^4.0.0"
   }
 }

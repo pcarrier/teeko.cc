@@ -1,3 +1,5 @@
+import "preact/debug";
+
 import "./index.less";
 
 import { render } from "preact";
