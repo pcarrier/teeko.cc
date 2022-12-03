@@ -9,7 +9,6 @@ import { Help } from "./Help.jsx";
 import { TitleBar } from "./TitleBar.tsx";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
-import { generateUsername } from "unique-username-generator";
 import { setUserVars } from "@fullstory/browser";
 import { randomID } from "./random";
 import translations from "./translations";
