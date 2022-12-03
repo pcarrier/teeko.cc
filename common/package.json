@@ -2,8 +2,8 @@
   "name": "teeko-cc-common",
   "private": true,
   "devDependencies": {
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.4"
+    "prettier": "^2.8.0",
+    "typescript": "^4.9.3"
   },
   "scripts": {
     "build": "tsc",
