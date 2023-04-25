@@ -1,6 +1,8 @@
 describe("Simple navigation", () => {
+  const url = "http://127.0.0.1:4173";
+
   it("visits teeko.cc", () => {
-    cy.visit("http://127.0.0.1:3000");
+    cy.visit(url);
     cy.contains("Blue opens.");
     cy.contains("Play").click();
     cy.contains("Friends").click();
@@ -14,7 +16,7 @@ describe("Simple navigation", () => {
   });
 
   it("changes language", () => {
-    cy.visit("http://127.0.0.1:3000");
+    cy.visit(url);
     cy.get("select").select("fr");
     cy.contains("Jouer").click();
     cy.contains("Aide").click();
