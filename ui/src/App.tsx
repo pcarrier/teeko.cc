@@ -9,7 +9,6 @@ import { Help } from "./Help.jsx";
 import { TitleBar } from "./TitleBar.tsx";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
-import { setUserVars } from "@fullstory/browser";
 import { randomID } from "./random";
 import translations from "./translations";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
@@ -55,17 +54,9 @@ export const App: FunctionComponent = () => {
 
   const storedPill = localStorage.getItem("pill");
   const [pill, startWithHelp] = useMemo(() => {
-    if (storedPill !== null && storedPill !== "") {
-      setUserVars({
-        displayName: storedPill,
-      });
-      return [storedPill, false];
-    }
+    if (storedPill !== null && storedPill !== "") return [storedPill, false];
     const newPill = randomID();
     localStorage.setItem("pill", newPill);
-    setUserVars({
-      displayName: newPill,
-    });
     return [newPill, storedPill === null];
   }, [storedPill]);
 
