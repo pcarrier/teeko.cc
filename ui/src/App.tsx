@@ -1,12 +1,11 @@
 import { FunctionComponent } from "preact";
-import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
 import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
-import { TitleBar } from "./TitleBar.tsx";
+import { TitleBar } from "./TitleBar";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
 import { randomID } from "./random";
@@ -29,12 +28,6 @@ export enum OnlineStatus {
 }
 
 export const App: FunctionComponent = () => {
-  useRegisterSW({
-    onRegistered(r) {
-      r && setInterval(() => r.update(), 60 * 1000);
-    },
-  });
-
   const audio = useMemo(() => new Audio("/bell.opus"), undefined);
 
   const startLang = useMemo(() => {
