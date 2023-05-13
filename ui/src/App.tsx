@@ -1,5 +1,4 @@
 import { FunctionComponent } from "preact";
-import { useRegisterSW } from "virtual:pwa-register/preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
@@ -29,12 +28,6 @@ export enum OnlineStatus {
 }
 
 export const App: FunctionComponent = () => {
-  useRegisterSW({
-    onRegistered(r) {
-      r && setInterval(() => r.update(), 60 * 1000);
-    },
-  });
-
   const audio = useMemo(() => new Audio("/bell.opus"), undefined);
 
   const startLang = useMemo(() => {

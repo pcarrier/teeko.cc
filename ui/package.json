@@ -14,8 +14,7 @@
     "@types/uuid": "^9.0.1",
     "less": "^4.1.3",
     "typescript": "^5.0.4",
-    "vite": "^4.3.5",
-    "vite-plugin-pwa": "^0.14.7"
+    "vite": "^4.3.5"
   },
   "dependencies": {
     "@aduh95/preact-fontawesome": "^0.1.5",
