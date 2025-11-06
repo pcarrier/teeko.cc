@@ -1,40 +1,34 @@
-import { customAlphabet } from "https://deno.land/x/nanoid@v3.0.0/mod.ts";
+import { customAlphabet } from "nanoid";
 import { Message, State } from "../common/src/model.ts";
+import type { ServerWebSocket } from "bun";
 
 export const randomID = customAlphabet(
   "0123456789abcdefghijklmnopqrstuvwxyz",
   8
 );
 
-const url = Deno.env.get("DISCORD_WEBHOOK");
-const port = (() => {
-  const str = Deno.env.get("PORT");
-  if (str) return parseInt(str);
-  return 8081;
-})();
+const url = Bun.env.DISCORD_WEBHOOK;
+const port = parseInt(Bun.env.PORT || "8081");
 
-const notifyChannel: (content: string) => void = (() => {
-  if (!url) return (content) => console.log("fake Discord", content);
-  return async function sendToDiscord(content: string) {
-    try {
-      await fetch(url, {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content }),
-      });
-    } catch (e) {
-      console.log("Discord error", e);
-    }
-  };
-})();
+const notifyChannel = !url
+  ? (content: string) => console.log("fake Discord", content)
+  : async (content: string) => {
+      try {
+        await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+      } catch (e) {
+        console.log("Discord error", e);
+      }
+    };
 
 type RoomState = State;
 
 type Room = {
   path: string;
-  clients: Map<string | undefined, WebSocket[]>;
+  clients: Map<string | undefined, ServerWebSocket<RoomData>[]>;
   p1: string | undefined;
   p2: string | undefined;
   state: RoomState | null;
@@ -42,7 +36,7 @@ type Room = {
 };
 
 type ServerState = {
-  waiting: [string, WebSocket[]] | undefined;
+  waiting: [string, ServerWebSocket<LobbyData>[]] | undefined;
   rooms: Map<string, Room>;
 };
 
@@ -51,9 +45,18 @@ const serverState: ServerState = {
   rooms: new Map(),
 };
 
+type RoomData = {
+  pill: string | undefined;
+  roomPath: string;
+};
+
+type LobbyData = {
+  pill: string | undefined;
+};
+
 type Context = {
   pill: string | undefined;
-  socket: WebSocket;
+  socket: ServerWebSocket<RoomData>;
   roomPath: string;
 };
 
@@ -82,7 +85,7 @@ function sendPop(room: Room) {
   );
 }
 
-function sendState(state: RoomState | null, socket: WebSocket) {
+function sendState(state: RoomState | null, socket: ServerWebSocket<RoomData>) {
   socket.send(JSON.stringify({ st: state }));
 }
 
@@ -105,7 +108,7 @@ function customize(room: Room, pill: string | undefined): RoomState | null {
 function attemptAction(
   room: Room,
   state: RoomState,
-  from: WebSocket,
+  from: ServerWebSocket<RoomData>,
   pill: string | undefined
 ) {
   function abort() {
@@ -198,8 +201,8 @@ function roomMessage(ctx: Context, data: string) {
   }
 }
 
-function handleError(e: Event | ErrorEvent) {
-  console.log("WS error", e instanceof ErrorEvent ? e.message : e.type);
+function handleError(error: Error) {
+  console.log("WS error", error.message);
 }
 
 function closeInRoom(ctx: Context) {
@@ -220,7 +223,7 @@ function closeInRoom(ctx: Context) {
 
 const roomPrefix = "/room/";
 
-function connectedToLobby(pill: string | undefined, socket: WebSocket) {
+function connectedToLobby(pill: string | undefined, socket: ServerWebSocket<LobbyData>) {
   if (!pill) {
     console.log("Lobby connection failed, no pill");
     return;
@@ -258,7 +261,7 @@ function connectedToLobby(pill: string | undefined, socket: WebSocket) {
   }
 }
 
-function closeInLobby(pill: string | undefined, socket: WebSocket) {
+function closeInLobby(pill: string | undefined, socket: ServerWebSocket<LobbyData>) {
   if (!serverState.waiting) return;
   if (serverState.waiting[1].includes(socket)) {
     serverState.waiting[1] = serverState.waiting[1].filter((s) => s !== socket);
@@ -269,48 +272,74 @@ function closeInLobby(pill: string | undefined, socket: WebSocket) {
   }
 }
 
-async function main() {
-  for await (const conn of Deno.listen({ port })) {
-    const httpConn = Deno.serveHttp(conn);
-    for await (const evt of httpConn) {
-      if (evt.request.headers.get("upgrade") != "websocket") {
-        await evt.respondWith(new Response(null, { status: 501 }));
-      } else {
-        const url = new URL(evt.request.url);
-        const pill = url.searchParams.get("pill") || undefined;
-        const path = url.pathname;
+Bun.serve({
+  port,
+  fetch(req, server) {
+    const url = new URL(req.url);
+    const pill = url.searchParams.get("pill") || undefined;
+    const path = url.pathname;
 
-        if (path.startsWith(roomPrefix)) {
-          const { socket, response } = Deno.upgradeWebSocket(evt.request);
-
-          const ctx: Context = {
-            pill,
-            socket,
-            roomPath: path.substring(roomPrefix.length),
-          };
-          socket.onopen = () => connectedToRoom(ctx);
-          socket.onmessage = (m) => roomMessage(ctx, m.data);
-          socket.onclose = () => closeInRoom(ctx);
-          socket.onerror = (e) => handleError(e);
-
-          await evt.respondWith(response);
-        } else if (path === "/lobby") {
-          const { socket, response } = Deno.upgradeWebSocket(evt.request);
-
-          socket.onopen = () => connectedToLobby(pill, socket);
-          socket.onclose = () => closeInLobby(pill, socket);
-          socket.onerror = (e) => handleError(e);
-
-          await evt.respondWith(response);
-        } else {
-          await evt.respondWith(new Response(null, { status: 404 }));
-        }
-      }
+    if (path.startsWith(roomPrefix)) {
+      const upgraded = server.upgrade<RoomData>(req, {
+        data: {
+          pill,
+          roomPath: path.substring(roomPrefix.length),
+        },
+      });
+      if (upgraded) return undefined;
+      return new Response(null, { status: 500 });
+    } else if (path === "/lobby") {
+      const upgraded = server.upgrade<LobbyData>(req, {
+        data: { pill },
+      });
+      if (upgraded) return undefined;
+      return new Response(null, { status: 500 });
     }
-  }
-}
 
-main().catch((e) => {
-  console.log(e);
-  Deno.exit(1);
+    return new Response(null, { status: 404 });
+  },
+  websocket: {
+    open(ws) {
+      const data = ws.data as RoomData | LobbyData;
+      if ("roomPath" in data) {
+        const ctx: Context = {
+          pill: data.pill,
+          socket: ws as ServerWebSocket<RoomData>,
+          roomPath: data.roomPath,
+        };
+        connectedToRoom(ctx);
+      } else {
+        connectedToLobby(data.pill, ws as ServerWebSocket<LobbyData>);
+      }
+    },
+    message(ws, message) {
+      const data = ws.data as RoomData | LobbyData;
+      if ("roomPath" in data) {
+        const ctx: Context = {
+          pill: data.pill,
+          socket: ws as ServerWebSocket<RoomData>,
+          roomPath: data.roomPath,
+        };
+        roomMessage(ctx, message as string);
+      }
+    },
+    close(ws) {
+      const data = ws.data as RoomData | LobbyData;
+      if ("roomPath" in data) {
+        const ctx: Context = {
+          pill: data.pill,
+          socket: ws as ServerWebSocket<RoomData>,
+          roomPath: data.roomPath,
+        };
+        closeInRoom(ctx);
+      } else {
+        closeInLobby(data.pill, ws as ServerWebSocket<LobbyData>);
+      }
+    },
+    error(ws, error) {
+      handleError(error as Error);
+    },
+  },
 });
+
+console.log(`WebSocket server running on port ${port}`);

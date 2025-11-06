@@ -1,0 +1,16 @@
+{
+  "name": "@ws",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts"
+  },
+  "dependencies": {
+    "nanoid": "^5.0.9"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

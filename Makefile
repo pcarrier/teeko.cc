@@ -23,7 +23,7 @@ deploy-ui: build-ui
 		--data '{"purge_everything":true}'
 
 ws/bundle.js: ws/index.ts common/src/model.ts
-	deno bundle ws/index.ts ws/bundle.js
+	bun build ws/index.ts --outfile ws/bundle.js
 
 .PHONY: deploy-ws
 deploy-ws: ws/bundle.js
@@ -32,7 +32,7 @@ deploy-ws: ws/bundle.js
 
 .PHONY: ws
 ws:
-	deno run --allow-net --allow-env ws/index.ts
+	bun run ws/index.ts
 
 .PHONY: ui
 ui:
