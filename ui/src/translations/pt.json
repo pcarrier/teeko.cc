@@ -17,7 +17,6 @@
   "titleBar": {
     "local": "Local",
     "online": "Online",
-    "nickname": "Apelido:",
     "nicknamePlaceholder": "Escolha um apelido",
     "matched": "Procurar jogador",
     "matching": "Procurando jogador…",

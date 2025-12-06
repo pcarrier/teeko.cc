@@ -17,7 +17,6 @@
   "titleBar": {
     "local": "本地",
     "online": "在线",
-    "nickname": "昵称：",
     "nicknamePlaceholder": "选择昵称",
     "matched": "寻找对手",
     "matching": "寻找对手中…",

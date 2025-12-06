@@ -64,25 +64,20 @@ const NicknameInput: FunctionComponent<{
   nickname: string;
   setNickname: (v: string) => void;
 }> = ({ nickname, setNickname }) => (
-  <>
-    <Localizer>
-      <label for="nickname"><Text id="titleBar.nickname" /></label>
-    </Localizer>
-    <Localizer>
-      <input
-        id="nickname"
-        type="text"
-        value={nickname}
-        placeholder={<Text id="titleBar.nicknamePlaceholder" />}
-        maxLength={256}
-        onInput={(e: Event) => {
-          const value = (e.target as HTMLInputElement).value;
-          setNickname(value);
-          localStorage.setItem("nickname", value);
-        }}
-      />
-    </Localizer>
-  </>
+  <Localizer>
+    <input
+      id="nickname"
+      type="text"
+      value={nickname}
+      placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+      maxLength={256}
+      onInput={(e: Event) => {
+        const value = (e.target as HTMLInputElement).value;
+        setNickname(value);
+        localStorage.setItem("nickname", value);
+      }}
+    />
+  </Localizer>
 );
 
 const DifficultySelect: FunctionComponent<{

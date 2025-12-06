@@ -17,7 +17,6 @@
   "titleBar": {
     "local": "Local",
     "online": "En ligne",
-    "nickname": "Pseudo :",
     "nicknamePlaceholder": "Choisissez un pseudo",
     "matched": "Chercher joueuse·r",
     "matching": "Recherche d'adversaire…",
