@@ -354,7 +354,7 @@ export const App: FunctionComponent = () => {
         {showGame && (
           <>
             <TitleBar roomPath={roomPath} pop={pop} onlineStatus={onlineStatus} />
-            <Game board={board} roomPath={roomPath} moveToBoard={moveToBoard} />
+            <Game board={board} roomPath={roomPath} moveToBoard={moveToBoard} disabled={isBotGame && (isBotTurn() || isBotThinking)} />
           </>
         )}
 

@@ -12,17 +12,24 @@ type SolutionResponse = {
   error?: string;
 };
 
-async function fetchMoves(board: Board): Promise<SolutionResponse> {
-  const response = await fetch(SOLUTION_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      a: [...pieces(board.a)],
-      b: [...pieces(board.b)],
-      turn: board.m.length % 2 === 0 ? "a" : "b",
-    }),
-  });
-  return response.json();
+async function fetchMoves(board: Board, retries = 3): Promise<SolutionResponse> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(SOLUTION_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          a: [...pieces(board.a)],
+          b: [...pieces(board.b)],
+          turn: board.m.length % 2 === 0 ? "a" : "b",
+        }),
+      });
+      return await response.json();
+    } catch (e) {
+      if (i === retries - 1) throw e;
+    }
+  }
+  throw new Error("Failed after retries");
 }
 
 function weightedRandom(moves: Move[], bias = 1): Move {

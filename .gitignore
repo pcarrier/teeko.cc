@@ -1,8 +1,6 @@
 /.direnv/
-.idea
+/teeko-solution
+/ws/bundle.js
 node_modules/
 dist/
 target/
-ws/bundle.js
-*.tsbuildinfo
-.DS_Store

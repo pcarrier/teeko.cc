@@ -10,14 +10,17 @@ export const Game: FunctionComponent<{
   board: Board;
   roomPath?: string;
   moveToBoard: (board: Board) => void;
-}> = ({ board, roomPath, moveToBoard }) => {
+  disabled?: boolean;
+}> = ({ board, roomPath, moveToBoard, disabled }) => {
   const move = (from: number, to: number) => {
+    if (disabled) return;
     const after = computeMove(board, from, to);
     if (after && roomPath) after.p = false;
     if (after) moveToBoard(after);
   };
 
   const place = (pos: number) => {
+    if (disabled) return;
     const after = computePlace(board, pos);
     if (after && roomPath) after.p = false;
     if (after) moveToBoard(after);

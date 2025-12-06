@@ -100,6 +100,9 @@ func init() {
 
 // Goedel numbering - bijection between positions and integers
 func goedel(a, b uint32, n int) int {
+	if n == 0 {
+		return 0
+	}
 	ab := a | b
 	posNum, patNum := 0, 0
 	pat := uint32(0)
@@ -649,7 +652,7 @@ type Request struct {
 }
 
 type Move struct {
-	From     int    `json:"from,omitempty"`
+	From     *int   `json:"from,omitempty"`
 	To       int    `json:"to"`
 	Score    int    `json:"score"`
 	Outcome  string `json:"outcome"`
@@ -695,6 +698,14 @@ func maskToSquares(m uint32) []int {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == http.MethodOptions {
+		return
+	}
+
 	respond := func(resp Response) { json.NewEncoder(w).Encode(resp) }
 	fail := func(msg string) { respond(Response{Error: msg}) }
 
@@ -784,7 +795,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				ng := goedel(other, newMover|dest, 8)
 				ms := -scores[8][ng]
 				mo, md := outcome(ms)
-				moves = append(moves, Move{from, bitToSquare(dest), int(ms), mo, md})
+				fromCopy := from
+				moves = append(moves, Move{&fromCopy, bitToSquare(dest), int(ms), mo, md})
 			}
 		}
 	} else {

@@ -5,12 +5,14 @@
     "start": "vite preview --host",
     "build": "vite build",
     "dev": "vite --host",
+    "deploy": "xmit teeko.cc",
     "lint": "tsc && eslint src && prettier -c src",
     "lint:fix": "prettier -w ."
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.2",
     "@types/preact-i18n": "^2.3.6",
+    "@xmit.co/xmit": "^0.5.0-0",
     "less": "^4.4.2",
     "typescript": "^5.9.3",
     "vite": "^4.5.14"

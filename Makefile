@@ -1,5 +1,5 @@
 .PHONY: deploy
-deploy: deploy-ui deploy-ws
+deploy: deploy-ui deploy-ws deploy-solution
 
 ui/public/icon-512x512.png: ui/public/icon.svg
 	rsvg-convert --height 512 --output ui/public/icon-512x512.png ui/public/icon.svg
@@ -12,15 +12,11 @@ ui/public/icon-192x192.png: ui/public/icon.svg
 
 .PHONY: build-ui
 build-ui: ui/public/icon-512x512.png ui/public/icon-256x256.png ui/public/icon-192x192.png
-	cd ui && npm ci && npm run build
+	cd ui && bun ci && bun run build
 
 .PHONY: deploy-ui
 deploy-ui: build-ui
-	rsync --archive --delay-updates ui/dist/ horse:/data/teeko.cc/
-	curl -sfX POST "https://api.cloudflare.com/client/v4/zones/664e4bfb647853cad92f1bf7d0a20b35/purge_cache" \
-		-H "Authorization: Bearer $$(< ~/.cfpurgetoken)" \
-		-H "Content-Type: application/json" \
-		--data '{"purge_everything":true}'
+	cd ui && bun run deploy
 
 ws/bundle.js: ws/index.ts common/src/model.ts
 	bun build ws/index.ts --outfile ws/bundle.js
@@ -30,10 +26,18 @@ deploy-ws: ws/bundle.js
 	rsync --archive ws/bundle.js horse:/data/ws.teeko.cc/
 	ssh horse doas systemctl restart teeko-ws
 
+solution/solution: solution/teeko.go
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o teeko-solution ./solution
+
+.PHONY: deploy-solution
+deploy-solution: solution/solution
+	rsync --archive teeko-solution horse:/data/
+	ssh horse doas systemctl restart teeko-solution
+
 .PHONY: ws
 ws:
 	bun run ws/index.ts
 
 .PHONY: ui
 ui:
-	cd ui && npm ci && npm run build && npm start
+	cd ui && bun ci && bun run build && bun start
