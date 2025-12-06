@@ -7,11 +7,18 @@
     "credits": "Teeko de John Scarne.",
     "close": "Ludi"
   },
+  "buttons": {
+    "discord": "Discord",
+    "wikipedia": "Vikipedio",
+    "source": "Fontkodo",
+    "undo": "Malfari",
+    "restart": "Rekomenci"
+  },
   "titleBar": {
     "local": "Loka",
     "online": "Reta",
     "nickname": "Kromnomo:",
-    "nicknamePlaceholder": "Enigu kromnomon por ludi rete",
+    "nicknamePlaceholder": "Elektu kromnomon",
     "matched": "Trovi ludanton",
     "matching": "Trovanta…",
     "friends": "Ludi kun amikoj",

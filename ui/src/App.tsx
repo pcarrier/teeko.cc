@@ -192,25 +192,6 @@ export const App: FunctionComponent = () => {
                     <h1>
                       <Text id="titleBar.friends" />
                     </h1>
-                    <Localizer>
-                      <label htmlFor="nickname">
-                        <Text id="titleBar.nickname" />
-                      </label>
-                    </Localizer>
-                    <Localizer>
-                      <input
-                        id="nickname"
-                        type="text"
-                        value={nickname}
-                        placeholder={<Text id="titleBar.nicknamePlaceholder" />}
-                        maxLength="256"
-                        onInput={(e: Event) => {
-                          const value = (e.target as HTMLInputElement).value;
-                          setNickname(value);
-                          localStorage.setItem("nickname", value);
-                        }}
-                      />
-                    </Localizer>
                     <div className="joinBar">
                       <Localizer>
                         <input
@@ -268,32 +249,36 @@ export const App: FunctionComponent = () => {
                             }}
                           />
                         </Localizer>
-                        <button
-                          id="match"
-                          disabled={!nickname.trim()}
-                          onClick={() => {
-                            setShowMenu(false);
-                            setMatching(true);
-                          }}
-                        >
-                          <Text id="titleBar.matched" />
-                        </button>
+                        <div class="labeledButtons">
+                          <button
+                            id="match"
+                            disabled={!nickname.trim()}
+                            onClick={() => {
+                              setShowMenu(false);
+                              setMatching(true);
+                            }}
+                          >
+                            <Text id="titleBar.matched" />
+                          </button>
+                          <button
+                            id="friends"
+                            disabled={!nickname.trim()}
+                            onClick={() => {
+                              setMatching(false);
+                              setJoining(true);
+                            }}
+                          >
+                            <Text id="titleBar.friends" />
+                          </button>
+                        </div>
                       </>
                     )}
-                    <button
-                      id="friends"
-                      onClick={() => {
-                        setMatching(false);
-                        setJoining(true);
-                      }}
-                    >
-                      <Text id="titleBar.friends" />
-                    </button>
-                    <div class="iconBar">
+                    <div class="labeledButtons">
                       <button
                         onClick={() => openUrl("https://discord.gg/KEj9brTRS6")}
                       >
                         <FontAwesomeIcon icon={faDiscord} />
+                        <Text id="buttons.discord" />
                       </button>
                       <button
                         onClick={() =>
@@ -301,6 +286,7 @@ export const App: FunctionComponent = () => {
                         }
                       >
                         <FontAwesomeIcon icon={faWikipediaW} />
+                        <Text id="buttons.wikipedia" />
                       </button>
                       <button
                         onClick={() =>
@@ -308,6 +294,7 @@ export const App: FunctionComponent = () => {
                         }
                       >
                         <FontAwesomeIcon icon={faGithub} />
+                        <Text id="buttons.source" />
                       </button>
                     </div>
                   </>

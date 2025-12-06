@@ -7,11 +7,18 @@
     "credits": "游戏创始人John Scarne.",
     "close": "开始游戏"
   },
+  "buttons": {
+    "discord": "Discord",
+    "wikipedia": "维基百科",
+    "source": "源代码",
+    "undo": "撤销",
+    "restart": "重新开始"
+  },
   "titleBar": {
     "local": "本地",
     "online": "在线",
     "nickname": "昵称：",
-    "nicknamePlaceholder": "输入昵称以在线游戏",
+    "nicknamePlaceholder": "选择昵称",
     "matched": "寻找对手",
     "matching": "寻找中…",
     "friends": "开启或加入房间",

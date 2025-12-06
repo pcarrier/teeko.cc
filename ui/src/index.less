@@ -257,11 +257,6 @@ button.icon {
   width: 3em;
 }
 
-.buttonsBar button {
-  width: 4em;
-  height: 4em;
-}
-
 .nav {
   display: flex;
   flex-flow: row nowrap;
@@ -296,16 +291,34 @@ button.icon {
   flex-direction: column;
   align-items: stretch;
   z-index: 2;
+  min-width: max-content;
 }
 
-.iconBar {
+.labeledButtons {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.5em;
 }
 
-.iconBar button {
+.labeledButtons button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
   flex: 1;
+  min-width: 0;
+  height: auto;
+  padding: 0.75em 1em;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.game .labeledButtons {
+  margin-top: 0.5em;
 }
 
 .buttonSpinner {

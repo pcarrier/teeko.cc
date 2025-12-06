@@ -1,4 +1,5 @@
 import { FunctionComponent } from "preact";
+import { Text } from "preact-i18n";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faBackwardStep } from "@fortawesome/free-solid-svg-icons/faBackwardStep";
 import { faRotateBack } from "@fortawesome/free-solid-svg-icons/faRotateBack";
@@ -49,9 +50,10 @@ export const Game: FunctionComponent<{
         klass="full"
         showStatus={true}
       />
-      <p class="buttonsBar">
+      <div class="labeledButtons">
         <button id="undo" onClick={undo} disabled={board.m.length === 0}>
           <FontAwesomeIcon icon={faBackwardStep} />
+          <Text id="buttons.undo" />
         </button>
         <button
           id="reset"
@@ -59,8 +61,9 @@ export const Game: FunctionComponent<{
           disabled={board.a === 0}
         >
           <FontAwesomeIcon icon={faRotateBack} />
+          <Text id="buttons.restart" />
         </button>
-      </p>
+      </div>
     </div>
   );
 };

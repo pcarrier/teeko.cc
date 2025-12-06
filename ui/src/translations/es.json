@@ -7,11 +7,18 @@
     "credits": "Teeko fue inventado por John Scarne.",
     "close": "Jugar"
   },
+  "buttons": {
+    "discord": "Discord",
+    "wikipedia": "Wikipedia",
+    "source": "Código",
+    "undo": "Deshacer",
+    "restart": "Reiniciar"
+  },
   "titleBar": {
     "local": "Local",
     "online": "Online",
     "nickname": "Apodo:",
-    "nicknamePlaceholder": "Ingresa un apodo para jugar en línea",
+    "nicknamePlaceholder": "Elige un apodo",
     "matched": "Buscar un jugador",
     "matching": "Buscando…",
     "friends": "Amigos",

@@ -7,11 +7,18 @@
     "credits": "Игра съсдадена от Джон Скарн.",
     "close": "Играете"
   },
+  "buttons": {
+    "discord": "Discord",
+    "wikipedia": "Уикипедия",
+    "source": "Код",
+    "undo": "Отмяна",
+    "restart": "Рестарт"
+  },
   "titleBar": {
     "local": "Местно табло",
     "online": "Онлайн",
     "nickname": "Прякор:",
-    "nicknamePlaceholder": "Въведете прякор за онлайн игра",
+    "nicknamePlaceholder": "Изберете прякор",
     "matched": "Намерете противник",
     "matching": "Търсене…",
     "friends": "Играете с приятели",
