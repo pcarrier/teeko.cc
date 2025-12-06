@@ -4,7 +4,7 @@
     "place": "首先，放置所有棋子, 每回合一粒。",
     "move": "然后， 每回合挪一粒棋子到一个空位：",
     "win": "链接一条4单位长的线即可得胜：",
-    "credits": "游戏创始人John Scarne.",
+    "credits": "游戏创始人John Scarne。解法由Guy L. Steele提供。",
     "close": "开始游戏"
   },
   "buttons": {
@@ -20,7 +20,7 @@
     "nickname": "昵称：",
     "nicknamePlaceholder": "选择昵称",
     "matched": "寻找对手",
-    "matching": "寻找中…",
+    "matching": "寻找对手中…",
     "friends": "开启或加入房间",
     "cancel": "取消",
     "boardNameInput": "房间名 (选择性)",
@@ -42,5 +42,26 @@
     "bMoveTo": "红方移动至…",
     "aMove": "蓝方移动…",
     "bMove": "方移动…"
+  },
+  "menu": {
+    "rules": "规则",
+    "playLocally": "本地对战",
+    "findPlayer": "寻找对手",
+    "playWithFriends": "与好友对战"
+  },
+  "bot": {
+    "playVsBot": "人机对战",
+    "title": "人机对战",
+    "difficulty": "难度：",
+    "beginner": "入门",
+    "easy": "简单",
+    "medium": "中等",
+    "hard": "困难",
+    "perfect": "完美",
+    "whoStarts": "谁先走？",
+    "iStart": "我先走",
+    "botStarts": "电脑先走",
+    "start": "开始",
+    "thinking": "思考中…"
   }
 }

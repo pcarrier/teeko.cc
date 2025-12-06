@@ -3,9 +3,7 @@ import { Text } from "preact-i18n";
 import { BoardView } from "./BoardView";
 import { emptyBoard, Player } from "teeko-cc-common/src/model.js";
 
-export const Help: FunctionComponent<{
-  close: () => void;
-}> = ({ close }) => (
+export const Help: FunctionComponent = () => (
   <div class="help">
     <p>
       <Text id="help.open" />
@@ -65,8 +63,5 @@ export const Help: FunctionComponent<{
     <p>
       <Text id="help.credits" />
     </p>
-    <button onClick={close}>
-      <Text id="help.close" />
-    </button>
   </div>
 );

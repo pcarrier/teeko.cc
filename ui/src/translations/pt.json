@@ -4,7 +4,7 @@
     "place": "Primeiro, coloca todas as peças, uma por turno.",
     "move": "Depois, move uma peça por turno para uma posição vazia:",
     "win": "Forma uma linha de 4 ou um quadrado pequeno para vencer:",
-    "credits": "Teeko foi inventado por John Scarne.",
+    "credits": "Teeko foi inventado por John Scarne. Solução de Guy L. Steele.",
     "close": "Jogar"
   },
   "buttons": {
@@ -20,7 +20,7 @@
     "nickname": "Apelido:",
     "nicknamePlaceholder": "Escolha um apelido",
     "matched": "Procurar jogador",
-    "matching": "Procurando…",
+    "matching": "Procurando jogador…",
     "friends": "Amigos",
     "cancel": "Cancelar",
     "boardNameInput": "Nome do tabuleiro (opcional)",
@@ -42,5 +42,26 @@
     "bMoveTo": "Vermelho move para…",
     "aMove": "Azul move…",
     "bMove": "Vermelho move…"
+  },
+  "menu": {
+    "rules": "Regras",
+    "playLocally": "Jogar localmente",
+    "findPlayer": "Procurar jogador",
+    "playWithFriends": "Jogar com amigos"
+  },
+  "bot": {
+    "playVsBot": "Jogar vs Bot",
+    "title": "Jogar vs Bot",
+    "difficulty": "Dificuldade:",
+    "beginner": "Iniciante",
+    "easy": "Fácil",
+    "medium": "Médio",
+    "hard": "Difícil",
+    "perfect": "Perfeito",
+    "whoStarts": "Quem começa?",
+    "iStart": "Eu começo",
+    "botStarts": "Bot começa",
+    "start": "Começar",
+    "thinking": "Pensando…"
   }
 }

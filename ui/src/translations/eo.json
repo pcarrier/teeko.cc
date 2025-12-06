@@ -4,7 +4,7 @@
     "place": "Unue, metu ĉiuj pecoj, unu ĉiuturne.",
     "move": "Tiam, ĉiuturne, movu unu peco al najbara kvadrato:",
     "win": "Formu lineon de 4 aŭ malgrandan kvadraton gajni:",
-    "credits": "Teeko de John Scarne.",
+    "credits": "Teeko de John Scarne. Solvo de Guy L. Steele.",
     "close": "Ludi"
   },
   "buttons": {
@@ -20,7 +20,7 @@
     "nickname": "Kromnomo:",
     "nicknamePlaceholder": "Elektu kromnomon",
     "matched": "Trovi ludanton",
-    "matching": "Trovanta…",
+    "matching": "Serĉante ludanton…",
     "friends": "Ludi kun amikoj",
     "cancel": "Malaranĝi",
     "boardNameInput": "Tabula nomo (nedeviga)",
@@ -42,5 +42,26 @@
     "bMoveTo": "Ruĝo movas al…",
     "aMove": "Bluo movas…",
     "bMove": "Ruĝo movas…"
+  },
+  "menu": {
+    "rules": "Reguloj",
+    "playLocally": "Ludi loke",
+    "findPlayer": "Trovi ludanton",
+    "playWithFriends": "Ludi kun amikoj"
+  },
+  "bot": {
+    "playVsBot": "Ludi kontraŭ roboto",
+    "title": "Ludi kontraŭ roboto",
+    "difficulty": "Malfacilo:",
+    "beginner": "Komencanto",
+    "easy": "Facila",
+    "medium": "Meza",
+    "hard": "Malfacila",
+    "perfect": "Perfekta",
+    "whoStarts": "Kiu komencas?",
+    "iStart": "Mi komencas",
+    "botStarts": "Roboto komencas",
+    "start": "Komenci",
+    "thinking": "Pensante…"
   }
 }

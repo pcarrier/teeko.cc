@@ -1,10 +1,7 @@
 @color: #ccc;
-// @colorLight: #333;
 @strong: #fff;
-// @strongLight: #000;
 @bg: #000;
 @navBg: tint(@bg, 10%);
-// @bgLight: #fff;
 @boardColor: #444;
 @selectionColor: #888;
 @link: #04f;
@@ -12,8 +9,6 @@
 @bColor: #f00;
 @aDark: shade(@aColor, 25%);
 @bDark: shade(@bColor, 25%);
-// @aLight: tint(@aColor, 25%);
-// @bLight: tint(@bColor, 25%);
 @boardWidth: min(100vw, 75vh);
 @maxBoardWidth: 120mm;
 @maxHalfBoardWidth: 60mm;
@@ -23,15 +18,13 @@ div {
   padding: 0;
 }
 
-a,
-a:visited {
+a, a:visited {
   cursor: pointer;
   color: @link;
   text-decoration: none;
 }
 
-html,
-body {
+html, body {
   display: grid;
   justify-content: center;
   align-content: center;
@@ -41,8 +34,7 @@ body {
   min-height: 100%;
   user-select: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: @color;
@@ -60,9 +52,7 @@ h1 {
   color: @strong;
 }
 
-button,
-input,
-select {
+button, input {
   appearance: none;
   font-size: 100%;
   background-color: transparent;
@@ -73,188 +63,59 @@ select {
   margin: 0.5em;
 }
 
-select {
-  margin: 1em;
-  padding: 1em;
-}
+button {
+  height: 3em;
 
-select option {
-  color: @color;
-  background-color: @bg;
-}
+  &.icon {
+    width: 3em;
+  }
 
-input:hover, select:hover, button:hover:enabled {
-  background-color: @boardColor;
-}
+  &:disabled {
+    color: @boardColor;
+    border-color: shade(@boardColor, 50%);
+  }
 
-button:disabled {
-  color: @boardColor;
-  border: 1px solid shade(@boardColor, 50%);
+  &.selected {
+    background-color: @boardColor;
+    border-color: @strong;
+  }
+
+  &:hover:enabled {
+    background-color: @boardColor;
+  }
 }
 
 input {
   padding: 0.5em;
+
+  &:hover {
+    background-color: @boardColor;
+  }
 }
 
-.game {
-  width: 100%;
+select {
+  font-size: 100%;
+  color: @strong;
+  background-color: transparent;
+  border: 1px solid @boardColor;
+  border-radius: 0.5em;
+  margin: 1em;
+  padding: 1em;
+  cursor: pointer;
+
+  &:hover {
+    background-color: @boardColor;
+  }
+
+  option {
+    color: @color;
+    background-color: @bg;
+  }
 }
 
-.board.full {
-  touch-action: none;
+.top {
   width: @boardWidth;
   max-width: @maxBoardWidth;
-}
-
-.board.half {
-  width: 50%;
-  max-width: @maxHalfBoardWidth;
-}
-
-.board line.bg {
-  stroke-width: 0.03;
-  stroke: @boardColor;
-  stroke-dasharray: 0.03;
-}
-
-.board circle.out.A {
-  fill: shade(@aColor, 50%);
-}
-
-.board circle.out.B {
-  fill: shade(@bColor, 50%);
-}
-
-.board circle.out.active.A {
-  fill: @aColor;
-}
-
-.board circle.out.active.B {
-  fill: @bColor;
-}
-
-.board circle.bg {
-  fill: @boardColor;
-}
-
-.board circle.bg.release.A {
-  fill: @aColor;
-}
-
-.board circle.bg.release.B {
-  fill: @bColor;
-}
-
-.board line.last {
-  stroke-width: 0.05;
-}
-
-.board line.last.A {
-  stroke: @aDark;
-}
-
-.board line.last.B {
-  stroke: @bDark;
-}
-
-.board circle.last.A {
-  fill: @aDark;
-}
-
-.board circle.last.B {
-  fill: @bDark;
-}
-
-.board circle.selected {
-  fill: @selectionColor;
-}
-
-.board circle.target.A {
-  fill: shade(@aColor, 50%);
-}
-
-.board circle.target.B {
-  fill: shade(@bColor, 50%);
-}
-
-.board .piece.A {
-  fill: @aColor;
-}
-
-.board .piece.B {
-  fill: @bColor;
-}
-
-.board .piece.dummy {
-  pointer-events: none;
-}
-
-.board line.arrow {
-  stroke-width: 0.1;
-  stroke-linecap: round;
-}
-
-.board line.arrow.A {
-  stroke: shade(@aColor, 50%);
-}
-
-.board line.arrow.B {
-  stroke: shade(@bColor, 50%);
-}
-
-.board #arrowheadA {
-  fill: shade(@aColor, 50%);
-}
-
-.board #arrowheadB {
-  fill: shade(@bColor, 50%);
-}
-
-.titleBar {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-}
-
-.titleBar h1 {
-  text-align: left;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.titleBar .pop {
-  flex: 1;
-  text-align: left;
-}
-
-.titleBar .pop {
-  margin-left: 0.5em;
-}
-
-.titleBar .alone {
-  color: @bColor;
-}
-
-.status {
-  color: @boardColor;
-  margin: 1em 0 0 0;
-}
-
-.status.playing {
-  color: @strong;
-}
-
-.status.win {
-  color: @bColor;
-}
-
-button {
-  height: 3em;
-}
-
-button.icon {
-  width: 3em;
 }
 
 .nav {
@@ -263,156 +124,180 @@ button.icon {
   align-items: center;
   background-color: @navBg;
   height: 14mm;
+  border-radius: 0.5em 0.5em 0 0;
+  padding: 0.5em;
+
+  > h1 {
+    font-size: 120%;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1;
+    text-transform: uppercase;
+  }
+
+  > select {
+    font-size: 10pt;
+  }
 }
 
-.nav > h1 {
-  font-size: 120%;
-  margin: 0;
-  padding: 0;
-  flex-grow: 1;
-  text-transform: uppercase;
-}
-
-.nav > select {
-  font-size: 10pt;
-}
-
-.nav .menuContainer {
-  position: relative;
-  height: 100%;
-}
-
-.nav .menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: @navBg;
+.menuContainer {
+  background-color: @bg;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  z-index: 2;
-  min-width: max-content;
+}
+
+.titleBar {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+
+  h1 {
+    text-align: left;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .pop {
+    flex: 1;
+    text-align: left;
+    margin-left: 0.5em;
+  }
+
+  .alone {
+    color: @bColor;
+  }
+}
+
+.status {
+  color: @boardColor;
+  margin: 1em 0 0 0;
+
+  &.playing {
+    color: @strong;
+  }
+
+  &.win {
+    color: @bColor;
+  }
+}
+
+.game {
+  width: 100%;
+
+  .labeledButtons {
+    margin-top: 0.5em;
+  }
+}
+
+.board {
+  &.full {
+    touch-action: none;
+    width: @boardWidth;
+    max-width: @maxBoardWidth;
+  }
+
+  &.half {
+    width: 50%;
+    max-width: @maxHalfBoardWidth;
+  }
+
+  line.bg {
+    stroke-width: 0.03;
+    stroke: @boardColor;
+    stroke-dasharray: 0.03;
+  }
+
+  circle {
+    &.bg {
+      fill: @boardColor;
+
+      &.release.A { fill: @aColor; }
+      &.release.B { fill: @bColor; }
+    }
+
+    &.out.A { fill: shade(@aColor, 50%); }
+    &.out.B { fill: shade(@bColor, 50%); }
+    &.out.active.A { fill: @aColor; }
+    &.out.active.B { fill: @bColor; }
+
+    &.last.A { fill: @aDark; }
+    &.last.B { fill: @bDark; }
+
+    &.selected { fill: @selectionColor; }
+
+    &.target.A { fill: shade(@aColor, 50%); }
+    &.target.B { fill: shade(@bColor, 50%); }
+  }
+
+  line.last {
+    stroke-width: 0.05;
+    &.A { stroke: @aDark; }
+    &.B { stroke: @bDark; }
+  }
+
+  .piece {
+    &.A { fill: @aColor; }
+    &.B { fill: @bColor; }
+    &.dummy { pointer-events: none; }
+  }
+
+  line.arrow {
+    stroke-width: 0.1;
+    stroke-linecap: round;
+    &.A { stroke: shade(@aColor, 50%); }
+    &.B { stroke: shade(@bColor, 50%); }
+  }
+
+  #arrowheadA { fill: shade(@aColor, 50%); }
+  #arrowheadB { fill: shade(@bColor, 50%); }
 }
 
 .labeledButtons {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   justify-content: center;
   gap: 0.5em;
   padding: 0.5em;
-}
 
-.labeledButtons button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5em;
-  flex: 1;
-  min-width: 0;
-  height: auto;
-  padding: 0.75em 1em;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.game .labeledButtons {
-  margin-top: 0.5em;
-}
-
-.buttonSpinner {
-  position: relative;
-}
-
-.buttonSpinner svg {
-  position: absolute;
+  button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    flex: 1;
+    min-width: 0;
+    height: auto;
+    padding: 0.75em 1em;
+    margin: 0;
+    white-space: nowrap;
+  }
 }
 
 .joinBar {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
 
-.joinBar input {
-  flex-grow: 1;
-}
-
-.borderless {
-  border: none;
+  input {
+    flex-grow: 1;
+  }
 }
 
 .invisible {
   visibility: hidden;
 }
 
-.top {
-  width: @boardWidth;
-  max-width: @maxBoardWidth;
+.botBar, .matchingBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 1em;
 }
 
-/*
-@media (prefers-color-scheme: light) {
-  html, body, select option {
-    color: @colorLight;
-    background-color: @bgLight;
-  }
-
-  h1, button, input, select {
-    color: @strongLight;
-  }
-
-  .board circle.lineMargin {
-    fill: @bgLight;
-  }
-
-  button:disabled {
-    border: 1px solid tint(@boardColor, 50%);
-  }
-
-  .board circle.out.A {
-    fill: TINT(@aColor, 50%);
-  }
-
-  .board circle.out.B {
-    fill: TINT(@bColor, 50%);
-  }
-
-  .board line.last.A {
-    stroke: @aLight;
-  }
-
-  .board line.last.B {
-    stroke: @bLight;
-  }
-
-  .board circle.last.A {
-    fill: @aLight;
-  }
-
-  .board circle.last.B {
-    fill: @bLight;
-  }
-
-  .board line.arrow.A {
-    stroke: tint(@aColor, 50%);
-  }
-
-  .board line.arrow.B {
-    stroke: tint(@bColor, 50%);
-  }
-
-  .board #arrowheadA {
-    fill: tint(@aColor, 50%);
-  }
-
-  .board #arrowheadB {
-    fill: tint(@bColor, 50%);
-  }
-
-  .status.playing {
-    color: @strongLight;
-  }
+.botBar select {
+  margin: 0;
 }
-*/

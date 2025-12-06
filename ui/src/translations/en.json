@@ -4,7 +4,7 @@
     "place": "First, place all pieces, one each turn.",
     "move": "Then, each turn, move one to a neighbor:",
     "win": "Form a line of 4 or a small square to win:",
-    "credits": "Teeko by John Scarne.",
+    "credits": "Teeko by John Scarne. Solution by Guy L. Steele.",
     "close": "Play"
   },
   "buttons": {
@@ -20,7 +20,7 @@
     "nickname": "Nickname:",
     "nicknamePlaceholder": "Choose a nickname",
     "matched": "Find a player",
-    "matching": "Finding…",
+    "matching": "Finding a player…",
     "friends": "Play with friends",
     "cancel": "Cancel",
     "boardNameInput": "Board name (optional)",
@@ -42,5 +42,26 @@
     "bMoveTo": "Red moves to…",
     "aMove": "Blue moves…",
     "bMove": "Red moves…"
+  },
+  "menu": {
+    "rules": "Rules",
+    "playLocally": "Play locally",
+    "findPlayer": "Find a player",
+    "playWithFriends": "Play with friends"
+  },
+  "bot": {
+    "playVsBot": "Play vs Bot",
+    "title": "Play vs Bot",
+    "difficulty": "Difficulty:",
+    "beginner": "Beginner",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "perfect": "Perfect",
+    "whoStarts": "Who starts?",
+    "iStart": "I start",
+    "botStarts": "Bot starts",
+    "start": "Start",
+    "thinking": "Thinking…"
   }
 }

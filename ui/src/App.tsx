@@ -1,8 +1,8 @@
 import { FunctionComponent } from "preact";
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useState, useCallback } from "preact/hooks";
 import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
-import { Board, emptyBoard, Message } from "teeko-cc-common/src/model.js";
+import { Board, emptyBoard, Message, computePlace, computeMove } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
 import { TitleBar } from "./TitleBar";
@@ -12,365 +12,363 @@ import { randomID } from "./random";
 import translations from "./translations";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons/faBars";
-import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 import { faClose } from "@fortawesome/free-solid-svg-icons/faClose";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons/faUserPlus";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons/faClipboardCheck";
+import { faRobot } from "@fortawesome/free-solid-svg-icons/faRobot";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
+import { faBook } from "@fortawesome/free-solid-svg-icons/faBook";
+import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
+import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
+import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
-import classnames from "classnames";
+import { getBotMove, isGameOver, Difficulty, BotPlayer } from "./bot";
 
-export enum OnlineStatus {
-  OFFLINE,
-  ONLINE,
+export enum OnlineStatus { OFFLINE, ONLINE }
+
+type Route =
+  | { type: "menu" }
+  | { type: "rules" }
+  | { type: "play" }
+  | { type: "bot" }
+  | { type: "bot-game" }
+  | { type: "friends" }
+  | { type: "room"; id: string };
+
+function parseRoute(pathname: string): Route {
+  const path = pathname.substring(1);
+  if (!path) return { type: "menu" };
+  if (path === "rules") return { type: "rules" };
+  if (path === "play") return { type: "play" };
+  if (path === "bot") return { type: "bot" };
+  if (path === "bot-game") return { type: "bot-game" };
+  if (path === "friends") return { type: "friends" };
+  if (path.startsWith("room/")) return { type: "room", id: path.substring(5) };
+  return { type: "room", id: path };
 }
 
-export const App: FunctionComponent = () => {
-  const audio = useMemo(() => new Audio("/bell.opus"), undefined);
+function loadBoard(key: string): Board {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed.m) return parsed;
+    }
+  } catch {}
+  return emptyBoard();
+}
 
+const NicknameInput: FunctionComponent<{
+  nickname: string;
+  setNickname: (v: string) => void;
+}> = ({ nickname, setNickname }) => (
+  <>
+    <Localizer>
+      <label for="nickname"><Text id="titleBar.nickname" /></label>
+    </Localizer>
+    <Localizer>
+      <input
+        id="nickname"
+        type="text"
+        value={nickname}
+        placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+        maxLength={256}
+        onInput={(e: Event) => {
+          const value = (e.target as HTMLInputElement).value;
+          setNickname(value);
+          localStorage.setItem("nickname", value);
+        }}
+      />
+    </Localizer>
+  </>
+);
+
+const DifficultySelect: FunctionComponent<{
+  value: Difficulty;
+  onChange: (d: Difficulty) => void;
+}> = ({ value, onChange }) => (
+  <select value={value} onChange={(e) => onChange((e.target as HTMLSelectElement).value as Difficulty)}>
+    <option value="beginner"><Text id="bot.beginner" /></option>
+    <option value="easy"><Text id="bot.easy" /></option>
+    <option value="medium"><Text id="bot.medium" /></option>
+    <option value="hard"><Text id="bot.hard" /></option>
+    <option value="perfect"><Text id="bot.perfect" /></option>
+  </select>
+);
+
+const ExternalLinks: FunctionComponent = () => (
+  <div class="labeledButtons">
+    <button onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}>
+      <FontAwesomeIcon icon={faDiscord} /> <Text id="buttons.discord" />
+    </button>
+    <button onClick={() => window.open("https://en.wikipedia.org/wiki/Teeko", "_blank")}>
+      <FontAwesomeIcon icon={faWikipediaW} /> <Text id="buttons.wikipedia" />
+    </button>
+    <button onClick={() => window.open("https://github.com/pcarrier/teeko.cc", "_blank")}>
+      <FontAwesomeIcon icon={faGithub} /> <Text id="buttons.source" />
+    </button>
+  </div>
+);
+
+export const App: FunctionComponent = () => {
+  const audio = useMemo(() => new Audio("/bell.opus"), []);
   const startLang = useMemo(() => {
-    const oldLang = localStorage.getItem("lang");
-    if (oldLang) return oldLang;
+    const saved = localStorage.getItem("lang");
+    if (saved) return saved;
     const preferred = navigator.languages.map((l) => l.split("-")[0]);
     return preferred.find((l) => l in translations) || "en";
-  }, undefined);
+  }, []);
+
   const [lang, setLang] = useState(startLang);
-
-  function moveToLang(lang: string) {
-    localStorage.setItem("lang", lang);
-    setLang(lang);
-  }
-
-  const translation = translations[lang];
-
   const [nickname, setNickname] = useState(() => localStorage.getItem("nickname") || "");
-  const startWithHelp = useMemo(() => localStorage.getItem("nickname") === null, []);
-
-  const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
-  const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [hasCopied, setHasCopied] = useState<boolean>(false);
-  const [roomPath, setRoomPath] = useState<string | undefined>(undefined);
-  const [nextRoom, setNextRoom] = useState();
-  const [ws, setWs] = useState<Sockette | undefined>(undefined);
-  const [pop, setPop] = useState<number | undefined>(undefined);
-  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
-    OnlineStatus.OFFLINE
+  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.pathname));
+  const [hasCopied, setHasCopied] = useState(false);
+  const [nextRoom, setNextRoom] = useState("");
+  const [ws, setWs] = useState<Sockette>();
+  const [pop, setPop] = useState<number>();
+  const [onlineStatus, setOnlineStatus] = useState(OnlineStatus.OFFLINE);
+  const [board, setBoard] = useState<Board>(() => loadBoard("localBoard"));
+  const [botDifficulty, _setBotDifficulty] = useState<Difficulty>(
+    () => (localStorage.getItem("botDifficulty") as Difficulty) || "medium"
   );
-
-  const [isJoining, setJoining] = useState(false);
+  const [botPlaysAs, setBotPlaysAs] = useState<BotPlayer>("b");
+  const [isBotThinking, setBotThinking] = useState(false);
   const [isMatching, setMatching] = useState(false);
 
-  let initial = emptyBoard();
+  const roomPath = route.type === "room" ? route.id : undefined;
+  const isBotGame = route.type === "bot-game";
+  const showGame = route.type === "play" || isBotGame || route.type === "room";
 
-  const storedBoard = localStorage.getItem("board");
-  if (storedBoard) {
-    const parsed = JSON.parse(storedBoard);
-    if (parsed.m) {
-      initial = parsed;
+  const setBotDifficulty = (d: Difficulty) => {
+    localStorage.setItem("botDifficulty", d);
+    _setBotDifficulty(d);
+  };
+
+  const navigate = (path: string) => {
+    history.pushState({}, "", path);
+    setRoute(parseRoute(path));
+  };
+
+  useEvent("popstate", () => setRoute(parseRoute(window.location.pathname)));
+
+  useEffect(() => {
+    if (route.type === "play") setBoard(loadBoard("localBoard"));
+    else if (isBotGame) setBoard(loadBoard("botBoard"));
+  }, [route.type]);
+
+  const moveToBoard = (newBoard: Board, propagate = true) => {
+    setBoard(newBoard);
+    if (route.type === "play") localStorage.setItem("localBoard", JSON.stringify(newBoard));
+    else if (isBotGame) localStorage.setItem("botBoard", JSON.stringify(newBoard));
+    if (propagate && ws) ws.send(JSON.stringify({ st: { board: newBoard } } as Message));
+  };
+
+  const isBotTurn = useCallback(() => {
+    if (!isBotGame || isGameOver(board)) return false;
+    return (board.m.length % 2 === 0 ? "a" : "b") === botPlaysAs;
+  }, [isBotGame, board, botPlaysAs]);
+
+  const makeBotMove = useCallback(async () => {
+    if (!isBotTurn() || isBotThinking) return;
+    setBotThinking(true);
+    try {
+      await new Promise((r) => setTimeout(r, 500));
+      const move = await getBotMove(board, botDifficulty);
+      if (move) {
+        const newBoard = board.m.length < 8
+          ? computePlace(board, move.to)
+          : move.from !== undefined ? computeMove(board, move.from, move.to) : undefined;
+        if (newBoard) moveToBoard(newBoard);
+      }
+    } catch (e) {
+      console.error("Bot move failed:", e);
+    } finally {
+      setBotThinking(false);
     }
-  }
+  }, [isBotTurn, isBotThinking, board, botDifficulty]);
 
-  const [board, setBoard] = useState<Board>(initial);
+  useEffect(() => {
+    if (isBotTurn() && !isBotThinking) makeBotMove();
+  }, [board, isBotGame, botPlaysAs, isBotTurn]);
 
-  function moveToBoard(board: Board, propagate = true) {
-    setBoard(board);
-    localStorage.setItem("board", JSON.stringify(board));
-    if (propagate && ws) {
-      ws.send(JSON.stringify({ st: { board } } as Message));
-    }
-  }
+  const startBotGame = () => {
+    localStorage.setItem("botBoard", JSON.stringify(emptyBoard()));
+    navigate("/bot-game");
+  };
+
+  const joinRoom = (roomId: string) => navigate(`/room/${roomId}`);
 
   if (!board.p && !roomPath) board.p = true;
 
-  function updateWsPath() {
-    setRoomPath(
-      window.location.pathname.length < 2
-        ? undefined
-        : window.location.pathname.substring(1)
-    );
-  }
-
-  updateWsPath();
-  useEvent("popstate", updateWsPath);
-
   useEffect(() => {
-    if (isMatching && nickname) {
-      const url = wsUrl("lobby", nickname);
-      const sockette = new Sockette(url, {
-        onmessage: (evt: MessageEvent) => {
-          const msg = JSON.parse(evt.data) as Message;
-          if (msg.join) {
-            setMatching(false);
-            moveToBoard(emptyBoard());
-            audio.play();
-            jump(msg.join);
-          }
-        },
-      });
-      return () => {
-        sockette.close();
-        setMatching(false);
-      };
-    }
+    if (!isMatching || !nickname) return;
+    const sockette = new Sockette(wsUrl("lobby", nickname), {
+      onmessage: (evt: MessageEvent) => {
+        const msg = JSON.parse(evt.data) as Message;
+        if (msg.join) {
+          setMatching(false);
+          moveToBoard(emptyBoard());
+          audio.play();
+          joinRoom(msg.join);
+        }
+      },
+    });
+    return () => { sockette.close(); setMatching(false); };
   }, [isMatching]);
 
-  function offline() {
-    setOnlineStatus(OnlineStatus.OFFLINE);
-    setPop(undefined);
-  }
-
   useEffect(() => {
-    if (roomPath && nickname) {
-      const url = wsUrl(`room/${roomPath}`, nickname);
-      const sockette = new Sockette(url, {
-        onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
-        onreconnect: offline,
-        onclose: offline,
-        onmessage: (evt: MessageEvent) => {
-          const msg = JSON.parse(evt.data) as Message;
-          if (msg.st === null) {
-            ws?.send(JSON.stringify({ st: { board } } as Message));
-          }
-          if (msg.st?.board) {
-            moveToBoard(msg.st.board, false);
-          }
-          if (msg.pop !== undefined) {
-            setPop(msg.pop);
-          }
-        },
-      });
-      setWs(sockette);
-      return () => {
-        sockette.close();
-        setWs(undefined);
-      };
-    }
+    if (!roomPath || !nickname) return;
+    const sockette = new Sockette(wsUrl(`room/${roomPath}`, nickname), {
+      onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
+      onreconnect: () => { setOnlineStatus(OnlineStatus.OFFLINE); setPop(undefined); },
+      onclose: () => { setOnlineStatus(OnlineStatus.OFFLINE); setPop(undefined); },
+      onmessage: (evt: MessageEvent) => {
+        const msg = JSON.parse(evt.data) as Message;
+        if (msg.st === null) ws?.send(JSON.stringify({ st: { board } } as Message));
+        if (msg.st?.board) moveToBoard(msg.st.board, false);
+        if (msg.pop !== undefined) setPop(msg.pop);
+      },
+    });
+    setWs(sockette);
+    return () => { sockette.close(); setWs(undefined); };
   }, [roomPath]);
 
-  function jump(location: string | undefined) {
-    setJoining(false);
-    setShowMenu(false);
-    setShowHelp(false);
-    history.pushState({}, "", location ? `/${location}` : "/");
-    updateWsPath();
-  }
-
   useEffect(() => {
-    if (hasCopied) setTimeout(() => setHasCopied(false), 1_000);
+    if (hasCopied) setTimeout(() => setHasCopied(false), 1000);
   }, [hasCopied]);
 
-  function share() {
-    if (navigator.share)
-      navigator.share({
-        title: `teeko.cc (${roomPath})`,
-        text: "Teeko?",
-        url: `https://teeko.cc/${roomPath}`,
-      });
-    else {
-      navigator.clipboard
-        .writeText(`Teeko? https://teeko.cc/${roomPath}`)
-        .then(() => setHasCopied(true));
+  const share = () => {
+    const url = `https://teeko.cc/room/${roomPath}`;
+    if (navigator.share) {
+      navigator.share({ title: `teeko.cc (${roomPath})`, text: "Teeko?", url });
+    } else {
+      navigator.clipboard.writeText(`Teeko? ${url}`).then(() => setHasCopied(true));
     }
-  }
-
-  function openUrl(url: string) {
-    setShowMenu(false);
-    window.open(url, "_blank");
-  }
+  };
 
   return (
-    <IntlProvider definition={translation}>
+    <IntlProvider definition={translations[lang]}>
       <div class="top">
-        <div class="nav">
-          {showMenu && (
-            <div className="menuContainer">
-              <div className="menu">
-                {isJoining ? (
-                  <>
-                    <h1>
-                      <Text id="titleBar.friends" />
-                    </h1>
-                    <div className="joinBar">
-                      <Localizer>
-                        <input
-                          type="text"
-                          value={nextRoom}
-                          placeholder={<Text id="titleBar.boardNameInput" />}
-                          maxLength="256"
-                          onInput={(e: Event) =>
-                            setNextRoom((e.target as any).value)
-                          }
-                          onKeyUp={(e) => {
-                            if (e.keyCode === 13 && nickname.trim()) {
-                              e.preventDefault();
-                              jump(nextRoom || randomID());
-                            }
-                          }}
-                        />
-                      </Localizer>
-                      <button
-                        id="join"
-                        disabled={!nickname.trim()}
-                        onClick={() => jump(nextRoom || randomID())}
-                      >
-                        <Text id="titleBar.join" />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {isMatching ? (
-                      <button
-                        id="cancelMatch"
-                        onClick={() => setMatching(false)}
-                      >
-                        {spinner} <Text id="titleBar.matching" />
-                      </button>
-                    ) : (
-                      <>
-                        <Localizer>
-                          <label htmlFor="nickname">
-                            <Text id="titleBar.nickname" />
-                          </label>
-                        </Localizer>
-                        <Localizer>
-                          <input
-                            id="nickname"
-                            type="text"
-                            value={nickname}
-                            placeholder={<Text id="titleBar.nicknamePlaceholder" />}
-                            maxLength="256"
-                            onInput={(e: Event) => {
-                              const value = (e.target as HTMLInputElement).value;
-                              setNickname(value);
-                              localStorage.setItem("nickname", value);
-                            }}
-                          />
-                        </Localizer>
-                        <div class="labeledButtons">
-                          <button
-                            id="match"
-                            disabled={!nickname.trim()}
-                            onClick={() => {
-                              setShowMenu(false);
-                              setMatching(true);
-                            }}
-                          >
-                            <Text id="titleBar.matched" />
-                          </button>
-                          <button
-                            id="friends"
-                            disabled={!nickname.trim()}
-                            onClick={() => {
-                              setMatching(false);
-                              setJoining(true);
-                            }}
-                          >
-                            <Text id="titleBar.friends" />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    <div class="labeledButtons">
-                      <button
-                        onClick={() => openUrl("https://discord.gg/KEj9brTRS6")}
-                      >
-                        <FontAwesomeIcon icon={faDiscord} />
-                        <Text id="buttons.discord" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          openUrl("https://en.wikipedia.org/wiki/Teeko")
-                        }
-                      >
-                        <FontAwesomeIcon icon={faWikipediaW} />
-                        <Text id="buttons.wikipedia" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          openUrl("https://github.com/pcarrier/teeko.cc")
-                        }
-                      >
-                        <FontAwesomeIcon icon={faGithub} />
-                        <Text id="buttons.source" />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+        <nav class="nav">
           <button
-            className={classnames("icon", { invisible: showHelp })}
-            onclick={() => {
-              if (roomPath) jump(undefined);
-              else if (isJoining) setJoining(false);
-              else setShowMenu(!showMenu);
-            }}
+            class={`icon ${route.type === "menu" ? "invisible" : ""}`}
+            onClick={() => navigate("/")}
           >
-            <FontAwesomeIcon
-              icon={showMenu || roomPath !== undefined ? faClose : faBars}
-            />
-            {isMatching && !showMenu && (
-              <div className="buttonSpinner">{spinner}</div>
-            )}
+            <FontAwesomeIcon icon={route.type === "rules" ? faClose : faBars} />
           </button>
-          <button
-            className={classnames("icon", {
-              invisible: roomPath === undefined,
-            })}
-            id="share"
-            onClick={share}
-          >
-            {hasCopied ? (
-              <FontAwesomeIcon icon={faClipboardCheck} />
-            ) : (
-              <FontAwesomeIcon icon={faUserPlus} />
-            )}
+          <button class={`icon ${route.type !== "room" ? "invisible" : ""}`} onClick={share}>
+            <FontAwesomeIcon icon={hasCopied ? faClipboardCheck : faUserPlus} />
           </button>
           <h1>Teeko.cc</h1>
           <select
-            className="langSelector"
-            onChange={(e) => moveToLang(e.target.value)}
-          >
-            {Object.keys(translations).map((l) => (
-              <option value={l} selected={l === lang}>
-                {l.toUpperCase()}
-              </option>
-            ))}
-          </select>
-          <button
-            className="icon"
-            onClick={() => {
-              if (showHelp) {
-                setShowHelp(false);
-              } else {
-                setShowMenu(false);
-                setShowHelp(true);
-              }
+            class="langSelector"
+            onChange={(e) => {
+              const v = (e.target as HTMLSelectElement).value;
+              localStorage.setItem("lang", v);
+              setLang(v);
             }}
           >
-            <FontAwesomeIcon icon={showHelp ? faClose : faQuestion} />
-          </button>
-        </div>
-        {showHelp ? (
-          <Help close={() => setShowHelp(false)} />
-        ) : (
+            {Object.keys(translations).map((l) => (
+              <option value={l} selected={l === lang}>{l.toUpperCase()}</option>
+            ))}
+          </select>
+                  </nav>
+
+        {route.type === "menu" && (
+          <div class="menuContainer">
+            <button onClick={() => navigate("/rules")}>
+              <FontAwesomeIcon icon={faBook} /> <Text id="menu.rules" />
+            </button>
+            <button onClick={() => navigate("/play")}>
+              <FontAwesomeIcon icon={faHouse} /> <Text id="menu.playLocally" />
+            </button>
+            <button onClick={() => navigate("/bot")}>
+              <FontAwesomeIcon icon={faRobot} /> <Text id="bot.playVsBot" />
+            </button>
+            <hr />
+            <NicknameInput nickname={nickname} setNickname={setNickname} />
+            <div class="labeledButtons">
+              <button disabled={!nickname.trim() || isMatching} onClick={() => setMatching(true)}>
+                <FontAwesomeIcon icon={faSearch} /> <Text id="menu.findPlayer" />
+              </button>
+              <button disabled={!nickname.trim()} onClick={() => navigate("/friends")}>
+                <FontAwesomeIcon icon={faUsers} /> <Text id="menu.playWithFriends" />
+              </button>
+            </div>
+            <hr />
+            <ExternalLinks />
+          </div>
+        )}
+
+        {route.type === "bot" && (
+          <div class="menuContainer">
+            <h1><Text id="bot.title" /></h1>
+            <label><Text id="bot.difficulty" /></label>
+            <DifficultySelect value={botDifficulty} onChange={setBotDifficulty} />
+            <label><Text id="bot.whoStarts" /></label>
+            <div class="labeledButtons">
+              <button class={botPlaysAs === "b" ? "selected" : ""} onClick={() => setBotPlaysAs("b")}>
+                <Text id="bot.iStart" />
+              </button>
+              <button class={botPlaysAs === "a" ? "selected" : ""} onClick={() => setBotPlaysAs("a")}>
+                <Text id="bot.botStarts" />
+              </button>
+            </div>
+            <button onClick={startBotGame}>
+              <FontAwesomeIcon icon={faRobot} /> <Text id="bot.start" />
+            </button>
+          </div>
+        )}
+
+        {route.type === "friends" && (
+          <div class="menuContainer">
+            <h1><Text id="titleBar.friends" /></h1>
+            <NicknameInput nickname={nickname} setNickname={setNickname} />
+            <div class="joinBar">
+              <Localizer>
+                <input
+                  type="text"
+                  value={nextRoom}
+                  placeholder={<Text id="titleBar.boardNameInput" />}
+                  maxLength={256}
+                  onInput={(e: Event) => setNextRoom((e.target as HTMLInputElement).value)}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter" && nickname.trim()) {
+                      e.preventDefault();
+                      joinRoom(nextRoom || randomID());
+                    }
+                  }}
+                />
+              </Localizer>
+              <button disabled={!nickname.trim()} onClick={() => joinRoom(nextRoom || randomID())}>
+                <Text id="titleBar.join" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {route.type === "rules" && <Help />}
+
+        {showGame && (
           <>
-            <TitleBar
-              roomPath={roomPath}
-              pop={pop}
-              onlineStatus={onlineStatus}
-            />
-            <Game
-              board={board}
-              roomPath={roomPath}
-              showHelp={() => setShowHelp(true)}
-              moveToBoard={moveToBoard}
-            />
+            <TitleBar roomPath={roomPath} pop={pop} onlineStatus={onlineStatus} />
+            <Game board={board} roomPath={roomPath} moveToBoard={moveToBoard} />
           </>
+        )}
+
+        {isBotGame && (
+          <div class="botBar">
+            <DifficultySelect value={botDifficulty} onChange={setBotDifficulty} />
+          </div>
+        )}
+
+        {isMatching && (
+          <div class="matchingBar">
+            <span>{spinner} <Text id="titleBar.matching" /></span>
+            <button onClick={() => setMatching(false)}><Text id="titleBar.cancel" /></button>
+          </div>
         )}
       </div>
     </IntlProvider>

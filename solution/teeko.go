@@ -13,7 +13,11 @@ import (
 	"math/bits"
 	"net/http"
 	"os"
+	"runtime"
+	"sync"
+	"sync/atomic"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -69,6 +73,12 @@ var (
 	scores [9][]int8
 )
 
+// Precomputed positions (a, b pairs) for each piece count
+var (
+	posCache    [9][]uint64 // packed as (a << 32) | b
+	posCacheReady bool
+)
+
 func init() {
 	// Pascal's triangle
 	for n := range 32 {
@@ -119,6 +129,9 @@ func goedel(a, b uint32, n int) int {
 }
 
 func degoedel(idx, n int) (a, b uint32) {
+	if n == 0 {
+		return 0, 0
+	}
 	patNum := idx / positions[n]
 	posNum := idx % positions[n]
 
@@ -167,6 +180,54 @@ func isWin(mask uint32) bool {
 	return wins[mask]
 }
 
+// Pack/unpack position pairs
+func packPos(a, b uint32) uint64 {
+	return (uint64(a) << 32) | uint64(b)
+}
+
+func unpackPos(packed uint64) (a, b uint32) {
+	return uint32(packed >> 32), uint32(packed)
+}
+
+// Initialize position cache for faster lookups
+func initPosCache() {
+	if posCacheReady {
+		return
+	}
+	fmt.Println("Precomputing position cache…")
+	start := time.Now()
+
+	numWorkers := runtime.NumCPU()
+	var wg sync.WaitGroup
+
+	for n := range 9 {
+		posCache[n] = make([]uint64, configs[n])
+		chunkSize := (configs[n] + numWorkers - 1) / numWorkers
+
+		for w := 0; w < numWorkers; w++ {
+			wg.Add(1)
+			start := w * chunkSize
+			end := min(start+chunkSize, configs[n])
+			go func(n, start, end int) {
+				defer wg.Done()
+				for g := start; g < end; g++ {
+					a, b := degoedel(g, n)
+					posCache[n][g] = packPos(a, b)
+				}
+			}(n, start, end)
+		}
+		wg.Wait()
+	}
+
+	posCacheReady = true
+	fmt.Printf("  Position cache ready in %v\n", time.Since(start).Round(time.Millisecond))
+}
+
+// Fast position lookup from cache
+func getPos(g, n int) (a, b uint32) {
+	return unpackPos(posCache[n][g])
+}
+
 func bitToSquare(bit uint32) int {
 	return bits.TrailingZeros32(bit)
 }
@@ -200,138 +261,224 @@ func bestScore(neighbors []int, table []int8) int8 {
 // Database computation
 func computePlay() {
 	fmt.Println("Computing play phase…")
-	table := scores[8]
+	start := time.Now()
 
-	// Initial scores
-	illegal := 0
-	for g := range configs[8] {
-		a, b := degoedel(g, 8)
-		aWin, bWin := isWin(a), isWin(b)
-		switch {
-		case aWin && bWin:
-			table[g] = ScoreIllegal
-			illegal++
-		case bWin:
-			table[g] = ScoreBWin
-		case aWin:
-			table[g] = ScoreAWin
-		default:
-			table[g] = ScoreTie
-		}
+	// Precompute positions first
+	initPosCache()
+
+	table := scores[8]
+	numWorkers := runtime.NumCPU()
+	fmt.Printf("  Using %d workers\n", numWorkers)
+
+	// Initial scores (parallel)
+	fmt.Printf("  Initializing %d positions…\n", configs[8])
+	var illegal, aWins, bWins atomic.Int64
+	var wg sync.WaitGroup
+	chunkSize := (configs[8] + numWorkers - 1) / numWorkers
+
+	for w := 0; w < numWorkers; w++ {
+		wg.Add(1)
+		startIdx := w * chunkSize
+		endIdx := min(startIdx+chunkSize, configs[8])
+		go func(startIdx, endIdx int) {
+			defer wg.Done()
+			localIllegal, localAWins, localBWins := int64(0), int64(0), int64(0)
+			for g := startIdx; g < endIdx; g++ {
+				a, b := getPos(g, 8)
+				aWin, bWin := isWin(a), isWin(b)
+				switch {
+				case aWin && bWin:
+					table[g] = ScoreIllegal
+					localIllegal++
+				case bWin:
+					table[g] = ScoreBWin
+					localBWins++
+				case aWin:
+					table[g] = ScoreAWin
+					localAWins++
+				default:
+					table[g] = ScoreTie
+				}
+			}
+			illegal.Add(localIllegal)
+			aWins.Add(localAWins)
+			bWins.Add(localBWins)
+		}(startIdx, endIdx)
 	}
-	fmt.Printf("  %d illegal positions\n", illegal)
+	wg.Wait()
+	fmt.Printf("  Initial: %d illegal, %d A wins, %d B wins\n", illegal.Load(), aWins.Load(), bWins.Load())
 
 	// Retrograde analysis
 	fmt.Println("  Retrograde analysis…")
 	snapshot := make([]int8, configs[8])
+	maxLevel := 0
+
 	for level := ScoreAWin; level > 0; level-- {
 		copy(snapshot, table)
-		changed := false
+		var changed atomic.Bool
 
-		for g := range configs[8] {
-			if snapshot[g] == ScoreTie {
-				continue
-			}
-			ps := -snapshot[g]
-			a, b := degoedel(g, 8)
+		// Phase 1: Generate unmoves (parallel)
+		for w := 0; w < numWorkers; w++ {
+			wg.Add(1)
+			startIdx := w * chunkSize
+			endIdx := min(startIdx+chunkSize, configs[8])
+			go func(startIdx, endIdx int) {
+				defer wg.Done()
+				for g := startIdx; g < endIdx; g++ {
+					if snapshot[g] == ScoreTie {
+						continue
+					}
+					ps := -snapshot[g]
+					a, b := getPos(g, 8)
 
-			// Generate unmoves (predecessor positions)
-			ab := a | b
-			for p := b; p != 0; {
-				piece := p & -p
-				p ^= piece
-				pos := bits.TrailingZeros32(piece)
-				for dests := neighs[pos] &^ ab; dests != 0; {
-					dest := dests & -dests
-					dests ^= dest
-					n := goedel((b^piece)|dest, a, 8)
-					if ps == level {
-						newscore := ps - 1
-						if psn := snapshot[n]; (psn < newscore && psn > ScoreBWin) || psn == ScoreNone {
-							table[n] = newscore
-							changed = true
+					// Generate unmoves (predecessor positions)
+					ab := a | b
+					for p := b; p != 0; {
+						piece := p & -p
+						p ^= piece
+						pos := bits.TrailingZeros32(piece)
+						for dests := neighs[pos] &^ ab; dests != 0; {
+							dest := dests & -dests
+							dests ^= dest
+							n := goedel((b^piece)|dest, a, 8)
+							if ps == level {
+								newscore := ps - 1
+								if psn := snapshot[n]; (psn < newscore && psn > ScoreBWin) || psn == ScoreNone {
+									table[n] = newscore
+									changed.Store(true)
+								}
+							} else if ps == -level && snapshot[n] == ScoreTie {
+								snapshot[n] = ScoreNone
+							}
 						}
-					} else if ps == -level && snapshot[n] == ScoreTie {
-						snapshot[n] = ScoreNone
 					}
 				}
-			}
+			}(startIdx, endIdx)
 		}
+		wg.Wait()
 
-		// Process marked positions
-		for g := range configs[8] {
-			if snapshot[g] == ScoreNone {
-				a, b := degoedel(g, 8)
-				var neighbors []int
-				ab := a | b
-				for p := a; p != 0; {
-					piece := p & -p
-					p ^= piece
-					pos := bits.TrailingZeros32(piece)
-					for dests := neighs[pos] &^ ab; dests != 0; {
-						dest := dests & -dests
-						dests ^= dest
-						neighbors = append(neighbors, goedel(b, (a^piece)|dest, 8))
+		// Phase 2: Process marked positions (parallel)
+		for w := 0; w < numWorkers; w++ {
+			wg.Add(1)
+			startIdx := w * chunkSize
+			endIdx := min(startIdx+chunkSize, configs[8])
+			go func(startIdx, endIdx int) {
+				defer wg.Done()
+				neighbors := make([]int, 0, 32) // pre-allocated per worker
+				for g := startIdx; g < endIdx; g++ {
+					if snapshot[g] == ScoreNone {
+						a, b := getPos(g, 8)
+						neighbors = neighbors[:0] // reset without allocation
+						ab := a | b
+						for p := a; p != 0; {
+							piece := p & -p
+							p ^= piece
+							pos := bits.TrailingZeros32(piece)
+							for dests := neighs[pos] &^ ab; dests != 0; {
+								dest := dests & -dests
+								dests ^= dest
+								neighbors = append(neighbors, goedel(b, (a^piece)|dest, 8))
+							}
+						}
+						if ns := bestScore(neighbors, snapshot); ns != ScoreTie && ns != ScoreNone {
+							table[g] = ns
+							changed.Store(true)
+						} else {
+							table[g] = ScoreTie
+						}
 					}
 				}
-				if ns := bestScore(neighbors, snapshot); ns != ScoreTie && ns != ScoreNone {
-					table[g] = ns
-					changed = true
-				} else {
-					table[g] = ScoreTie
-				}
-			}
+			}(startIdx, endIdx)
 		}
+		wg.Wait()
 
-		if !changed {
+		if !changed.Load() {
+			maxLevel = int(ScoreAWin - level)
+			fmt.Printf("  Converged at depth %d\n", maxLevel)
 			break
 		}
 		if level%10 == 0 {
-			fmt.Printf("    Level %d\n", level)
+			fmt.Printf("    Level %d…\n", level)
 		}
 	}
 
 	countStats("Play", table)
+	fmt.Printf("  Play phase completed in %v\n", time.Since(start).Round(time.Millisecond))
 }
 
 func computeDrop() {
 	fmt.Println("Computing drop phase…")
+	start := time.Now()
+	numWorkers := runtime.NumCPU()
 
 	// 7 pieces - check for B wins, then propagate from play
+	fmt.Printf("  Processing 7 pieces (%d positions)…\n", configs[7])
 	table7 := scores[7]
-	for g := range configs[7] {
-		_, b := degoedel(g, 7)
-		if isWin(b) {
-			table7[g] = ScoreBWin
-		}
+	var bWins atomic.Int64
+	var wg sync.WaitGroup
+	chunkSize := (configs[7] + numWorkers - 1) / numWorkers
+
+	for w := 0; w < numWorkers; w++ {
+		wg.Add(1)
+		startIdx := w * chunkSize
+		endIdx := min(startIdx+chunkSize, configs[7])
+		go func(startIdx, endIdx int) {
+			defer wg.Done()
+			localBWins := int64(0)
+			for g := startIdx; g < endIdx; g++ {
+				_, b := getPos(g, 7)
+				if isWin(b) {
+					table7[g] = ScoreBWin
+					localBWins++
+				}
+			}
+			bWins.Add(localBWins)
+		}(startIdx, endIdx)
 	}
-	propagateDrop(7)
+	wg.Wait()
+	fmt.Printf("    %d immediate B wins\n", bWins.Load())
+	propagateDrop(7, numWorkers)
 
 	// 6 to 0 pieces
 	for n := 6; n >= 0; n-- {
-		propagateDrop(n)
+		fmt.Printf("  Processing %d pieces (%d positions)…\n", n, configs[n])
+		propagateDrop(n, numWorkers)
 	}
 
 	fmt.Printf("  Initial position score: %d\n", scores[0][0])
+	fmt.Printf("  Drop phase completed in %v\n", time.Since(start).Round(time.Millisecond))
 }
 
-func propagateDrop(n int) {
+func propagateDrop(n, numWorkers int) {
 	current, next := scores[n], scores[n+1]
-	for g := range configs[n] {
-		if current[g] != ScoreTie {
-			continue // preserve wins detected earlier
-		}
-		a, b := degoedel(g, n)
-		ab := a | b
+	var wg sync.WaitGroup
+	chunkSize := (configs[n] + numWorkers - 1) / numWorkers
 
-		var neighbors []int
-		for sq := uint32(1); sq < (1 << Size); sq <<= 1 {
-			if sq&ab == 0 {
-				neighbors = append(neighbors, goedel(b, a|sq, n+1))
+	for w := 0; w < numWorkers; w++ {
+		wg.Add(1)
+		startIdx := w * chunkSize
+		endIdx := min(startIdx+chunkSize, configs[n])
+		go func(startIdx, endIdx int) {
+			defer wg.Done()
+			neighbors := make([]int, 0, Size) // pre-allocated per worker
+			for g := startIdx; g < endIdx; g++ {
+				if current[g] != ScoreTie {
+					continue // preserve wins detected earlier
+				}
+				a, b := getPos(g, n)
+				ab := a | b
+
+				neighbors = neighbors[:0] // reset without allocation
+				for sq := uint32(1); sq < (1 << Size); sq <<= 1 {
+					if sq&ab == 0 {
+						neighbors = append(neighbors, goedel(b, a|sq, n+1))
+					}
+				}
+				current[g] = bestScore(neighbors, next)
 			}
-		}
-		current[g] = bestScore(neighbors, next)
+		}(startIdx, endIdx)
 	}
+	wg.Wait()
 	countStats(fmt.Sprintf("Drop %d", n), current)
 }
 
@@ -348,6 +495,75 @@ func countStats(label string, table []int8) {
 		}
 	}
 	fmt.Printf("  %s: %d draws, %d A wins, %d B wins\n", label, ties, aWins, bWins)
+}
+
+func findLongestWins() {
+	fmt.Println("Finding longest forced wins…")
+
+	var longestAWin, longestBWin int8
+	var longestAIdx, longestBIdx, longestAPieces, longestBPieces int
+
+	longestAWin = ScoreAWin // Start at shortest (126), look for smallest positive
+	longestBWin = ScoreBWin // Start at shortest (-126), look for largest negative
+
+	for n := range 9 {
+		table := scores[n]
+		for g, s := range table {
+			// A win: smaller score = longer win (score 1 is longest)
+			if s > 0 && s <= ScoreAWin && s < longestAWin {
+				longestAWin = s
+				longestAIdx = g
+				longestAPieces = n
+			}
+			// B win: larger score (closer to 0) = longer win (score -1 is longest)
+			if s < 0 && s >= ScoreBWin && s > longestBWin {
+				longestBWin = s
+				longestBIdx = g
+				longestBPieces = n
+			}
+		}
+	}
+
+	if longestAWin <= ScoreAWin && longestAWin > 0 {
+		a, b := degoedel(longestAIdx, longestAPieces)
+		dist := int(ScoreAWin - longestAWin)
+		fmt.Printf("\nLongest forced win for Blue (A):\n")
+		fmt.Printf("  Distance: %d plies\n", dist)
+		fmt.Printf("  Pieces: %d\n", longestAPieces)
+		fmt.Printf("  A squares: %v\n", maskToSquares(a))
+		fmt.Printf("  B squares: %v\n", maskToSquares(b))
+		printBoard(a, b)
+	}
+
+	if longestBWin >= ScoreBWin && longestBWin < 0 {
+		a, b := degoedel(longestBIdx, longestBPieces)
+		dist := int(longestBWin - ScoreBWin)
+		fmt.Printf("\nLongest forced win for Red (B):\n")
+		fmt.Printf("  Distance: %d plies\n", dist)
+		fmt.Printf("  Pieces: %d\n", longestBPieces)
+		fmt.Printf("  A squares: %v\n", maskToSquares(a))
+		fmt.Printf("  B squares: %v\n", maskToSquares(b))
+		printBoard(a, b)
+	}
+}
+
+func printBoard(a, b uint32) {
+	fmt.Println("  Board:")
+	for row := 0; row < Edge; row++ {
+		fmt.Print("    ")
+		for col := 0; col < Edge; col++ {
+			sq := uint32(1) << (row*Edge + col)
+			switch {
+			case a&sq != 0:
+				fmt.Print("A ")
+			case b&sq != 0:
+				fmt.Print("B ")
+			default:
+				fmt.Print("· ")
+			}
+		}
+		fmt.Println()
+	}
 }
 
 // Database I/O
@@ -601,6 +817,7 @@ func main() {
 	dbFile := flag.String("db", "teeko.db", "database file")
 	compute := flag.Bool("compute", false, "compute database")
 	serve := flag.Bool("serve", false, "start server")
+	stats := flag.Bool("stats", false, "show longest wins from database")
 	addr := flag.String("addr", ":8080", "server address")
 	flag.Parse()
 
@@ -612,6 +829,12 @@ func main() {
 		if err := saveDB(*dbFile); err != nil {
 			log.Fatal(err)
 		}
+	case *stats:
+		fmt.Printf("Loading %s…\n", *dbFile)
+		if err := mmapDB(*dbFile); err != nil {
+			log.Fatal(err)
+		}
+		findLongestWins()
 	case *serve:
 		fmt.Printf("Mmapping %s…\n", *dbFile)
 		if err := mmapDB(*dbFile); err != nil {
@@ -626,6 +849,7 @@ func main() {
 Usage:
   teeko -compute [-db FILE]   Compute and save database
   teeko -serve [-db FILE]     Start HTTP server
+  teeko -stats [-db FILE]     Show longest forced wins
 
 API:
   POST /query

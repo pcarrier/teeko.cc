@@ -4,7 +4,7 @@
     "place": "D'abord, posez tous les pions, un par tour.",
     "move": "Puis, à chaque tour, bougez un pion vers une case voisine :",
     "win": "Formez une ligne de 4 ou un petit carré pour gagner :",
-    "credits": "Teeko par John Scarne.",
+    "credits": "Teeko par John Scarne. Solution par Guy L. Steele.",
     "close": "Jouer"
   },
   "buttons": {
@@ -20,7 +20,7 @@
     "nickname": "Pseudo :",
     "nicknamePlaceholder": "Choisissez un pseudo",
     "matched": "Chercher joueuse·r",
-    "matching": "Recherche…",
+    "matching": "Recherche d'adversaire…",
     "friends": "Jouer avec des amis",
     "cancel": "Renoncer",
     "boardNameInput": "Nom du plateau (optionnel)",
@@ -42,5 +42,26 @@
     "bMoveTo": "Rouge bouge vers…",
     "aMove": "Bleu bouge…",
     "bMove": "Rouge bouge…"
+  },
+  "menu": {
+    "rules": "Règles",
+    "playLocally": "Jouer localement",
+    "findPlayer": "Chercher un·e adversaire",
+    "playWithFriends": "Jouer avec des ami·es"
+  },
+  "bot": {
+    "playVsBot": "Jouer contre le bot",
+    "title": "Jouer contre le bot",
+    "difficulty": "Difficulté :",
+    "beginner": "Débutant",
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile",
+    "perfect": "Parfait",
+    "whoStarts": "Qui commence ?",
+    "iStart": "Je commence",
+    "botStarts": "Le bot commence",
+    "start": "Commencer",
+    "thinking": "Réflexion…"
   }
 }
