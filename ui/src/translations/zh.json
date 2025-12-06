@@ -10,6 +10,8 @@
   "titleBar": {
     "local": "本地",
     "online": "在线",
+    "nickname": "昵称：",
+    "nicknamePlaceholder": "输入昵称以在线游戏",
     "matched": "寻找对手",
     "matching": "寻找中…",
     "friends": "开启或加入房间",

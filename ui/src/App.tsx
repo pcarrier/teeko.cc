@@ -45,13 +45,8 @@ export const App: FunctionComponent = () => {
 
   const translation = translations[lang];
 
-  const storedPill = localStorage.getItem("pill");
-  const [pill, startWithHelp] = useMemo(() => {
-    if (storedPill !== null && storedPill !== "") return [storedPill, false];
-    const newPill = randomID();
-    localStorage.setItem("pill", newPill);
-    return [newPill, storedPill === null];
-  }, [storedPill]);
+  const [nickname, setNickname] = useState(() => localStorage.getItem("nickname") || "");
+  const startWithHelp = useMemo(() => localStorage.getItem("nickname") === null, []);
 
   const [showHelp, setShowHelp] = useState<boolean>(startWithHelp);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -101,8 +96,8 @@ export const App: FunctionComponent = () => {
   useEvent("popstate", updateWsPath);
 
   useEffect(() => {
-    if (isMatching) {
-      const url = wsUrl("lobby", pill);
+    if (isMatching && nickname) {
+      const url = wsUrl("lobby", nickname);
       const sockette = new Sockette(url, {
         onmessage: (evt: MessageEvent) => {
           const msg = JSON.parse(evt.data) as Message;
@@ -127,8 +122,8 @@ export const App: FunctionComponent = () => {
   }
 
   useEffect(() => {
-    if (roomPath) {
-      const url = wsUrl(`room/${roomPath}`, pill);
+    if (roomPath && nickname) {
+      const url = wsUrl(`room/${roomPath}`, nickname);
       const sockette = new Sockette(url, {
         onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
         onreconnect: offline,
@@ -197,6 +192,25 @@ export const App: FunctionComponent = () => {
                     <h1>
                       <Text id="titleBar.friends" />
                     </h1>
+                    <Localizer>
+                      <label htmlFor="nickname">
+                        <Text id="titleBar.nickname" />
+                      </label>
+                    </Localizer>
+                    <Localizer>
+                      <input
+                        id="nickname"
+                        type="text"
+                        value={nickname}
+                        placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+                        maxLength="256"
+                        onInput={(e: Event) => {
+                          const value = (e.target as HTMLInputElement).value;
+                          setNickname(value);
+                          localStorage.setItem("nickname", value);
+                        }}
+                      />
+                    </Localizer>
                     <div className="joinBar">
                       <Localizer>
                         <input
@@ -208,7 +222,7 @@ export const App: FunctionComponent = () => {
                             setNextRoom((e.target as any).value)
                           }
                           onKeyUp={(e) => {
-                            if (e.keyCode === 13) {
+                            if (e.keyCode === 13 && nickname.trim()) {
                               e.preventDefault();
                               jump(nextRoom || randomID());
                             }
@@ -217,6 +231,7 @@ export const App: FunctionComponent = () => {
                       </Localizer>
                       <button
                         id="join"
+                        disabled={!nickname.trim()}
                         onClick={() => jump(nextRoom || randomID())}
                       >
                         <Text id="titleBar.join" />
@@ -234,21 +249,28 @@ export const App: FunctionComponent = () => {
                       </button>
                     ) : (
                       <>
-                        <label htmlFor="username">Username:</label>
-                        <input
-                          id="username"
-                          type="text"
-                          value={pill}
-                          maxLength="256"
-                          onInput={(e: Event) => {
-                            localStorage.setItem(
-                              "pill",
-                              (e.target as any).value
-                            );
-                          }}
-                        />
+                        <Localizer>
+                          <label htmlFor="nickname">
+                            <Text id="titleBar.nickname" />
+                          </label>
+                        </Localizer>
+                        <Localizer>
+                          <input
+                            id="nickname"
+                            type="text"
+                            value={nickname}
+                            placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+                            maxLength="256"
+                            onInput={(e: Event) => {
+                              const value = (e.target as HTMLInputElement).value;
+                              setNickname(value);
+                              localStorage.setItem("nickname", value);
+                            }}
+                          />
+                        </Localizer>
                         <button
                           id="match"
+                          disabled={!nickname.trim()}
                           onClick={() => {
                             setShowMenu(false);
                             setMatching(true);

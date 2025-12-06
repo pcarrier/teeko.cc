@@ -10,6 +10,8 @@
   "titleBar": {
     "local": "Local",
     "online": "Online",
+    "nickname": "Apelido:",
+    "nicknamePlaceholder": "Digite apelido para jogar online",
     "matched": "Procurar jogador",
     "matching": "Procurando…",
     "friends": "Amigos",

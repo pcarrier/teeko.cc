@@ -10,6 +10,8 @@
   "titleBar": {
     "local": "Local",
     "online": "En ligne",
+    "nickname": "Pseudo :",
+    "nicknamePlaceholder": "Entrez un pseudo pour jouer en ligne",
     "matched": "Chercher joueuse·r",
     "matching": "Recherche…",
     "friends": "Jouer avec des amis",

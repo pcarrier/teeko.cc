@@ -10,6 +10,8 @@
   "titleBar": {
     "local": "Местно табло",
     "online": "Онлайн",
+    "nickname": "Прякор:",
+    "nicknamePlaceholder": "Въведете прякор за онлайн игра",
     "matched": "Намерете противник",
     "matching": "Търсене…",
     "friends": "Играете с приятели",
