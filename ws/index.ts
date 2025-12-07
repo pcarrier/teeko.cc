@@ -1,20 +1,13 @@
-import { customAlphabet } from "nanoid";
-import { Message, State } from "../common/src/model.ts";
+import { RoomMessage, RTCSignal, State } from "../common/src/model.ts";
 import type { ServerWebSocket } from "bun";
 
-export const randomID = customAlphabet(
-  "0123456789abcdefghijklmnopqrstuvwxyz",
-  8
-);
-
-const url = Bun.env.DISCORD_WEBHOOK;
+const discordWebhook = Bun.env.DISCORD_WEBHOOK;
 const port = parseInt(Bun.env.PORT || "8081");
 
-const notifyChannel = !url
-  ? (content: string) => console.log("fake Discord", content)
-  : async (content: string) => {
+const notifyDiscord = discordWebhook
+  ? async (content: string) => {
       try {
-        await fetch(url, {
+        await fetch(discordWebhook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content }),
@@ -22,112 +15,81 @@ const notifyChannel = !url
       } catch (e) {
         console.log("Discord error", e);
       }
-    };
-
-type RoomState = State;
+    }
+  : (content: string) => console.log("Discord (mock):", content);
 
 type Room = {
   path: string;
   clients: Map<string | undefined, ServerWebSocket<RoomData>[]>;
   p1: string | undefined;
   p2: string | undefined;
-  state: RoomState | null;
-  timeout?: number;
+  state: State | null;
+  timeout?: Timer;
 };
 
-type ServerState = {
-  waiting: [string, ServerWebSocket<LobbyData>[]] | undefined;
-  rooms: Map<string, Room>;
-};
+const rooms = new Map<string, Room>();
+let waiting: [string, ServerWebSocket<LobbyData>[]] | undefined;
 
-const serverState: ServerState = {
-  waiting: undefined,
-  rooms: new Map(),
-};
+type RoomData = { pill: string | undefined; roomPath: string };
+type LobbyData = { pill: string | undefined };
 
-type RoomData = {
-  pill: string | undefined;
-  roomPath: string;
-};
-
-type LobbyData = {
-  pill: string | undefined;
-};
-
-type Context = {
-  pill: string | undefined;
-  socket: ServerWebSocket<RoomData>;
-  roomPath: string;
-};
-
-function getRoom(ctx: Context): Room {
-  const path = ctx.roomPath;
-  const existing = serverState.rooms.get(path);
-  if (existing) {
-    return existing;
+function getRoom(path: string): Room {
+  let room = rooms.get(path);
+  if (!room) {
+    room = { path, clients: new Map(), state: null, p1: undefined, p2: undefined };
+    rooms.set(path, room);
+    console.log(`Opened room ${path}`);
   }
-  const created: Room = {
-    path,
-    clients: new Map(),
-    state: null,
-    p1: undefined,
-    p2: undefined,
-  };
-  serverState.rooms.set(path, created);
-  console.log(`Opened room ${path}`);
-  return created;
+  return room;
+}
+
+function getPeers(room: Room): string[] {
+  return Array.from(room.clients.keys()).filter((p): p is string => !!p);
 }
 
 function sendPop(room: Room) {
-  const pop = room.clients.size;
-  room.clients.forEach((sockets) =>
-    sockets.forEach((s) => s.send(JSON.stringify({ pop })))
-  );
-}
-
-function sendState(state: RoomState | null, socket: ServerWebSocket<RoomData>) {
-  socket.send(JSON.stringify({ st: state }));
+  const peers = getPeers(room);
+  room.clients.forEach((sockets, pill) => {
+    const msg = JSON.stringify({ pop: room.clients.size, peers: peers.filter((p) => p !== pill) });
+    sockets.forEach((s) => s.send(msg));
+  });
 }
 
 function canPlay(room: Room, pill: string | undefined): boolean {
-  if (room.state === null) return true;
-  if (room.p1 === undefined) return true;
+  if (!room.state || room.p1 === undefined) return true;
   if (room.p2 === undefined) return room.p1 !== pill;
-  return room.state.board.m.length % 2 === 0
-    ? room.p1 === undefined || room.p1 === pill
-    : room.p2 === undefined || room.p2 === pill;
+  const isP1Turn = room.state.board.m.length % 2 === 0;
+  return isP1Turn ? room.p1 === pill : room.p2 === pill;
 }
 
-function customize(room: Room, pill: string | undefined): RoomState | null {
-  const state = room.state;
-  if (state === null) return state;
-  const p = canPlay(room, pill);
-  return { board: { ...state.board, p } };
+function stateForPlayer(room: Room, pill: string | undefined): State | null {
+  if (!room.state) return null;
+  return { board: { ...room.state.board, p: canPlay(room, pill) } };
+}
+
+function sendState(room: Room, pill: string | undefined, socket: ServerWebSocket<RoomData>) {
+  socket.send(JSON.stringify({ st: stateForPlayer(room, pill) }));
 }
 
 function attemptAction(
   room: Room,
-  state: RoomState,
+  state: State,
   from: ServerWebSocket<RoomData>,
   pill: string | undefined
 ) {
-  function abort() {
-    sendState(customize(room, pill), from);
-  }
+  const abort = () => sendState(room, pill, from);
 
-  const board = state.board;
-  const actions = board.m.length;
+  const actions = state.board.m.length;
   if (
     actions !== 0 &&
     room.state !== null &&
     actions !== room.state.board.m.length + 1 &&
     actions !== room.state.board.m.length - 1
   ) {
-    console.log(
-      `Dropped moving from ${JSON.stringify(room.state)} to ${actions} actions`
-    );
+    console.log(`Dropped moving from ${JSON.stringify(room.state)} to ${actions} actions`);
     return abort();
   }
+
   if (actions === 0) {
     room.p1 = undefined;
     room.p2 = undefined;
@@ -152,123 +114,136 @@ function attemptAction(
       (room.state === null || actions !== room.state.board.m.length - 1) &&
       pill !== currentPlayer
     ) {
-      console.log(
-        `Blocking action from ${pill}, not current player ${currentPlayer}`
-      );
+      console.log(`Blocking action from ${pill}, not current player ${currentPlayer}`);
       return abort();
     }
   }
+
   room.state = state;
-  room.clients.forEach((sockets, pill) => {
-    const state = customize(room, pill);
+  room.clients.forEach((sockets, clientPill) => {
+    const st = stateForPlayer(room, clientPill);
     sockets.forEach((s) => {
-      if (s !== from) sendState(state, s);
+      if (s !== from) s.send(JSON.stringify({ st }));
     });
   });
 }
 
 function closeRoom(room: Room) {
-  serverState.rooms.delete(room.path);
+  rooms.delete(room.path);
   console.log(`Closed room ${room.path}`);
 }
 
-function connectedToRoom(ctx: Context) {
-  console.log(`${ctx.pill} connected to ${ctx.roomPath}`);
-  const room = getRoom(ctx);
+function connectedToRoom(pill: string | undefined, socket: ServerWebSocket<RoomData>, roomPath: string) {
+  console.log(`${pill} connected to ${roomPath}`);
+  const room = getRoom(roomPath);
+
   if (room.timeout) {
     clearTimeout(room.timeout);
     room.timeout = undefined;
   }
-  let sockets = room.clients.get(ctx.pill);
+
+  let sockets = room.clients.get(pill);
+  const isNewPeer = !sockets;
   if (!sockets) {
     sockets = [];
-    room.clients.set(ctx.pill, sockets);
+    room.clients.set(pill, sockets);
   }
-  sockets.push(ctx.socket);
-  sendPop(room);
-  sendState(customize(room, ctx.pill), ctx.socket);
+  sockets.push(socket);
+
+  // Send initial peers list
+  const peers = getPeers(room).filter((p) => p !== pill);
+  socket.send(JSON.stringify({ peers }));
+
+  if (isNewPeer) sendPop(room);
+  sendState(room, pill, socket);
 }
 
-function roomMessage(ctx: Context, data: string) {
-  const room = getRoom(ctx);
+function relayRTC(room: Room, signal: RTCSignal) {
+  const sockets = room.clients.get(signal.to);
+  if (sockets) {
+    const msg = JSON.stringify({ rtc: signal });
+    sockets.forEach((s) => s.send(msg));
+  }
+}
+
+function roomMessage(pill: string | undefined, socket: ServerWebSocket<RoomData>, roomPath: string, data: string) {
+  const room = getRoom(roomPath);
   try {
-    const msg = JSON.parse(data) as Message;
-    if (msg.st) {
-      attemptAction(room, msg.st, ctx.socket, ctx.pill);
-    }
+    const msg = JSON.parse(data) as RoomMessage;
+    if (msg.st) attemptAction(room, msg.st, socket, pill);
+    if (msg.rtc && pill) relayRTC(room, { ...msg.rtc, from: pill });
   } catch (e) {
-    console.log("roomMessage error", e.message);
+    console.log("roomMessage error", (e as Error).message);
   }
 }
 
-function handleError(error: Error) {
-  console.log("WS error", error.message);
-}
-
-function closeInRoom(ctx: Context) {
-  console.log(`${ctx.pill} left ${ctx.roomPath}`);
-  const room = getRoom(ctx);
-  const forPill = room.clients.get(ctx.pill);
+function closeInRoom(pill: string | undefined, socket: ServerWebSocket<RoomData>, roomPath: string) {
+  console.log(`${pill} left ${roomPath}`);
+  const room = getRoom(roomPath);
+  const forPill = room.clients.get(pill);
   if (!forPill) return;
-  const remaining = forPill.filter((c) => c !== ctx.socket);
-  if (remaining.length > 0) {
-    room.clients.set(ctx.pill, remaining);
-  } else {
-    room.clients.delete(ctx.pill);
-  }
-  if (room.clients.size === 0)
-    room.timeout = setTimeout(() => closeRoom(room), 3600_000);
-  else sendPop(room);
-}
 
-const roomPrefix = "/room/";
+  const remaining = forPill.filter((c) => c !== socket);
+  if (remaining.length > 0) {
+    room.clients.set(pill, remaining);
+  } else {
+    room.clients.delete(pill);
+  }
+
+  if (room.clients.size === 0) {
+    room.timeout = setTimeout(() => closeRoom(room), 3600_000);
+  } else {
+    sendPop(room);
+  }
+}
 
 function connectedToLobby(pill: string | undefined, socket: ServerWebSocket<LobbyData>) {
   if (!pill) {
     console.log("Lobby connection failed, no pill");
     return;
   }
-  if (serverState.waiting === undefined) {
-    serverState.waiting = [pill, [socket]];
-    notifyChannel(`\`${pill}\` waiting for a match.`);
-  } else {
-    const [otherPill, otherSockets] = serverState.waiting;
-    if (otherPill === pill) {
-      serverState.waiting[1].push(socket);
-      return;
-    }
 
-    const [a, b] = pill < otherPill ? [pill, otherPill] : [otherPill, pill];
-    const join = `${a}—${b}`;
-    try {
-      otherSockets.forEach((s) => s.send(JSON.stringify({ join })));
-    } catch (e) {
-      console.log(
-        `Failure matching ${pill} with ${otherPill}`,
-        e.message || e.type || e
-      );
-      serverState.waiting = [pill, [socket]];
-      return;
-    }
-    try {
-      socket.send(JSON.stringify({ join }));
-      otherSockets.forEach((s) => s.close());
-      socket.close();
-    } catch (e) {
-      console.log(`Failure closing ${pill}`, e.message || e.type || e);
-    }
-    notifyChannel(`\`${pill}\` and \`${otherPill}\` matched!`);
+  if (!waiting) {
+    waiting = [pill, [socket]];
+    notifyDiscord(`\`${pill}\` waiting for a match.`);
+    return;
   }
+
+  const [otherPill, otherSockets] = waiting;
+  if (otherPill === pill) {
+    waiting[1].push(socket);
+    return;
+  }
+
+  const [a, b] = pill < otherPill ? [pill, otherPill] : [otherPill, pill];
+  const join = `${a}—${b}`;
+
+  try {
+    otherSockets.forEach((s) => s.send(JSON.stringify({ join })));
+  } catch (e) {
+    console.log(`Failure matching ${pill} with ${otherPill}`, (e as Error).message);
+    waiting = [pill, [socket]];
+    return;
+  }
+
+  try {
+    socket.send(JSON.stringify({ join }));
+    otherSockets.forEach((s) => s.close());
+    socket.close();
+  } catch (e) {
+    console.log(`Failure closing ${pill}`, (e as Error).message);
+  }
+
+  waiting = undefined;
+  notifyDiscord(`\`${pill}\` and \`${otherPill}\` matched!`);
 }
 
 function closeInLobby(pill: string | undefined, socket: ServerWebSocket<LobbyData>) {
-  if (!serverState.waiting) return;
-  if (serverState.waiting[1].includes(socket)) {
-    serverState.waiting[1] = serverState.waiting[1].filter((s) => s !== socket);
-    if (serverState.waiting[1].length === 0) {
-      notifyChannel(`\`${pill}\` no longer waiting.`);
-      serverState.waiting = undefined;
-    }
+  if (!waiting || !waiting[1].includes(socket)) return;
+  waiting[1] = waiting[1].filter((s) => s !== socket);
+  if (waiting[1].length === 0) {
+    notifyDiscord(`\`${pill}\` no longer waiting.`);
+    waiting = undefined;
   }
 }
 
@@ -279,21 +254,16 @@ Bun.serve({
     const pill = url.searchParams.get("pill") || undefined;
     const path = url.pathname;
 
-    if (path.startsWith(roomPrefix)) {
+    if (path.startsWith("/room/")) {
       const upgraded = server.upgrade<RoomData>(req, {
-        data: {
-          pill,
-          roomPath: path.substring(roomPrefix.length),
-        },
+        data: { pill, roomPath: path.substring(6) },
       });
-      if (upgraded) return undefined;
-      return new Response(null, { status: 500 });
-    } else if (path === "/lobby") {
-      const upgraded = server.upgrade<LobbyData>(req, {
-        data: { pill },
-      });
-      if (upgraded) return undefined;
-      return new Response(null, { status: 500 });
+      return upgraded ? undefined : new Response(null, { status: 500 });
+    }
+
+    if (path === "/lobby") {
+      const upgraded = server.upgrade<LobbyData>(req, { data: { pill } });
+      return upgraded ? undefined : new Response(null, { status: 500 });
     }
 
     return new Response(null, { status: 404 });
@@ -302,12 +272,7 @@ Bun.serve({
     open(ws) {
       const data = ws.data as RoomData | LobbyData;
       if ("roomPath" in data) {
-        const ctx: Context = {
-          pill: data.pill,
-          socket: ws as ServerWebSocket<RoomData>,
-          roomPath: data.roomPath,
-        };
-        connectedToRoom(ctx);
+        connectedToRoom(data.pill, ws as ServerWebSocket<RoomData>, data.roomPath);
       } else {
         connectedToLobby(data.pill, ws as ServerWebSocket<LobbyData>);
       }
@@ -315,29 +280,19 @@ Bun.serve({
     message(ws, message) {
       const data = ws.data as RoomData | LobbyData;
       if ("roomPath" in data) {
-        const ctx: Context = {
-          pill: data.pill,
-          socket: ws as ServerWebSocket<RoomData>,
-          roomPath: data.roomPath,
-        };
-        roomMessage(ctx, message as string);
+        roomMessage(data.pill, ws as ServerWebSocket<RoomData>, data.roomPath, message as string);
       }
     },
     close(ws) {
       const data = ws.data as RoomData | LobbyData;
       if ("roomPath" in data) {
-        const ctx: Context = {
-          pill: data.pill,
-          socket: ws as ServerWebSocket<RoomData>,
-          roomPath: data.roomPath,
-        };
-        closeInRoom(ctx);
+        closeInRoom(data.pill, ws as ServerWebSocket<RoomData>, data.roomPath);
       } else {
         closeInLobby(data.pill, ws as ServerWebSocket<LobbyData>);
       }
     },
-    error(ws, error) {
-      handleError(error as Error);
+    error(_, error) {
+      console.log("WS error", error.message);
     },
   },
 });

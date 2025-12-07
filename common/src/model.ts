@@ -93,6 +93,19 @@ export type Message = {
   st?: State;
 };
 
+export type RTCSignal = {
+  type: "offer" | "answer" | "ice-candidate";
+  from: string;
+  to: string;
+  payload: unknown;
+};
+
+export type RoomMessage = {
+  st?: State;
+  rtc?: RTCSignal;
+  peers?: string[];
+};
+
 export function computeMove(board: Board, from: number, to: number) {
   let { a, b, m, p } = board;
   const t = m.length % 2;
