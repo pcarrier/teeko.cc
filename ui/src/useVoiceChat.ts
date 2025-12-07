@@ -11,8 +11,9 @@ type PeerConnection = {
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:ident.me" },
+    { urls: "stun:tnedi.me" },
+    { urls: "turn:turn.teeko.cc:3478" },
   ],
 };
 
@@ -40,7 +41,9 @@ export function useVoiceChat(
   const localStreamRef = useRef<MediaStream | null>(null);
   const connectionsRef = useRef<Map<string, PeerConnection>>(new Map());
   const audioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
-  const pendingCandidatesRef = useRef<Map<string, RTCIceCandidateInit[]>>(new Map());
+  const pendingCandidatesRef = useRef<Map<string, RTCIceCandidateInit[]>>(
+    new Map()
+  );
   const hasAutoStarted = useRef(false);
 
   const sendSignal = useCallback(
@@ -212,6 +215,11 @@ export function useVoiceChat(
       setState("connected");
       setVoiceHash(true);
 
+      // Announce voice chat to server
+      if (ws) {
+        ws.send(JSON.stringify({ voice: true }));
+      }
+
       // Initiate connections to all peers (we initiate if our nickname is "smaller")
       for (const peer of peers) {
         if (nickname < peer) {
@@ -223,9 +231,14 @@ export function useVoiceChat(
       setState("error");
       setVoiceHash(false);
     }
-  }, [peers, nickname, createPeerConnection]);
+  }, [ws, peers, nickname, createPeerConnection]);
 
   const stopVoiceChat = useCallback(() => {
+    // Announce leaving voice chat to server
+    if (ws) {
+      ws.send(JSON.stringify({ voice: false }));
+    }
+
     // Stop local stream
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => track.stop());
@@ -249,7 +262,7 @@ export function useVoiceChat(
     setIsMicMuted(false);
     setConnectedPeers(new Set());
     setVoiceHash(false);
-  }, []);
+  }, [ws]);
 
   const toggleMic = useCallback(() => {
     if (localStreamRef.current) {
@@ -289,8 +302,12 @@ export function useVoiceChat(
   }, []);
 
   // Check if there are peers with voice chat enabled that we're not connected to yet
-  const isConnecting = state === "connecting" ||
-    (state === "connected" && peers.some((p) => !connectedPeers.has(p) && connectionsRef.current.has(p)));
+  const isConnecting =
+    state === "connecting" ||
+    (state === "connected" &&
+      peers.some(
+        (p) => !connectedPeers.has(p) && connectionsRef.current.has(p)
+      ));
 
   return {
     state,

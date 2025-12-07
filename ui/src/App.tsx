@@ -1,5 +1,11 @@
 import { FunctionComponent } from "preact";
-import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "preact/hooks";
 import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
 import {
@@ -65,9 +71,7 @@ function loadBoard(key: string): Board {
       const parsed = JSON.parse(stored);
       if (parsed.m) return parsed;
     }
-  } catch {
-    // Invalid stored data, return empty board
-  }
+  } catch {}
   return emptyBoard();
 }
 
@@ -149,19 +153,21 @@ export const App: FunctionComponent = () => {
   const [botPlaysAs, setBotPlaysAs] = useState<BotPlayer>("b");
   const [isBotThinking, setBotThinking] = useState(false);
   const [isMatching, setMatching] = useState(false);
-
   const [peers, setPeers] = useState<string[]>([]);
-  const rtcSignalHandlerRef = useRef<((signal: RTCSignal) => void) | null>(null);
+  const [voicePeers, setVoicePeers] = useState<string[]>([]);
 
+  const rtcSignalHandlerRef = useRef<((signal: RTCSignal) => void) | null>(
+    null
+  );
   const onRTCSignal = useCallback((handler: (signal: RTCSignal) => void) => {
     rtcSignalHandlerRef.current = handler;
   }, []);
 
-  const voiceChat = useVoiceChat(ws, nickname, peers, onRTCSignal);
+  const voiceChat = useVoiceChat(ws, nickname, voicePeers, onRTCSignal);
 
   const roomPath = route.type === "room" ? route.id : undefined;
   const isBotGame = route.type === "bot";
-  const showGame = route.type === "play" || isBotGame || roomPath;
+  const showGame = route.type === "play" || isBotGame || (roomPath && nickname);
   const isBotTurn =
     isBotGame &&
     !isGameOver(board) &&
@@ -178,6 +184,11 @@ export const App: FunctionComponent = () => {
   };
 
   const joinRoom = (roomId: string) => navigate(`/room/${roomId}`);
+
+  const setNicknameAndSave = (value: string) => {
+    setNickname(value);
+    localStorage.setItem("nickname", value);
+  };
 
   useEvent("popstate", () => setRoute(parseRoute(window.location.pathname)));
 
@@ -247,10 +258,12 @@ export const App: FunctionComponent = () => {
       onreconnect: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
         setPeers([]);
+        setVoicePeers([]);
       },
       onclose: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
         setPeers([]);
+        setVoicePeers([]);
       },
       onmessage: (evt: MessageEvent) => {
         const msg = JSON.parse(evt.data) as RoomMessage & Message;
@@ -258,9 +271,9 @@ export const App: FunctionComponent = () => {
           ws?.send(JSON.stringify({ st: { board } } as Message));
         if (msg.st?.board) moveToBoard(msg.st.board, false);
         if (msg.peers !== undefined) setPeers(msg.peers);
-        if (msg.rtc && rtcSignalHandlerRef.current) {
+        if (msg.voicePeers !== undefined) setVoicePeers(msg.voicePeers);
+        if (msg.rtc && rtcSignalHandlerRef.current)
           rtcSignalHandlerRef.current(msg.rtc);
-        }
       },
     });
     setWs(sockette);
@@ -268,9 +281,10 @@ export const App: FunctionComponent = () => {
       sockette.close();
       setWs(undefined);
       setPeers([]);
+      setVoicePeers([]);
       voiceChat.stopVoiceChat();
     };
-  }, [roomPath]);
+  }, [roomPath, nickname]);
 
   useEffect(() => {
     if (hasCopied) setTimeout(() => setHasCopied(false), 1000);
@@ -285,11 +299,6 @@ export const App: FunctionComponent = () => {
         .writeText(`Teeko? ${url}`)
         .then(() => setHasCopied(true));
     }
-  };
-
-  const setNicknameAndSave = (value: string) => {
-    setNickname(value);
-    localStorage.setItem("nickname", value);
   };
 
   return (
@@ -422,6 +431,34 @@ export const App: FunctionComponent = () => {
         )}
 
         {route.type === "rules" && <Help />}
+
+        {roomPath && !nickname && (
+          <section class="gameSection">
+            <form
+              class="nicknamePrompt"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const input = (e.target as HTMLFormElement).elements.namedItem(
+                  "nickname"
+                ) as HTMLInputElement;
+                if (input.value.trim()) setNicknameAndSave(input.value.trim());
+              }}
+            >
+              <Localizer>
+                <input
+                  type="text"
+                  name="nickname"
+                  placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+                  maxLength={256}
+                  autoFocus
+                />
+              </Localizer>
+              <button type="submit">
+                <Text id="titleBar.join" />
+              </button>
+            </form>
+          </section>
+        )}
 
         {showGame && (
           <section class="gameSection">

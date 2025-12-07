@@ -104,6 +104,8 @@ export type RoomMessage = {
   st?: State;
   rtc?: RTCSignal;
   peers?: string[];
+  voice?: boolean;
+  voicePeers?: string[];
 };
 
 export function computeMove(board: Board, from: number, to: number) {

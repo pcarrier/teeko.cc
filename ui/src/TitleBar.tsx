@@ -38,7 +38,9 @@ export const TitleBar: FunctionComponent<{
             ) : (
               peers.map((p) => (
                 <span class="peer" key={p}>
-                  {voicePeers.has(p) && <FontAwesomeIcon icon={faWalkieTalkie} />}
+                  {voicePeers.has(p) && (
+                    <FontAwesomeIcon icon={faWalkieTalkie} />
+                  )}
                   {p}
                 </span>
               ))
@@ -60,11 +62,15 @@ export const TitleBar: FunctionComponent<{
                   <button
                     class={`icon ${voiceChat.isMicMuted ? "muted" : ""}`}
                     onClick={voiceChat.toggleMic}
-                    aria-label={voiceChat.isMicMuted ? "Unmute mic" : "Mute mic"}
+                    aria-label={
+                      voiceChat.isMicMuted ? "Unmute mic" : "Mute mic"
+                    }
                     title={voiceChat.isMicMuted ? "Unmute mic" : "Mute mic"}
                   >
                     <FontAwesomeIcon
-                      icon={voiceChat.isMicMuted ? faMicrophoneSlash : faMicrophone}
+                      icon={
+                        voiceChat.isMicMuted ? faMicrophoneSlash : faMicrophone
+                      }
                     />
                   </button>
                   <button
