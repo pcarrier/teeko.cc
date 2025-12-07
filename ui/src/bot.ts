@@ -44,21 +44,29 @@ function weightedRandom(moves: Move[], bias = 1): Move {
   return moves[moves.length - 1];
 }
 
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function selectMove(moves: Move[], difficulty: Difficulty): Move {
   if (moves.length === 0) throw new Error("No moves available");
-  const sorted = [...moves].sort((a, b) => b.score - a.score);
+  const sorted = shuffle([...moves]).sort((a, b) => b.score - a.score);
 
   switch (difficulty) {
     case "perfect":
       return sorted[0];
     case "hard":
-      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.2))));
+      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))), 2);
     case "medium":
-      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.5))));
+      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))));
     case "easy":
-      return weightedRandom(sorted, 0.5);
+      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.6))), 0.5);
     case "beginner":
-      return sorted[Math.floor(Math.random() * sorted.length)];
+      return weightedRandom(sorted, 2);
     default:
       return sorted[0];
   }
