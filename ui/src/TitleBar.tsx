@@ -4,6 +4,7 @@ import { OnlineStatus } from "./App";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons/faMicrophone";
 import { faMicrophoneSlash } from "@fortawesome/free-solid-svg-icons/faMicrophoneSlash";
+import { faWalkieTalkie } from "@fortawesome/free-solid-svg-icons/faWalkieTalkie";
 import { faVolumeHigh } from "@fortawesome/free-solid-svg-icons/faVolumeHigh";
 import { faVolumeXmark } from "@fortawesome/free-solid-svg-icons/faVolumeXmark";
 import { faPhone } from "@fortawesome/free-solid-svg-icons/faPhone";
@@ -26,7 +27,8 @@ export const TitleBar: FunctionComponent<{
   peers: string[];
   onlineStatus: OnlineStatus;
   voiceChat?: VoiceChatControls;
-}> = ({ onlineStatus, roomPath, peers, voiceChat }) => {
+  voicePeers: Set<string>;
+}> = ({ onlineStatus, roomPath, peers, voiceChat, voicePeers }) => {
   return (
     <div class="titleBar">
       {roomPath && (
@@ -38,7 +40,12 @@ export const TitleBar: FunctionComponent<{
                 <Text id="titleBar.alone" />
               </span>
             ) : (
-              peers.map((p) => <span class="peer" key={p}>{p}</span>)
+              peers.map((p) => (
+                <span class="peer" key={p}>
+                  {voicePeers.has(p) && <FontAwesomeIcon icon={faWalkieTalkie} />}
+                  {p}
+                </span>
+              ))
             )}
           </div>
           {voiceChat && (

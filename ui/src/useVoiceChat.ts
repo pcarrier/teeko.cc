@@ -307,6 +307,7 @@ export function useVoiceChat(
     isConnecting,
     isMicMuted,
     isDeafened,
+    connectedPeers,
     startVoiceChat,
     stopVoiceChat,
     toggleMic,

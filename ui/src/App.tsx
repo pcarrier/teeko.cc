@@ -430,6 +430,7 @@ export const App: FunctionComponent = () => {
               peers={peers}
               onlineStatus={onlineStatus}
               voiceChat={voiceChat}
+              voicePeers={voiceChat.connectedPeers}
             />
             <Game
               board={displayBoard}
