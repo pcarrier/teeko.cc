@@ -70,16 +70,19 @@ function selectMove(moves: Move[], difficulty: Difficulty): Move {
       );
     case "medium":
       return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))),
+        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))),
         4
       );
     case "easy":
       return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.5))),
+        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.2))),
         3
       );
     case "beginner":
-      return weightedRandom(sorted, 2);
+      return weightedRandom(
+        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))),
+        2
+      );
     default:
       return sorted[0];
   }
