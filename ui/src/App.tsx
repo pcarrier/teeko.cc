@@ -163,7 +163,8 @@ export const App: FunctionComponent = () => {
     rtcSignalHandlerRef.current = handler;
   }, []);
 
-  const voiceChat = useVoiceChat(ws, nickname, voicePeers, onRTCSignal);
+  const isConnected = onlineStatus === OnlineStatus.ONLINE;
+  const voiceChat = useVoiceChat(ws, isConnected, nickname, voicePeers, onRTCSignal);
 
   const roomPath = route.type === "room" ? route.id : undefined;
   const isBotGame = route.type === "bot";

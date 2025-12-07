@@ -13,7 +13,7 @@ const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
     { urls: "stun:ident.me" },
     { urls: "stun:tnedi.me" },
-    { urls: "turn:turn.teeko.cc:3478" },
+    { urls: "turn:turn.teeko.cc:3478", username: "teeko", credential: "teeko" },
   ],
 };
 
@@ -31,6 +31,7 @@ function setVoiceHash(enabled: boolean) {
 
 export function useVoiceChat(
   ws: Sockette | undefined,
+  isConnected: boolean,
   nickname: string,
   peers: string[],
   onRTCSignal: (handler: (signal: RTCSignal) => void) => void
@@ -46,16 +47,25 @@ export function useVoiceChat(
   );
   const hasAutoStarted = useRef(false);
 
+  // Use refs to avoid stale closures in WebRTC callbacks
+  const wsRef = useRef(ws);
+  const isConnectedRef = useRef(isConnected);
+  const nicknameRef = useRef(nickname);
+
+  useEffect(() => { wsRef.current = ws; }, [ws]);
+  useEffect(() => { isConnectedRef.current = isConnected; }, [isConnected]);
+  useEffect(() => { nicknameRef.current = nickname; }, [nickname]);
+
   const sendSignal = useCallback(
     (signal: Omit<RTCSignal, "from">) => {
-      if (ws) {
+      if (wsRef.current && isConnectedRef.current) {
         const msg: RoomMessage = {
-          rtc: { ...signal, from: nickname } as RTCSignal,
+          rtc: { ...signal, from: nicknameRef.current } as RTCSignal,
         };
-        ws.send(JSON.stringify(msg));
+        wsRef.current.send(JSON.stringify(msg));
       }
     },
-    [ws, nickname]
+    []
   );
 
   const createPeerConnection = useCallback(
@@ -136,7 +146,7 @@ export function useVoiceChat(
 
       return pc;
     },
-    [sendSignal, state]
+    [sendSignal]
   );
 
   const handleSignal = useCallback(
@@ -216,13 +226,13 @@ export function useVoiceChat(
       setVoiceHash(true);
 
       // Announce voice chat to server
-      if (ws) {
-        ws.send(JSON.stringify({ voice: true }));
+      if (wsRef.current && isConnectedRef.current) {
+        wsRef.current.send(JSON.stringify({ voice: true }));
       }
 
       // Initiate connections to all peers (we initiate if our nickname is "smaller")
       for (const peer of peers) {
-        if (nickname < peer) {
+        if (nicknameRef.current < peer) {
           createPeerConnection(peer, true);
         }
       }
@@ -231,12 +241,12 @@ export function useVoiceChat(
       setState("error");
       setVoiceHash(false);
     }
-  }, [ws, peers, nickname, createPeerConnection]);
+  }, [peers, createPeerConnection]);
 
   const stopVoiceChat = useCallback(() => {
     // Announce leaving voice chat to server
-    if (ws) {
-      ws.send(JSON.stringify({ voice: false }));
+    if (wsRef.current && isConnectedRef.current) {
+      wsRef.current.send(JSON.stringify({ voice: false }));
     }
 
     // Stop local stream
@@ -262,7 +272,7 @@ export function useVoiceChat(
     setIsMicMuted(false);
     setConnectedPeers(new Set());
     setVoiceHash(false);
-  }, [ws]);
+  }, []);
 
   const toggleMic = useCallback(() => {
     if (localStreamRef.current) {
@@ -279,20 +289,20 @@ export function useVoiceChat(
   useEffect(() => {
     if (state !== "off" && localStreamRef.current) {
       for (const peer of peers) {
-        if (!connectionsRef.current.has(peer) && nickname < peer) {
+        if (!connectionsRef.current.has(peer) && nicknameRef.current < peer) {
           createPeerConnection(peer, true);
         }
       }
     }
-  }, [peers, state, nickname, createPeerConnection]);
+  }, [peers, state, createPeerConnection]);
 
   // Auto-start voice chat if #voice hash is present
   useEffect(() => {
-    if (hasVoiceHash() && state === "off" && !hasAutoStarted.current && ws) {
+    if (hasVoiceHash() && state === "off" && !hasAutoStarted.current && isConnected) {
       hasAutoStarted.current = true;
       startVoiceChat();
     }
-  }, [ws, state, startVoiceChat]);
+  }, [isConnected, state, startVoiceChat]);
 
   // Cleanup on unmount
   useEffect(() => {

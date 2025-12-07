@@ -226,36 +226,34 @@ menu {
   display: flex;
   flex-direction: row;
   align-items: baseline;
+  background-color: @bg;
+  padding: 0.5em;
 
   h1 {
     text-align: left;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    margin: 0;
   }
 
   .peers {
     flex: 1;
     text-align: left;
     margin-left: 0.5em;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.5em;
+    font-size: 90%;
 
     .peer {
-      background: @boardColor;
-      padding: 0.2em 0.5em;
-      border-radius: 0.3em;
-      font-size: 90%;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3em;
+      &::before {
+        content: ", ";
+      }
+      &:first-child::before {
+        content: "";
+      }
     }
 
     .alone {
       color: @bColor;
-      font-size: 90%;
     }
   }
 

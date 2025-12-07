@@ -18,9 +18,15 @@ const notifyDiscord = discordWebhook
     }
   : (content: string) => console.log("Discord (mock):", content);
 
+type Client = {
+  socket: ServerWebSocket<RoomData>;
+  sessionId: string;
+  pill: string | undefined;
+};
+
 type Room = {
   path: string;
-  clients: Map<string | undefined, ServerWebSocket<RoomData>[]>;
+  clients: Map<string, Client>;
   voicePeers: Set<string>;
   p1: string | undefined;
   p2: string | undefined;
@@ -31,7 +37,7 @@ type Room = {
 const rooms = new Map<string, Room>();
 let waiting: [string, ServerWebSocket<LobbyData>[]] | undefined;
 
-type RoomData = { pill: string | undefined; roomPath: string };
+type RoomData = { pill: string | undefined; roomPath: string; sessionId: string };
 type LobbyData = { pill: string | undefined };
 
 function getRoom(path: string): Room {
@@ -51,29 +57,35 @@ function getRoom(path: string): Room {
   return room;
 }
 
-function getPeers(room: Room): string[] {
-  return Array.from(room.clients.keys()).filter((p): p is string => !!p);
+function getPeers(room: Room, excludeSessionId?: string): string[] {
+  const pills = new Set<string>();
+  room.clients.forEach((client) => {
+    if (client.pill && client.sessionId !== excludeSessionId) {
+      pills.add(client.pill);
+    }
+  });
+  return Array.from(pills);
 }
 
 function sendPop(room: Room) {
-  const peers = getPeers(room);
   const voicePeers = Array.from(room.voicePeers);
-  room.clients.forEach((sockets, pill) => {
+  room.clients.forEach((client) => {
+    const peers = getPeers(room, client.sessionId);
     const msg = JSON.stringify({
-      peers: peers.filter((p) => p !== pill),
-      voicePeers: voicePeers.filter((p) => p !== pill),
+      peers,
+      voicePeers: voicePeers.filter((p) => p !== client.pill),
     });
-    sockets.forEach((s) => s.send(msg));
+    client.socket.send(msg);
   });
 }
 
 function broadcastVoicePeers(room: Room) {
   const voicePeers = Array.from(room.voicePeers);
-  room.clients.forEach((sockets, pill) => {
+  room.clients.forEach((client) => {
     const msg = JSON.stringify({
-      voicePeers: voicePeers.filter((p) => p !== pill),
+      voicePeers: voicePeers.filter((p) => p !== client.pill),
     });
-    sockets.forEach((s) => s.send(msg));
+    client.socket.send(msg);
   });
 }
 
@@ -89,21 +101,17 @@ function stateForPlayer(room: Room, pill: string | undefined): State | null {
   return { board: { ...room.state.board, p: canPlay(room, pill) } };
 }
 
-function sendState(
-  room: Room,
-  pill: string | undefined,
-  socket: ServerWebSocket<RoomData>
-) {
-  socket.send(JSON.stringify({ st: stateForPlayer(room, pill) }));
+function sendState(room: Room, client: Client) {
+  client.socket.send(JSON.stringify({ st: stateForPlayer(room, client.pill) }));
 }
 
 function attemptAction(
   room: Room,
   state: State,
-  from: ServerWebSocket<RoomData>,
-  pill: string | undefined
+  fromClient: Client
 ) {
-  const abort = () => sendState(room, pill, from);
+  const pill = fromClient.pill;
+  const abort = () => sendState(room, fromClient);
 
   const actions = state.board.m.length;
   if (
@@ -150,11 +158,11 @@ function attemptAction(
   }
 
   room.state = state;
-  room.clients.forEach((sockets, clientPill) => {
-    const st = stateForPlayer(room, clientPill);
-    sockets.forEach((s) => {
-      if (s !== from) s.send(JSON.stringify({ st }));
-    });
+  room.clients.forEach((client) => {
+    const st = stateForPlayer(room, client.pill);
+    if (client.socket !== fromClient.socket) {
+      client.socket.send(JSON.stringify({ st }));
+    }
   });
 }
 
@@ -166,9 +174,10 @@ function closeRoom(room: Room) {
 function connectedToRoom(
   pill: string | undefined,
   socket: ServerWebSocket<RoomData>,
-  roomPath: string
+  roomPath: string,
+  sessionId: string
 ) {
-  console.log(`${pill} connected to ${roomPath}`);
+  console.log(`${pill} (${sessionId}) connected to ${roomPath}`);
   const room = getRoom(roomPath);
 
   if (room.timeout) {
@@ -176,47 +185,45 @@ function connectedToRoom(
     room.timeout = undefined;
   }
 
-  let sockets = room.clients.get(pill);
-  const isNewPeer = !sockets;
-  if (!sockets) {
-    sockets = [];
-    room.clients.set(pill, sockets);
-  }
-  sockets.push(socket);
+  const client: Client = { socket, sessionId, pill };
+  room.clients.set(sessionId, client);
 
   // Send initial peers and voicePeers list
-  const peers = getPeers(room).filter((p) => p !== pill);
+  const peers = getPeers(room, sessionId);
   const voicePeers = Array.from(room.voicePeers).filter((p) => p !== pill);
   socket.send(JSON.stringify({ peers, voicePeers }));
 
-  if (isNewPeer) sendPop(room);
-  sendState(room, pill, socket);
+  sendPop(room);
+  sendState(room, client);
 }
 
 function relayRTC(room: Room, signal: RTCSignal) {
-  const sockets = room.clients.get(signal.to);
-  if (sockets) {
-    const msg = JSON.stringify({ rtc: signal });
-    sockets.forEach((s) => s.send(msg));
-  }
+  const msg = JSON.stringify({ rtc: signal });
+  room.clients.forEach((client) => {
+    if (client.pill === signal.to) {
+      client.socket.send(msg);
+    }
+  });
 }
 
 function roomMessage(
-  pill: string | undefined,
-  socket: ServerWebSocket<RoomData>,
+  sessionId: string,
   roomPath: string,
   data: string
 ) {
   const room = getRoom(roomPath);
+  const client = room.clients.get(sessionId);
+  if (!client) return;
+
   try {
     const msg = JSON.parse(data) as RoomMessage;
-    if (msg.st) attemptAction(room, msg.st, socket, pill);
-    if (msg.rtc && pill) relayRTC(room, { ...msg.rtc, from: pill });
-    if (msg.voice !== undefined && pill) {
+    if (msg.st) attemptAction(room, msg.st, client);
+    if (msg.rtc && client.pill) relayRTC(room, { ...msg.rtc, from: client.pill });
+    if (msg.voice !== undefined && client.pill) {
       if (msg.voice) {
-        room.voicePeers.add(pill);
+        room.voicePeers.add(client.pill);
       } else {
-        room.voicePeers.delete(pill);
+        room.voicePeers.delete(client.pill);
       }
       broadcastVoicePeers(room);
     }
@@ -225,22 +232,20 @@ function roomMessage(
   }
 }
 
-function closeInRoom(
-  pill: string | undefined,
-  socket: ServerWebSocket<RoomData>,
-  roomPath: string
-) {
-  console.log(`${pill} left ${roomPath}`);
+function closeInRoom(sessionId: string, roomPath: string) {
   const room = getRoom(roomPath);
-  const forPill = room.clients.get(pill);
-  if (!forPill) return;
+  const client = room.clients.get(sessionId);
+  if (!client) return;
 
-  const remaining = forPill.filter((c) => c !== socket);
-  if (remaining.length > 0) {
-    room.clients.set(pill, remaining);
-  } else {
-    room.clients.delete(pill);
-    if (pill) room.voicePeers.delete(pill);
+  console.log(`${client.pill} (${sessionId}) left ${roomPath}`);
+  room.clients.delete(sessionId);
+
+  // Check if this pill has any other sessions still connected
+  const pillStillConnected = Array.from(room.clients.values()).some(
+    (c) => c.pill === client.pill
+  );
+  if (!pillStillConnected && client.pill) {
+    room.voicePeers.delete(client.pill);
   }
 
   if (room.clients.size === 0) {
@@ -309,6 +314,11 @@ function closeInLobby(
   }
 }
 
+let sessionCounter = 0;
+function generateSessionId(): string {
+  return `s${Date.now()}-${++sessionCounter}`;
+}
+
 Bun.serve({
   port,
   fetch(req, server) {
@@ -317,8 +327,9 @@ Bun.serve({
     const path = url.pathname;
 
     if (path.startsWith("/room/")) {
+      const sessionId = generateSessionId();
       const upgraded = server.upgrade<RoomData>(req, {
-        data: { pill, roomPath: path.substring(6) },
+        data: { pill, roomPath: path.substring(6), sessionId },
       });
       return upgraded ? undefined : new Response(null, { status: 500 });
     }
@@ -337,7 +348,8 @@ Bun.serve({
         connectedToRoom(
           data.pill,
           ws as ServerWebSocket<RoomData>,
-          data.roomPath
+          data.roomPath,
+          data.sessionId
         );
       } else {
         connectedToLobby(data.pill, ws as ServerWebSocket<LobbyData>);
@@ -346,18 +358,13 @@ Bun.serve({
     message(ws, message) {
       const data = ws.data as RoomData | LobbyData;
       if ("roomPath" in data) {
-        roomMessage(
-          data.pill,
-          ws as ServerWebSocket<RoomData>,
-          data.roomPath,
-          message as string
-        );
+        roomMessage(data.sessionId, data.roomPath, message as string);
       }
     },
     close(ws) {
       const data = ws.data as RoomData | LobbyData;
       if ("roomPath" in data) {
-        closeInRoom(data.pill, ws as ServerWebSocket<RoomData>, data.roomPath);
+        closeInRoom(data.sessionId, data.roomPath);
       } else {
         closeInLobby(data.pill, ws as ServerWebSocket<LobbyData>);
       }
