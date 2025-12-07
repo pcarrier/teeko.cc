@@ -60,22 +60,35 @@ function selectMove(moves: Move[], difficulty: Difficulty): Move {
   // Sort by score descending (higher = better for current player), shuffle first to randomize equal scores
   const sorted = shuffle([...moves]).sort((m1, m2) => m2.score - m1.score);
 
+  // Filter out blunder moves based on difficulty
+  // Score -125/-126 = opponent wins in 1, -123/-124 = opponent wins in 2
+  const dominated = sorted.filter((m) => {
+    if (difficulty === "beginner") return true;
+    if (m.score <= -125) return false; // 1-turn loss: exclude for easy+
+    if (difficulty === "hard" || difficulty === "perfect") {
+      if (m.score <= -123) return false; // 2-turn loss: exclude for hard+
+    }
+    return true;
+  });
+  // Fall back to all moves if all are losing
+  const candidates = dominated.length > 0 ? dominated : sorted;
+
   switch (difficulty) {
     case "perfect":
-      return sorted[0];
+      return candidates[0];
     case "hard":
       return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))),
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
         5
       );
     case "medium":
       return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))),
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
         4
       );
     case "easy":
       return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.2))),
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.2))),
         3
       );
     case "beginner":
@@ -84,7 +97,7 @@ function selectMove(moves: Move[], difficulty: Difficulty): Move {
         2
       );
     default:
-      return sorted[0];
+      return candidates[0];
   }
 }
 
