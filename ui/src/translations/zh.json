@@ -57,9 +57,7 @@
     "medium": "中等",
     "hard": "困难",
     "perfect": "完美",
-    "whoStarts": "谁先走？",
-    "iStart": "我先走",
-    "botStarts": "电脑先走",
+    "letBotStart": "电脑先走",
     "start": "开始",
     "thinking": "思考中…"
   }

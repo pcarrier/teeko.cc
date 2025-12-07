@@ -57,9 +57,7 @@
     "medium": "Meza",
     "hard": "Malfacila",
     "perfect": "Perfekta",
-    "whoStarts": "Kiu komencas?",
-    "iStart": "Mi komencas",
-    "botStarts": "Roboto komencas",
+    "letBotStart": "Roboto komencas",
     "start": "Komenci",
     "thinking": "Pensante…"
   }

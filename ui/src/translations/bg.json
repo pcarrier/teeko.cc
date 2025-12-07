@@ -57,9 +57,7 @@
     "medium": "Средно",
     "hard": "Трудно",
     "perfect": "Перфектно",
-    "whoStarts": "Кой започва?",
-    "iStart": "Аз започвам",
-    "botStarts": "Ботът започва",
+    "letBotStart": "Ботът започва",
     "start": "Старт",
     "thinking": "Мисли…"
   }

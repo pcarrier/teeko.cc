@@ -12,7 +12,10 @@ type SolutionResponse = {
   error?: string;
 };
 
-async function fetchMoves(board: Board, retries = 3): Promise<SolutionResponse> {
+async function fetchMoves(
+  board: Board,
+  retries = 3
+): Promise<SolutionResponse> {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(SOLUTION_API, {
@@ -54,17 +57,27 @@ function shuffle<T>(arr: T[]): T[] {
 
 function selectMove(moves: Move[], difficulty: Difficulty): Move {
   if (moves.length === 0) throw new Error("No moves available");
-  const sorted = shuffle([...moves]).sort((a, b) => b.score - a.score);
+  // Sort by score descending (higher = better for current player), shuffle first to randomize equal scores
+  const sorted = shuffle([...moves]).sort((m1, m2) => m2.score - m1.score);
 
   switch (difficulty) {
     case "perfect":
       return sorted[0];
     case "hard":
-      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))), 2);
+      return weightedRandom(
+        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))),
+        5
+      );
     case "medium":
-      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))));
+      return weightedRandom(
+        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))),
+        4
+      );
     case "easy":
-      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.6))), 0.5);
+      return weightedRandom(
+        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.5))),
+        3
+      );
     case "beginner":
       return weightedRandom(sorted, 2);
     default:

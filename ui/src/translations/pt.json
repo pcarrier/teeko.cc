@@ -57,9 +57,7 @@
     "medium": "Médio",
     "hard": "Difícil",
     "perfect": "Perfeito",
-    "whoStarts": "Quem começa?",
-    "iStart": "Eu começo",
-    "botStarts": "Bot começa",
+    "letBotStart": "Bot começa",
     "start": "Começar",
     "thinking": "Pensando…"
   }

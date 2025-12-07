@@ -13,18 +13,22 @@
 @maxBoardWidth: 120mm;
 @maxHalfBoardWidth: 60mm;
 
-div {
-  margin: 0;
-  padding: 0;
+* {
+  box-sizing: border-box;
 }
 
-a, a:visited {
+a {
   cursor: pointer;
   color: @link;
   text-decoration: none;
+
+  &:visited {
+    color: @link;
+  }
 }
 
-html, body {
+html,
+body {
   display: grid;
   justify-content: center;
   align-content: center;
@@ -34,7 +38,8 @@ html, body {
   min-height: 100%;
   user-select: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: @color;
@@ -42,17 +47,20 @@ html, body {
   font-size: 12pt;
 }
 
+h1,
+h2 {
+  font-size: 120%;
+  font-weight: normal;
+  color: @strong;
+  margin: 0.5em;
+}
+
 p {
   margin: 0.5em;
 }
 
-h1 {
-  font-size: 120%;
-  font-weight: normal;
-  color: @strong;
-}
-
-button, input {
+button,
+input {
   appearance: none;
   font-size: 100%;
   background-color: transparent;
@@ -61,10 +69,15 @@ button, input {
   border-radius: 0.5em;
   padding: 0.5em 1em;
   margin: 0.5em;
+
+  &:hover:enabled {
+    background-color: @boardColor;
+  }
 }
 
 button {
   height: 3em;
+  cursor: pointer;
 
   &.icon {
     width: 3em;
@@ -73,24 +86,17 @@ button {
   &:disabled {
     color: @boardColor;
     border-color: shade(@boardColor, 50%);
+    cursor: default;
   }
 
   &.selected {
     background-color: @boardColor;
     border-color: @strong;
   }
-
-  &:hover:enabled {
-    background-color: @boardColor;
-  }
 }
 
 input {
   padding: 0.5em;
-
-  &:hover {
-    background-color: @boardColor;
-  }
 }
 
 select {
@@ -118,7 +124,7 @@ select {
   max-width: @maxBoardWidth;
 }
 
-.nav {
+header {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -127,7 +133,7 @@ select {
   border-radius: 0.5em 0.5em 0 0;
   padding: 0.5em;
 
-  > h1 {
+  h1 {
     font-size: 120%;
     margin: 0;
     padding: 0;
@@ -135,16 +141,85 @@ select {
     text-transform: uppercase;
   }
 
-  > select {
+  select {
     font-size: 10pt;
   }
 }
 
-.menuContainer {
+menu {
   background-color: @bg;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  list-style: none;
+  margin: 0;
+  padding: 0.5em;
+
+  li {
+    display: flex;
+    flex-direction: column;
+
+    &.row {
+      flex-direction: row;
+      justify-content: center;
+      gap: 0.5em;
+
+      button {
+        flex: 1;
+      }
+    }
+
+    button,
+    input {
+      margin: 0.25em 0;
+    }
+  }
+}
+
+.friends {
+  background-color: @bg;
+  padding: 0.5em;
+
+  input {
+    width: 100%;
+  }
+}
+
+.joinForm {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5em;
+
+  input {
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  button {
+    margin: 0;
+  }
+}
+
+.externalLinks {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  gap: 1em;
+  padding: 0.5em;
+  margin-top: 0.5em;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    color: @color;
+    padding: 0.5em;
+
+    &:hover {
+      color: @strong;
+    }
+  }
 }
 
 .titleBar {
@@ -213,45 +288,85 @@ select {
     &.bg {
       fill: @boardColor;
 
-      &.release.A { fill: @aColor; }
-      &.release.B { fill: @bColor; }
+      &.release.A {
+        fill: @aColor;
+      }
+      &.release.B {
+        fill: @bColor;
+      }
     }
 
-    &.out.A { fill: shade(@aColor, 50%); }
-    &.out.B { fill: shade(@bColor, 50%); }
-    &.out.active.A { fill: @aColor; }
-    &.out.active.B { fill: @bColor; }
+    &.out.A {
+      fill: shade(@aColor, 50%);
+    }
+    &.out.B {
+      fill: shade(@bColor, 50%);
+    }
+    &.out.active.A {
+      fill: @aColor;
+    }
+    &.out.active.B {
+      fill: @bColor;
+    }
 
-    &.last.A { fill: @aDark; }
-    &.last.B { fill: @bDark; }
+    &.last.A {
+      fill: @aDark;
+    }
+    &.last.B {
+      fill: @bDark;
+    }
 
-    &.selected { fill: @selectionColor; }
+    &.selected {
+      fill: @selectionColor;
+    }
 
-    &.target.A { fill: shade(@aColor, 50%); }
-    &.target.B { fill: shade(@bColor, 50%); }
+    &.target.A {
+      fill: shade(@aColor, 50%);
+    }
+    &.target.B {
+      fill: shade(@bColor, 50%);
+    }
   }
 
   line.last {
     stroke-width: 0.05;
-    &.A { stroke: @aDark; }
-    &.B { stroke: @bDark; }
+    &.A {
+      stroke: @aDark;
+    }
+    &.B {
+      stroke: @bDark;
+    }
   }
 
   .piece {
-    &.A { fill: @aColor; }
-    &.B { fill: @bColor; }
-    &.dummy { pointer-events: none; }
+    &.A {
+      fill: @aColor;
+    }
+    &.B {
+      fill: @bColor;
+    }
+    &.dummy {
+      pointer-events: none;
+    }
   }
 
   line.arrow {
     stroke-width: 0.1;
     stroke-linecap: round;
-    &.A { stroke: shade(@aColor, 50%); }
-    &.B { stroke: shade(@bColor, 50%); }
+    &.A {
+      stroke: shade(@aColor, 50%);
+    }
+    &.B {
+      stroke: shade(@bColor, 50%);
+    }
   }
 
-  #arrowheadA { fill: shade(@aColor, 50%); }
-  #arrowheadB { fill: shade(@bColor, 50%); }
+  #arrowheadA {
+    fill: shade(@aColor, 50%);
+  }
+  #arrowheadB {
+    fill: shade(@bColor, 50%);
+  }
 }
 
 .labeledButtons {
@@ -276,28 +391,24 @@ select {
   }
 }
 
-.joinBar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  input {
-    flex-grow: 1;
-  }
-}
-
 .invisible {
   visibility: hidden;
 }
 
-.botBar, .matchingBar {
+.botControls,
+.matchingOverlay {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1em;
   margin-top: 1em;
+
+  select {
+    margin: 0;
+  }
 }
 
-.botBar select {
-  margin: 0;
+.startChoice {
+  display: flex;
+  gap: 0.5em;
 }

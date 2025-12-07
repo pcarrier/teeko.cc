@@ -16,7 +16,7 @@ build-ui: ui/public/icon-512x512.png ui/public/icon-256x256.png ui/public/icon-1
 
 .PHONY: deploy-ui
 deploy-ui: build-ui
-	cd ui && bun run deploy
+	cd ui && bun run build && bun run deploy
 
 ws/bundle.js: ws/index.ts common/src/model.ts
 	bun build ws/index.ts --outfile ws/bundle.js

@@ -1,8 +1,14 @@
 import { FunctionComponent } from "preact";
-import { useEffect, useMemo, useState, useCallback } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
-import { Board, emptyBoard, Message, computePlace, computeMove } from "teeko-cc-common/src/model.js";
+import {
+  Board,
+  emptyBoard,
+  Message,
+  computePlace,
+  computeMove,
+} from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
 import { TitleBar } from "./TitleBar";
@@ -26,27 +32,27 @@ import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
 import { getBotMove, isGameOver, Difficulty, BotPlayer } from "./bot";
 
-export enum OnlineStatus { OFFLINE, ONLINE }
+export enum OnlineStatus {
+  OFFLINE,
+  ONLINE,
+}
 
 type Route =
   | { type: "menu" }
   | { type: "rules" }
   | { type: "play" }
   | { type: "bot" }
-  | { type: "bot-game" }
   | { type: "friends" }
   | { type: "room"; id: string };
 
 function parseRoute(pathname: string): Route {
   const path = pathname.substring(1);
-  if (!path) return { type: "menu" };
   if (path === "rules") return { type: "rules" };
   if (path === "play") return { type: "play" };
   if (path === "bot") return { type: "bot" };
-  if (path === "bot-game") return { type: "bot-game" };
   if (path === "friends") return { type: "friends" };
   if (path.startsWith("room/")) return { type: "room", id: path.substring(5) };
-  return { type: "room", id: path };
+  return { type: "menu" };
 }
 
 function loadBoard(key: string): Board {
@@ -56,55 +62,61 @@ function loadBoard(key: string): Board {
       const parsed = JSON.parse(stored);
       if (parsed.m) return parsed;
     }
-  } catch {}
+  } catch {
+    // Invalid stored data, return empty board
+  }
   return emptyBoard();
 }
-
-const NicknameInput: FunctionComponent<{
-  nickname: string;
-  setNickname: (v: string) => void;
-}> = ({ nickname, setNickname }) => (
-  <Localizer>
-    <input
-      id="nickname"
-      type="text"
-      value={nickname}
-      placeholder={<Text id="titleBar.nicknamePlaceholder" />}
-      maxLength={256}
-      onInput={(e: Event) => {
-        const value = (e.target as HTMLInputElement).value;
-        setNickname(value);
-        localStorage.setItem("nickname", value);
-      }}
-    />
-  </Localizer>
-);
 
 const DifficultySelect: FunctionComponent<{
   value: Difficulty;
   onChange: (d: Difficulty) => void;
 }> = ({ value, onChange }) => (
-  <select value={value} onChange={(e) => onChange((e.target as HTMLSelectElement).value as Difficulty)}>
-    <option value="beginner"><Text id="bot.beginner" /></option>
-    <option value="easy"><Text id="bot.easy" /></option>
-    <option value="medium"><Text id="bot.medium" /></option>
-    <option value="hard"><Text id="bot.hard" /></option>
-    <option value="perfect"><Text id="bot.perfect" /></option>
+  <select
+    aria-label="Difficulty"
+    value={value}
+    onChange={(e) =>
+      onChange((e.target as HTMLSelectElement).value as Difficulty)
+    }
+  >
+    <option value="beginner">
+      <Text id="bot.beginner" />
+    </option>
+    <option value="easy">
+      <Text id="bot.easy" />
+    </option>
+    <option value="medium">
+      <Text id="bot.medium" />
+    </option>
+    <option value="hard">
+      <Text id="bot.hard" />
+    </option>
+    <option value="perfect">
+      <Text id="bot.perfect" />
+    </option>
   </select>
 );
 
 const ExternalLinks: FunctionComponent = () => (
-  <div class="labeledButtons">
-    <button onClick={() => window.open("https://discord.gg/KEj9brTRS6", "_blank")}>
+  <nav class="externalLinks" aria-label="External links">
+    <a href="https://discord.gg/KEj9brTRS6" target="_blank" rel="noopener">
       <FontAwesomeIcon icon={faDiscord} /> <Text id="buttons.discord" />
-    </button>
-    <button onClick={() => window.open("https://en.wikipedia.org/wiki/Teeko", "_blank")}>
+    </a>
+    <a
+      href="https://en.wikipedia.org/wiki/Teeko"
+      target="_blank"
+      rel="noopener"
+    >
       <FontAwesomeIcon icon={faWikipediaW} /> <Text id="buttons.wikipedia" />
-    </button>
-    <button onClick={() => window.open("https://github.com/pcarrier/teeko.cc", "_blank")}>
+    </a>
+    <a
+      href="https://github.com/pcarrier/teeko.cc"
+      target="_blank"
+      rel="noopener"
+    >
       <FontAwesomeIcon icon={faGithub} /> <Text id="buttons.source" />
-    </button>
-  </div>
+    </a>
+  </nav>
 );
 
 export const App: FunctionComponent = () => {
@@ -117,8 +129,12 @@ export const App: FunctionComponent = () => {
   }, []);
 
   const [lang, setLang] = useState(startLang);
-  const [nickname, setNickname] = useState(() => localStorage.getItem("nickname") || "");
-  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.pathname));
+  const [nickname, setNickname] = useState(
+    () => localStorage.getItem("nickname") || ""
+  );
+  const [route, setRoute] = useState<Route>(() =>
+    parseRoute(window.location.pathname)
+  );
   const [hasCopied, setHasCopied] = useState(false);
   const [nextRoom, setNextRoom] = useState("");
   const [ws, setWs] = useState<Sockette>();
@@ -133,8 +149,12 @@ export const App: FunctionComponent = () => {
   const [isMatching, setMatching] = useState(false);
 
   const roomPath = route.type === "room" ? route.id : undefined;
-  const isBotGame = route.type === "bot-game";
-  const showGame = route.type === "play" || isBotGame || route.type === "room";
+  const isBotGame = route.type === "bot";
+  const showGame = route.type === "play" || isBotGame || roomPath;
+  const isBotTurn =
+    isBotGame &&
+    !isGameOver(board) &&
+    (board.m.length % 2 === 0 ? "a" : "b") === botPlaysAs;
 
   const setBotDifficulty = (d: Difficulty) => {
     localStorage.setItem("botDifficulty", d);
@@ -146,56 +166,49 @@ export const App: FunctionComponent = () => {
     setRoute(parseRoute(path));
   };
 
+  const joinRoom = (roomId: string) => navigate(`/room/${roomId}`);
+
   useEvent("popstate", () => setRoute(parseRoute(window.location.pathname)));
 
   useEffect(() => {
     if (route.type === "play") setBoard(loadBoard("localBoard"));
-    else if (isBotGame) setBoard(loadBoard("botBoard"));
-  }, [route.type]);
+    else if (isBotGame) setBoard(emptyBoard());
+  }, [route.type, isBotGame]);
 
   const moveToBoard = (newBoard: Board, propagate = true) => {
     setBoard(newBoard);
-    if (route.type === "play") localStorage.setItem("localBoard", JSON.stringify(newBoard));
-    else if (isBotGame) localStorage.setItem("botBoard", JSON.stringify(newBoard));
-    if (propagate && ws) ws.send(JSON.stringify({ st: { board: newBoard } } as Message));
+    if (newBoard.m.length === 0) setBotPlaysAs("b");
+    if (route.type === "play")
+      localStorage.setItem("localBoard", JSON.stringify(newBoard));
+    if (propagate && ws)
+      ws.send(JSON.stringify({ st: { board: newBoard } } as Message));
   };
-
-  const isBotTurn = useCallback(() => {
-    if (!isBotGame || isGameOver(board)) return false;
-    return (board.m.length % 2 === 0 ? "a" : "b") === botPlaysAs;
-  }, [isBotGame, board, botPlaysAs]);
-
-  const makeBotMove = useCallback(async () => {
-    if (!isBotTurn() || isBotThinking) return;
-    setBotThinking(true);
-    try {
-      await new Promise((r) => setTimeout(r, 500));
-      const move = await getBotMove(board, botDifficulty);
-      if (move) {
-        const newBoard = board.m.length < 8
-          ? computePlace(board, move.to)
-          : move.from !== undefined ? computeMove(board, move.from, move.to) : undefined;
-        if (newBoard) moveToBoard(newBoard);
-      }
-    } catch (e) {
-      console.error("Bot move failed:", e);
-    } finally {
-      setBotThinking(false);
-    }
-  }, [isBotTurn, isBotThinking, board, botDifficulty]);
 
   useEffect(() => {
-    if (isBotTurn() && !isBotThinking) makeBotMove();
-  }, [board, isBotGame, botPlaysAs, isBotTurn]);
+    if (!isBotTurn || isBotThinking) return;
+    setBotThinking(true);
+    const timeout = setTimeout(async () => {
+      try {
+        const move = await getBotMove(board, botDifficulty);
+        if (move) {
+          const newBoard =
+            board.m.length < 8
+              ? computePlace(board, move.to)
+              : move.from !== undefined
+              ? computeMove(board, move.from, move.to)
+              : undefined;
+          if (newBoard) moveToBoard(newBoard);
+        }
+      } catch (e) {
+        console.error("Bot move failed:", e);
+      } finally {
+        setBotThinking(false);
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [isBotTurn, board, botDifficulty]);
 
-  const startBotGame = () => {
-    localStorage.setItem("botBoard", JSON.stringify(emptyBoard()));
-    navigate("/bot-game");
-  };
-
-  const joinRoom = (roomId: string) => navigate(`/room/${roomId}`);
-
-  if (!board.p && !roomPath) board.p = true;
+  const displayBoard = !board.p && !roomPath ? { ...board, p: true } : board;
 
   useEffect(() => {
     if (!isMatching || !nickname) return;
@@ -210,24 +223,37 @@ export const App: FunctionComponent = () => {
         }
       },
     });
-    return () => { sockette.close(); setMatching(false); };
+    return () => {
+      sockette.close();
+      setMatching(false);
+    };
   }, [isMatching]);
 
   useEffect(() => {
     if (!roomPath || !nickname) return;
     const sockette = new Sockette(wsUrl(`room/${roomPath}`, nickname), {
       onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
-      onreconnect: () => { setOnlineStatus(OnlineStatus.OFFLINE); setPop(undefined); },
-      onclose: () => { setOnlineStatus(OnlineStatus.OFFLINE); setPop(undefined); },
+      onreconnect: () => {
+        setOnlineStatus(OnlineStatus.OFFLINE);
+        setPop(undefined);
+      },
+      onclose: () => {
+        setOnlineStatus(OnlineStatus.OFFLINE);
+        setPop(undefined);
+      },
       onmessage: (evt: MessageEvent) => {
         const msg = JSON.parse(evt.data) as Message;
-        if (msg.st === null) ws?.send(JSON.stringify({ st: { board } } as Message));
+        if (msg.st === null)
+          ws?.send(JSON.stringify({ st: { board } } as Message));
         if (msg.st?.board) moveToBoard(msg.st.board, false);
         if (msg.pop !== undefined) setPop(msg.pop);
       },
     });
     setWs(sockette);
-    return () => { sockette.close(); setWs(undefined); };
+    return () => {
+      sockette.close();
+      setWs(undefined);
+    };
   }, [roomPath]);
 
   useEffect(() => {
@@ -239,26 +265,38 @@ export const App: FunctionComponent = () => {
     if (navigator.share) {
       navigator.share({ title: `teeko.cc (${roomPath})`, text: "Teeko?", url });
     } else {
-      navigator.clipboard.writeText(`Teeko? ${url}`).then(() => setHasCopied(true));
+      navigator.clipboard
+        .writeText(`Teeko? ${url}`)
+        .then(() => setHasCopied(true));
     }
+  };
+
+  const setNicknameAndSave = (value: string) => {
+    setNickname(value);
+    localStorage.setItem("nickname", value);
   };
 
   return (
     <IntlProvider definition={translations[lang]}>
-      <div class="top">
-        <nav class="nav">
+      <article class="top">
+        <header>
           <button
             class={`icon ${route.type === "menu" ? "invisible" : ""}`}
             onClick={() => navigate("/")}
+            aria-label={route.type === "rules" ? "Close" : "Menu"}
           >
             <FontAwesomeIcon icon={route.type === "rules" ? faClose : faBars} />
           </button>
-          <button class={`icon ${route.type !== "room" ? "invisible" : ""}`} onClick={share}>
+          <button
+            class={`icon ${route.type !== "room" ? "invisible" : ""}`}
+            onClick={share}
+            aria-label="Invite"
+          >
             <FontAwesomeIcon icon={hasCopied ? faClipboardCheck : faUserPlus} />
           </button>
           <h1>Teeko.cc</h1>
           <select
-            class="langSelector"
+            aria-label="Language"
             onChange={(e) => {
               const v = (e.target as HTMLSelectElement).value;
               localStorage.setItem("lang", v);
@@ -266,106 +304,151 @@ export const App: FunctionComponent = () => {
             }}
           >
             {Object.keys(translations).map((l) => (
-              <option value={l} selected={l === lang}>{l.toUpperCase()}</option>
+              <option value={l} selected={l === lang}>
+                {l.toUpperCase()}
+              </option>
             ))}
           </select>
-                  </nav>
+        </header>
 
         {route.type === "menu" && (
-          <div class="menuContainer">
-            <button onClick={() => navigate("/rules")}>
-              <FontAwesomeIcon icon={faBook} /> <Text id="menu.rules" />
-            </button>
-            <button onClick={() => navigate("/play")}>
-              <FontAwesomeIcon icon={faHouse} /> <Text id="menu.playLocally" />
-            </button>
-            <button onClick={() => navigate("/bot")}>
-              <FontAwesomeIcon icon={faRobot} /> <Text id="bot.playVsBot" />
-            </button>
-            <hr />
-            <NicknameInput nickname={nickname} setNickname={setNickname} />
-            <div class="labeledButtons">
-              <button disabled={!nickname.trim() || isMatching} onClick={() => setMatching(true)}>
-                <FontAwesomeIcon icon={faSearch} /> <Text id="menu.findPlayer" />
+          <menu>
+            <li>
+              <button onClick={() => navigate("/rules")}>
+                <FontAwesomeIcon icon={faBook} /> <Text id="menu.rules" />
               </button>
-              <button disabled={!nickname.trim()} onClick={() => navigate("/friends")}>
-                <FontAwesomeIcon icon={faUsers} /> <Text id="menu.playWithFriends" />
+            </li>
+            <li>
+              <button onClick={() => navigate("/play")}>
+                <FontAwesomeIcon icon={faHouse} />{" "}
+                <Text id="menu.playLocally" />
               </button>
-            </div>
-            <hr />
-            <ExternalLinks />
-          </div>
-        )}
-
-        {route.type === "bot" && (
-          <div class="menuContainer">
-            <h1><Text id="bot.title" /></h1>
-            <label><Text id="bot.difficulty" /></label>
-            <DifficultySelect value={botDifficulty} onChange={setBotDifficulty} />
-            <label><Text id="bot.whoStarts" /></label>
-            <div class="labeledButtons">
-              <button class={botPlaysAs === "b" ? "selected" : ""} onClick={() => setBotPlaysAs("b")}>
-                <Text id="bot.iStart" />
+            </li>
+            <li>
+              <button onClick={() => navigate("/bot")}>
+                <FontAwesomeIcon icon={faRobot} /> <Text id="bot.playVsBot" />
               </button>
-              <button class={botPlaysAs === "a" ? "selected" : ""} onClick={() => setBotPlaysAs("a")}>
-                <Text id="bot.botStarts" />
+            </li>
+            <li>
+              <Localizer>
+                <input
+                  type="text"
+                  value={nickname}
+                  placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+                  maxLength={256}
+                  onInput={(e: Event) =>
+                    setNicknameAndSave((e.target as HTMLInputElement).value)
+                  }
+                />
+              </Localizer>
+            </li>
+            <li class="row">
+              <button
+                disabled={!nickname.trim() || isMatching}
+                onClick={() => setMatching(true)}
+              >
+                <FontAwesomeIcon icon={faSearch} />{" "}
+                <Text id="menu.findPlayer" />
               </button>
-            </div>
-            <button onClick={startBotGame}>
-              <FontAwesomeIcon icon={faRobot} /> <Text id="bot.start" />
-            </button>
-          </div>
+              <button
+                disabled={!nickname.trim()}
+                onClick={() => navigate("/friends")}
+              >
+                <FontAwesomeIcon icon={faUsers} />{" "}
+                <Text id="menu.playWithFriends" />
+              </button>
+            </li>
+            <li>
+              <ExternalLinks />
+            </li>
+          </menu>
         )}
 
         {route.type === "friends" && (
-          <div class="menuContainer">
-            <h1><Text id="titleBar.friends" /></h1>
-            <NicknameInput nickname={nickname} setNickname={setNickname} />
-            <div class="joinBar">
+          <section class="friends">
+            <h2>
+              <Text id="titleBar.friends" />
+            </h2>
+            <Localizer>
+              <input
+                type="text"
+                value={nickname}
+                placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+                maxLength={256}
+                onInput={(e: Event) =>
+                  setNicknameAndSave((e.target as HTMLInputElement).value)
+                }
+              />
+            </Localizer>
+            <form
+              class="joinForm"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (nickname.trim()) joinRoom(nextRoom || randomID());
+              }}
+            >
               <Localizer>
                 <input
                   type="text"
                   value={nextRoom}
                   placeholder={<Text id="titleBar.boardNameInput" />}
                   maxLength={256}
-                  onInput={(e: Event) => setNextRoom((e.target as HTMLInputElement).value)}
-                  onKeyUp={(e) => {
-                    if (e.key === "Enter" && nickname.trim()) {
-                      e.preventDefault();
-                      joinRoom(nextRoom || randomID());
-                    }
-                  }}
+                  onInput={(e: Event) =>
+                    setNextRoom((e.target as HTMLInputElement).value)
+                  }
                 />
               </Localizer>
-              <button disabled={!nickname.trim()} onClick={() => joinRoom(nextRoom || randomID())}>
+              <button type="submit" disabled={!nickname.trim()}>
                 <Text id="titleBar.join" />
               </button>
-            </div>
-          </div>
+            </form>
+          </section>
         )}
 
         {route.type === "rules" && <Help />}
 
         {showGame && (
-          <>
-            <TitleBar roomPath={roomPath} pop={pop} onlineStatus={onlineStatus} />
-            <Game board={board} roomPath={roomPath} moveToBoard={moveToBoard} disabled={isBotGame && (isBotTurn() || isBotThinking)} />
-          </>
+          <section class="gameSection">
+            <TitleBar
+              roomPath={roomPath}
+              pop={pop}
+              onlineStatus={onlineStatus}
+            />
+            <Game
+              board={displayBoard}
+              roomPath={roomPath}
+              moveToBoard={moveToBoard}
+              disabled={isBotGame && (isBotTurn || isBotThinking)}
+              isBotGame={isBotGame}
+            />
+          </section>
         )}
 
         {isBotGame && (
-          <div class="botBar">
-            <DifficultySelect value={botDifficulty} onChange={setBotDifficulty} />
-          </div>
+          <footer class="botControls">
+            <DifficultySelect
+              value={botDifficulty}
+              onChange={setBotDifficulty}
+            />
+            {board.m.length === 0 && (
+              <button onClick={() => setBotPlaysAs("a")}>
+                <Text id="bot.letBotStart" />
+              </button>
+            )}
+          </footer>
         )}
 
         {isMatching && (
-          <div class="matchingBar">
-            <span>{spinner} <Text id="titleBar.matching" /></span>
-            <button onClick={() => setMatching(false)}><Text id="titleBar.cancel" /></button>
-          </div>
+          <aside class="matchingOverlay" role="status">
+            <p>
+              {spinner} <Text id="titleBar.matching" />
+            </p>
+            <button onClick={() => setMatching(false)}>
+              <Text id="titleBar.cancel" />
+            </button>
+          </aside>
         )}
-      </div>
+      </article>
     </IntlProvider>
   );
 };
