@@ -658,6 +658,40 @@ type Request struct {
 	Turn string `json:"turn,omitempty"`
 }
 
+type LogEntry struct {
+	Timestamp string   `json:"timestamp"`
+	Method    string   `json:"method"`
+	Path      string   `json:"path"`
+	Request   *Request `json:"request,omitempty"`
+	Status    int      `json:"status"`
+	Error     string   `json:"error,omitempty"`
+	Positions int      `json:"positions,omitempty"`
+	Duration  float64  `json:"duration"`
+}
+
+type requestLogger struct {
+	start time.Time
+	r     *http.Request
+	req   *Request
+	entry LogEntry
+}
+
+func newRequestLogger(r *http.Request) *requestLogger {
+	return &requestLogger{
+		start: time.Now(),
+		r:     r,
+	}
+}
+
+func (l *requestLogger) log() {
+	l.entry.Timestamp = l.start.Format(time.RFC3339)
+	l.entry.Method = l.r.Method
+	l.entry.Path = l.r.URL.Path
+	l.entry.Request = l.req
+	l.entry.Duration = time.Since(l.start).Seconds()
+	json.NewEncoder(os.Stdout).Encode(l.entry)
+}
+
 type Move struct {
 	From     *int   `json:"from,omitempty"`
 	To       int    `json:"to"`
@@ -722,50 +756,68 @@ func setCORS(w http.ResponseWriter) {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
+	l := newRequestLogger(r)
+	defer l.log()
 	setCORS(w)
 
 	if r.Method == http.MethodOptions {
+		l.entry.Status = 200
 		return
 	}
 
 	if r.Method != http.MethodPost {
-		json.NewEncoder(w).Encode(Response{Error: "POST required"})
+		l.entry.Status = 405
+		l.entry.Error = "POST required"
+		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 		return
 	}
 
 	var req Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		json.NewEncoder(w).Encode(Response{Error: "invalid JSON"})
+		l.entry.Status = 400
+		l.entry.Error = "invalid JSON"
+		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 		return
 	}
+	l.req = &req
 
 	var a, b uint32
 	for _, sq := range req.A {
 		if sq < 0 || sq > 24 {
-			json.NewEncoder(w).Encode(Response{Error: fmt.Sprintf("invalid square: %d", sq)})
+			l.entry.Status = 400
+			l.entry.Error = fmt.Sprintf("invalid square: %d", sq)
+			json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 			return
 		}
 		a |= 1 << sq
 	}
 	for _, sq := range req.B {
 		if sq < 0 || sq > 24 {
-			json.NewEncoder(w).Encode(Response{Error: fmt.Sprintf("invalid square: %d", sq)})
+			l.entry.Status = 400
+			l.entry.Error = fmt.Sprintf("invalid square: %d", sq)
+			json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 			return
 		}
 		b |= 1 << sq
 	}
 
 	if a&b != 0 {
-		json.NewEncoder(w).Encode(Response{Error: "overlapping pieces"})
+		l.entry.Status = 400
+		l.entry.Error = "overlapping pieces"
+		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 		return
 	}
 	aCount, bCount := bits.OnesCount32(a), bits.OnesCount32(b)
 	if aCount > 4 || bCount > 4 {
-		json.NewEncoder(w).Encode(Response{Error: "too many pieces"})
+		l.entry.Status = 400
+		l.entry.Error = "too many pieces"
+		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 		return
 	}
 	if aCount < bCount || aCount-bCount > 1 {
-		json.NewEncoder(w).Encode(Response{Error: fmt.Sprintf("invalid counts: A=%d, B=%d", aCount, bCount)})
+		l.entry.Status = 400
+		l.entry.Error = fmt.Sprintf("invalid counts: A=%d, B=%d", aCount, bCount)
+		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
 		return
 	}
 
@@ -847,6 +899,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	})
 	w.Write(buf.Bytes())
 	bufPool.Put(buf)
+
+	l.entry.Status = 200
+	l.entry.Positions = len(moves)
 }
 
 func main() {
