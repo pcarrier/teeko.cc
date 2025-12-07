@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"flag"
@@ -20,6 +21,12 @@ import (
 	"time"
 	"unsafe"
 )
+
+var bufPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
 
 // Board constants
 const (
@@ -672,6 +679,9 @@ type Response struct {
 	Error    string `json:"error,omitempty"`
 }
 
+// Pre-allocated move slices per piece count (max moves possible)
+var moveCapacity = [9]int{25, 24, 23, 22, 21, 20, 19, 18, 32}
+
 func outcome(s int8) (string, int) {
 	switch {
 	case s == ScoreTie:
@@ -696,64 +706,73 @@ func maskToSquares(m uint32) []int {
 	return sq
 }
 
+var corsHeaders = map[string]string{
+	"Content-Type":                 "application/json",
+	"Access-Control-Allow-Origin":  "*",
+	"Access-Control-Allow-Methods": "POST, OPTIONS",
+	"Access-Control-Allow-Headers": "Content-Type",
+	"Access-Control-Max-Age":       "86400",
+}
+
+func setCORS(w http.ResponseWriter) {
+	h := w.Header()
+	for k, v := range corsHeaders {
+		h.Set(k, v)
+	}
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	setCORS(w)
 
 	if r.Method == http.MethodOptions {
 		return
 	}
 
-	respond := func(resp Response) { json.NewEncoder(w).Encode(resp) }
-	fail := func(msg string) { respond(Response{Error: msg}) }
-
 	if r.Method != http.MethodPost {
-		fail("POST required")
+		json.NewEncoder(w).Encode(Response{Error: "POST required"})
 		return
 	}
 
 	var req Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		fail("invalid JSON")
+		json.NewEncoder(w).Encode(Response{Error: "invalid JSON"})
 		return
 	}
 
 	var a, b uint32
 	for _, sq := range req.A {
 		if sq < 0 || sq > 24 {
-			fail(fmt.Sprintf("invalid square: %d", sq))
+			json.NewEncoder(w).Encode(Response{Error: fmt.Sprintf("invalid square: %d", sq)})
 			return
 		}
 		a |= 1 << sq
 	}
 	for _, sq := range req.B {
 		if sq < 0 || sq > 24 {
-			fail(fmt.Sprintf("invalid square: %d", sq))
+			json.NewEncoder(w).Encode(Response{Error: fmt.Sprintf("invalid square: %d", sq)})
 			return
 		}
 		b |= 1 << sq
 	}
 
 	if a&b != 0 {
-		fail("overlapping pieces")
+		json.NewEncoder(w).Encode(Response{Error: "overlapping pieces"})
 		return
 	}
 	aCount, bCount := bits.OnesCount32(a), bits.OnesCount32(b)
 	if aCount > 4 || bCount > 4 {
-		fail("too many pieces")
+		json.NewEncoder(w).Encode(Response{Error: "too many pieces"})
 		return
 	}
 	if aCount < bCount || aCount-bCount > 1 {
-		fail(fmt.Sprintf("invalid counts: A=%d, B=%d", aCount, bCount))
+		json.NewEncoder(w).Encode(Response{Error: fmt.Sprintf("invalid counts: A=%d, B=%d", aCount, bCount)})
 		return
 	}
 
 	n := aCount + bCount
-	phase := "play"
-	if n < 8 {
-		phase = "drop"
+	phase := "drop"
+	if n == 8 {
+		phase = "play"
 	}
 
 	// Determine turn
@@ -772,8 +791,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	score := scores[n][g]
 	out, dist := outcome(score)
 
-	// Generate moves
-	var moves []Move
+	// Generate moves with pre-allocated capacity
+	moves := make([]Move, 0, moveCapacity[n])
 	var mover, other uint32
 	if aTurn {
 		mover, other = a, b
@@ -784,6 +803,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	if n == 8 {
 		// Play phase moves
+		table := scores[8]
 		for p := mover; p != 0; {
 			piece := p & -p
 			p ^= piece
@@ -793,7 +813,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				dest := dests & -dests
 				dests ^= dest
 				ng := goedel(other, newMover|dest, 8)
-				ms := -scores[8][ng]
+				ms := -table[ng]
 				mo, md := outcome(ms)
 				fromCopy := from
 				moves = append(moves, Move{&fromCopy, bitToSquare(dest), int(ms), mo, md})
@@ -817,12 +837,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		turn = PlayerB
 	}
 
-	respond(Response{
+	buf := bufPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	json.NewEncoder(buf).Encode(Response{
 		A: maskToSquares(a), B: maskToSquares(b),
 		Turn: turn, Phase: phase, Pieces: n,
 		Score: int(score), Outcome: out, Distance: dist,
 		Moves: moves,
 	})
+	w.Write(buf.Bytes())
+	bufPool.Put(buf)
 }
 
 func main() {
