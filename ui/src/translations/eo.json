@@ -1,4 +1,7 @@
 {
+  "voice": {
+    "connecting": "Konektante…"
+  },
   "help": {
     "open": "Ĉiu ludanto havas 4 pecojn. Bluo komencas.",
     "place": "Unue, metu ĉiuj pecoj, unu ĉiuturne.",

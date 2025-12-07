@@ -1,4 +1,7 @@
 {
+  "voice": {
+    "connecting": "Connecting…"
+  },
   "help": {
     "open": "Each player has 4 pieces. Blue opens.",
     "place": "First, place all pieces, one each turn.",

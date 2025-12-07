@@ -234,14 +234,60 @@ menu {
     white-space: nowrap;
   }
 
-  .pop {
+  .peers {
     flex: 1;
     text-align: left;
     margin-left: 0.5em;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5em;
+
+    .peer {
+      background: @boardColor;
+      padding: 0.2em 0.5em;
+      border-radius: 0.3em;
+      font-size: 90%;
+    }
+
+    .alone {
+      color: @bColor;
+      font-size: 90%;
+    }
   }
 
-  .alone {
-    color: @bColor;
+  .voiceChat {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+    margin-right: 0.5em;
+
+    button.icon {
+      width: 2.5em;
+      height: 2.5em;
+      padding: 0;
+      margin: 0;
+      border-radius: 50%;
+
+      &.hangup {
+        color: @bColor;
+        border-color: @bColor;
+
+        &:hover:enabled {
+          background-color: shade(@bColor, 50%);
+        }
+      }
+
+      &.muted {
+        color: @bColor;
+        border-color: @bColor;
+      }
+    }
+
+    .voiceStatus {
+      font-size: 80%;
+      color: @color;
+    }
   }
 }
 

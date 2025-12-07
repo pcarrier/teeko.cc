@@ -1,11 +1,13 @@
 import { FunctionComponent } from "preact";
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { IntlProvider, Localizer, Text } from "preact-i18n";
 import { useEvent } from "./useEvent.js";
 import {
   Board,
   emptyBoard,
   Message,
+  RoomMessage,
+  RTCSignal,
   computePlace,
   computeMove,
 } from "teeko-cc-common/src/model.js";
@@ -31,6 +33,7 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
 import { getBotMove, isGameOver, Difficulty, BotPlayer } from "./bot";
+import { useVoiceChat } from "./useVoiceChat";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -138,7 +141,6 @@ export const App: FunctionComponent = () => {
   const [hasCopied, setHasCopied] = useState(false);
   const [nextRoom, setNextRoom] = useState("");
   const [ws, setWs] = useState<Sockette>();
-  const [pop, setPop] = useState<number>();
   const [onlineStatus, setOnlineStatus] = useState(OnlineStatus.OFFLINE);
   const [board, setBoard] = useState<Board>(() => loadBoard("localBoard"));
   const [botDifficulty, _setBotDifficulty] = useState<Difficulty>(
@@ -147,6 +149,15 @@ export const App: FunctionComponent = () => {
   const [botPlaysAs, setBotPlaysAs] = useState<BotPlayer>("b");
   const [isBotThinking, setBotThinking] = useState(false);
   const [isMatching, setMatching] = useState(false);
+
+  const [peers, setPeers] = useState<string[]>([]);
+  const rtcSignalHandlerRef = useRef<((signal: RTCSignal) => void) | null>(null);
+
+  const onRTCSignal = useCallback((handler: (signal: RTCSignal) => void) => {
+    rtcSignalHandlerRef.current = handler;
+  }, []);
+
+  const voiceChat = useVoiceChat(ws, nickname, peers, onRTCSignal);
 
   const roomPath = route.type === "room" ? route.id : undefined;
   const isBotGame = route.type === "bot";
@@ -235,24 +246,29 @@ export const App: FunctionComponent = () => {
       onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
       onreconnect: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
-        setPop(undefined);
+        setPeers([]);
       },
       onclose: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
-        setPop(undefined);
+        setPeers([]);
       },
       onmessage: (evt: MessageEvent) => {
-        const msg = JSON.parse(evt.data) as Message;
+        const msg = JSON.parse(evt.data) as RoomMessage & Message;
         if (msg.st === null)
           ws?.send(JSON.stringify({ st: { board } } as Message));
         if (msg.st?.board) moveToBoard(msg.st.board, false);
-        if (msg.pop !== undefined) setPop(msg.pop);
+        if (msg.peers !== undefined) setPeers(msg.peers);
+        if (msg.rtc && rtcSignalHandlerRef.current) {
+          rtcSignalHandlerRef.current(msg.rtc);
+        }
       },
     });
     setWs(sockette);
     return () => {
       sockette.close();
       setWs(undefined);
+      setPeers([]);
+      voiceChat.stopVoiceChat();
     };
   }, [roomPath]);
 
@@ -411,8 +427,9 @@ export const App: FunctionComponent = () => {
           <section class="gameSection">
             <TitleBar
               roomPath={roomPath}
-              pop={pop}
+              peers={peers}
               onlineStatus={onlineStatus}
+              voiceChat={voiceChat}
             />
             <Game
               board={displayBoard}

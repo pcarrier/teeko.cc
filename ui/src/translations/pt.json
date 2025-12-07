@@ -1,4 +1,7 @@
 {
+  "voice": {
+    "connecting": "Conectando…"
+  },
   "help": {
     "open": "Cada jogador tem 4 peças. Azul começa.",
     "place": "Primeiro, coloca todas as peças, uma por turno.",
