@@ -62,11 +62,19 @@ function selectMove(moves: Move[], difficulty: Difficulty): Move {
 
   // Filter out blunder moves based on difficulty
   // Score -125/-126 = opponent wins in 1, -123/-124 = opponent wins in 2
+  // Beginner misses blunders 25% of turns, easy misses 10% of turns
+  const missBlunders =
+    (difficulty === "beginner" && Math.random() < 0.25) ||
+    (difficulty === "easy" && Math.random() < 0.1);
   const dominated = sorted.filter((m) => {
-    if (difficulty === "beginner" || difficulty === "easy") return true;
-    if (m.score <= -125) return false; // 1-turn loss: exclude for medium+
-    if (difficulty === "hard") {
-      if (m.score <= -123) return false; // 2-turn loss: exclude for hard+
+    if (m.score <= -125) {
+      // 1-turn loss blunder
+      if (missBlunders) return true; // let blunders through this turn
+      if (difficulty === "beginner" || difficulty === "easy") return false;
+      return false; // medium+ always filter
+    }
+    if (m.score <= -123 && difficulty === "hard") {
+      return false; // 2-turn loss: exclude for hard
     }
     return true;
   });
