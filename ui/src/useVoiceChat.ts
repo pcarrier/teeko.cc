@@ -36,7 +36,6 @@ export function useVoiceChat(
 ) {
   const [state, setState] = useState<VoiceChatState>("off");
   const [isMicMuted, setIsMicMuted] = useState(false);
-  const [isDeafened, setIsDeafened] = useState(false);
   const [connectedPeers, setConnectedPeers] = useState<Set<string>>(new Set());
   const localStreamRef = useRef<MediaStream | null>(null);
   const connectionsRef = useRef<Map<string, PeerConnection>>(new Map());
@@ -248,7 +247,6 @@ export function useVoiceChat(
 
     setState("off");
     setIsMicMuted(false);
-    setIsDeafened(false);
     setConnectedPeers(new Set());
     setVoiceHash(false);
   }, []);
@@ -263,14 +261,6 @@ export function useVoiceChat(
       setIsMicMuted(newMuted);
     }
   }, [isMicMuted]);
-
-  const toggleDeafen = useCallback(() => {
-    const newDeafened = !isDeafened;
-    audioElementsRef.current.forEach((el) => {
-      el.muted = newDeafened;
-    });
-    setIsDeafened(newDeafened);
-  }, [isDeafened]);
 
   // When new peers join, initiate connections if we're already in voice chat
   useEffect(() => {
@@ -306,12 +296,10 @@ export function useVoiceChat(
     state,
     isConnecting,
     isMicMuted,
-    isDeafened,
     connectedPeers,
     startVoiceChat,
     stopVoiceChat,
     toggleMic,
-    toggleDeafen,
     handleSignal,
   };
 }

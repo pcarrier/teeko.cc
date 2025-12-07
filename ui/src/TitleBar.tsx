@@ -5,8 +5,6 @@ import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons/faMicrophone";
 import { faMicrophoneSlash } from "@fortawesome/free-solid-svg-icons/faMicrophoneSlash";
 import { faWalkieTalkie } from "@fortawesome/free-solid-svg-icons/faWalkieTalkie";
-import { faVolumeHigh } from "@fortawesome/free-solid-svg-icons/faVolumeHigh";
-import { faVolumeXmark } from "@fortawesome/free-solid-svg-icons/faVolumeXmark";
 import { faPhone } from "@fortawesome/free-solid-svg-icons/faPhone";
 import { faPhoneSlash } from "@fortawesome/free-solid-svg-icons/faPhoneSlash";
 import type { VoiceChatState } from "./useVoiceChat";
@@ -15,11 +13,9 @@ type VoiceChatControls = {
   state: VoiceChatState;
   isConnecting: boolean;
   isMicMuted: boolean;
-  isDeafened: boolean;
   startVoiceChat: () => void;
   stopVoiceChat: () => void;
   toggleMic: () => void;
-  toggleDeafen: () => void;
 };
 
 export const TitleBar: FunctionComponent<{
@@ -69,16 +65,6 @@ export const TitleBar: FunctionComponent<{
                   >
                     <FontAwesomeIcon
                       icon={voiceChat.isMicMuted ? faMicrophoneSlash : faMicrophone}
-                    />
-                  </button>
-                  <button
-                    class={`icon ${voiceChat.isDeafened ? "muted" : ""}`}
-                    onClick={voiceChat.toggleDeafen}
-                    aria-label={voiceChat.isDeafened ? "Undeafen" : "Deafen"}
-                    title={voiceChat.isDeafened ? "Undeafen" : "Deafen"}
-                  >
-                    <FontAwesomeIcon
-                      icon={voiceChat.isDeafened ? faVolumeXmark : faVolumeHigh}
                     />
                   </button>
                   <button
