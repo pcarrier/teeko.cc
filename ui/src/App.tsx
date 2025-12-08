@@ -395,17 +395,6 @@ export const App: FunctionComponent = () => {
             <h2>
               <Text id="titleBar.friends" />
             </h2>
-            <Localizer>
-              <input
-                type="text"
-                value={nickname}
-                placeholder={<Text id="titleBar.nicknamePlaceholder" />}
-                maxLength={256}
-                onInput={(e: Event) =>
-                  setNicknameAndSave((e.target as HTMLInputElement).value)
-                }
-              />
-            </Localizer>
             <form
               class="joinForm"
               onSubmit={(e) => {
