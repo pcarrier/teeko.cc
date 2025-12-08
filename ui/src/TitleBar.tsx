@@ -39,7 +39,9 @@ export const TitleBar: FunctionComponent<{
               peers.map((p) => (
                 <span class="peer" key={p}>
                   {voicePeers.has(p) && (
-                    <FontAwesomeIcon icon={faWalkieTalkie} />
+                    <>
+                      <FontAwesomeIcon icon={faWalkieTalkie} />{" "}
+                    </>
                   )}
                   {p}
                 </span>
