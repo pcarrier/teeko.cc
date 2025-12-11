@@ -219,17 +219,17 @@ function selectMove(
     case "hard":
       return weightedRandom(
         candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
-        5
+        3
       );
     case "medium":
       return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
-        4
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.15))),
+        3
       );
     case "easy":
       return weightedRandom(
         candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.2))),
-        3
+        2
       );
     case "beginner":
       return weightedRandom(
