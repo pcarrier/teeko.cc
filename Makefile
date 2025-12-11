@@ -26,14 +26,6 @@ deploy-ws: ws/bundle.js
 	rsync --archive ws/bundle.js horse:/data/ws.teeko.cc/
 	ssh horse doas systemctl restart teeko-ws
 
-solution/solution: solution/teeko.go
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o teeko-solution ./solution
-
-.PHONY: deploy-solution
-deploy-solution: solution/solution
-	rsync --archive teeko-solution horse:/data/
-	ssh horse doas systemctl restart teeko-solution
-
 .PHONY: ws
 ws:
 	bun run ws/index.ts

@@ -40,7 +40,7 @@ function goedel(a: number, b: number, n: number): number {
     if (ab & bj) {
       if (b & bj) pat |= patBit;
       patBit >>>= 1;
-      posNum += chooseFlat[(24 - j) << 5 | (popcount8[(ab >>> j) & 255] + popcount8[(ab >>> (j + 8)) & 255] + popcount8[ab >>> (j + 16)])];
+      posNum += chooseFlat[(24 - j) << 5 | popcount(ab >>> j)];
     }
   }
   for (let j = 0; j < n; j++) {
@@ -68,6 +68,8 @@ export function onDbProgress(listener: (p: number) => void): () => void {
   return () => progressListeners.delete(listener);
 }
 
+const DB_SIZE = 96691520;
+
 async function loadDatabase(): Promise<void> {
   if (dbLoaded || dbLoading) return dbLoading ?? undefined;
 
@@ -76,10 +78,8 @@ async function loadDatabase(): Promise<void> {
     const res = await fetch("/assets/db");
     if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
 
-    const total = parseInt(res.headers.get("Content-Length") || "0", 10);
     let buffer: ArrayBuffer;
-
-    if (total && res.body) {
+    if (res.body) {
       const reader = res.body.getReader();
       const chunks: Uint8Array[] = [];
       let received = 0;
@@ -88,7 +88,7 @@ async function loadDatabase(): Promise<void> {
         if (done) break;
         chunks.push(value);
         received += value.length;
-        notify(received / total);
+        notify(received / DB_SIZE);
       }
       const combined = new Uint8Array(received);
       let pos = 0;
