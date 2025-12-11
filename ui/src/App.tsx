@@ -490,7 +490,7 @@ export const App: FunctionComponent = () => {
           <footer class="botControls">
             {dbProgress < 1 ? (
               <p class="dbProgress">
-                {spinner} <Text id="bot.downloading" fields={{ progress: Math.round(dbProgress * 100) }} />
+                {spinner} <Text id="bot.loading" fields={{ progress: Math.round(dbProgress * 100) }} />
               </p>
             ) : (
               <>

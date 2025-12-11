@@ -62,6 +62,6 @@
     "hard": "困难",
     "perfect": "完美",
     "letBotStart": "电脑先走",
-    "downloading": "下载中… {{progress}}%"
+    "loading": "加载数据库… {{progress}}%"
   }
 }

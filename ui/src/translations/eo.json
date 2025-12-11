@@ -62,6 +62,6 @@
     "hard": "Malfacila",
     "perfect": "Perfekta",
     "letBotStart": "Roboto komencas",
-    "downloading": "Elŝutante… {{progress}}%"
+    "loading": "Ŝargante datumbazon… {{progress}}%"
   }
 }
