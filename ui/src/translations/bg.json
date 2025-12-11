@@ -13,7 +13,6 @@
   "buttons": {
     "discord": "Discord",
     "wikipedia": "Уикипедия",
-    "source": "Код",
     "undo": "Отмяна",
     "restart": "Рестарт"
   },
@@ -50,7 +49,7 @@
     "playLocally": "Играй локално",
     "findPlayer": "Намери противник",
     "playWithFriends": "Играй с приятели",
-    "install": "Инсталирай",
+    "install": "Инсталиране",
     "offline": "В момента сте офлайн"
   },
   "bot": {

@@ -31,7 +31,6 @@ import { faUserPlus } from "@fortawesome/free-solid-svg-icons/faUserPlus";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons/faClipboardCheck";
 import { faRobot } from "@fortawesome/free-solid-svg-icons/faRobot";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
-import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { faBook } from "@fortawesome/free-solid-svg-icons/faBook";
 import { faDownload } from "@fortawesome/free-solid-svg-icons/faDownload";
@@ -105,8 +104,13 @@ const DifficultySelect: FunctionComponent<{
   </select>
 );
 
-const ExternalLinks: FunctionComponent = () => (
-  <nav class="externalLinks" aria-label="External links">
+const FooterLinks: FunctionComponent<{ onInstall?: () => void }> = ({ onInstall }) => (
+  <nav class="footerLinks" aria-label="Footer links">
+    {onInstall && (
+      <a href="#" onClick={(e) => { e.preventDefault(); onInstall(); }}>
+        <FontAwesomeIcon icon={faDownload} /> <Text id="menu.install" />
+      </a>
+    )}
     <a href="https://discord.gg/KEj9brTRS6" target="_blank" rel="noopener">
       <FontAwesomeIcon icon={faDiscord} /> <Text id="buttons.discord" />
     </a>
@@ -116,13 +120,6 @@ const ExternalLinks: FunctionComponent = () => (
       rel="noopener"
     >
       <FontAwesomeIcon icon={faWikipediaW} /> <Text id="buttons.wikipedia" />
-    </a>
-    <a
-      href="https://github.com/pcarrier/teeko.cc"
-      target="_blank"
-      rel="noopener"
-    >
-      <FontAwesomeIcon icon={faGithub} /> <Text id="buttons.source" />
     </a>
   </nav>
 );
@@ -356,13 +353,6 @@ export const App: FunctionComponent = () => {
 
         {route.type === "menu" && (
           <menu>
-            {installPrompt && !isStandalone && (
-              <li>
-                <button onClick={handleInstall}>
-                  <FontAwesomeIcon icon={faDownload} /> <Text id="menu.install" />
-                </button>
-              </li>
-            )}
             <li>
               <button onClick={() => navigate("/rules")}>
                 <FontAwesomeIcon icon={faBook} /> <Text id="menu.rules" />
@@ -416,7 +406,7 @@ export const App: FunctionComponent = () => {
                   </button>
                 </li>
                 <li>
-                  <ExternalLinks />
+                  <FooterLinks onInstall={installPrompt && !isStandalone ? handleInstall : undefined} />
                 </li>
               </>
             )}

@@ -13,7 +13,6 @@
   "buttons": {
     "discord": "Discord",
     "wikipedia": "Vikipedio",
-    "source": "Fonto",
     "undo": "Malfari",
     "restart": "Rekomenci"
   },
@@ -50,7 +49,7 @@
     "playLocally": "Ludi loke",
     "findPlayer": "Trovi ludanton",
     "playWithFriends": "Ludi kun amikoj",
-    "install": "Instali aplikaĵon",
+    "install": "Instali",
     "offline": "Nuntempe senreta"
   },
   "bot": {

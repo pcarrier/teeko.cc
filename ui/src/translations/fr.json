@@ -13,7 +13,6 @@
   "buttons": {
     "discord": "Discord",
     "wikipedia": "Wikipédia",
-    "source": "Source",
     "undo": "Annuler",
     "restart": "Recommencer"
   },
@@ -50,7 +49,7 @@
     "playLocally": "Jouer localement",
     "findPlayer": "Chercher un·e adversaire",
     "playWithFriends": "Jouer avec des ami·es",
-    "install": "Installer l'appli",
+    "install": "Installer",
     "offline": "Hors ligne"
   },
   "bot": {

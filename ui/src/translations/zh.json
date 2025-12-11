@@ -13,7 +13,6 @@
   "buttons": {
     "discord": "Discord",
     "wikipedia": "维基百科",
-    "source": "源码",
     "undo": "撤销",
     "restart": "重新开始"
   },
@@ -50,7 +49,7 @@
     "playLocally": "本地对战",
     "findPlayer": "寻找对手",
     "playWithFriends": "与好友对战",
-    "install": "安装应用",
+    "install": "安装",
     "offline": "当前离线"
   },
   "bot": {
