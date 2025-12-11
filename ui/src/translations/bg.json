@@ -62,8 +62,6 @@
     "hard": "Трудно",
     "perfect": "Перфектно",
     "letBotStart": "Ботът започва",
-    "start": "Старт",
-    "thinking": "Мисли…",
     "downloading": "Изтегляне… {{progress}}%"
   }
 }

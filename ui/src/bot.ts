@@ -8,40 +8,43 @@ export type Difficulty = "beginner" | "easy" | "medium" | "hard" | "perfect";
 export type BotPlayer = "a" | "b";
 
 const SIZE = 25;
-const positions = [1, 25, 300, 2300, 12650, 53130, 177100, 480700, 1081575];
+const positions = new Uint32Array([1, 25, 300, 2300, 12650, 53130, 177100, 480700, 1081575]);
 const configs = [1, 1, 2, 3, 6, 10, 20, 35, 70].map((p, i) => p * positions[i]);
 
-// Flattened choose table for cache locality: choose[n][k] -> chooseFlat[n * 32 + k]
-const chooseFlat = new Uint32Array(32 * 32);
+// Flattened choose table: choose[n][k] -> chooseFlat[n << 5 | k]
+const chooseFlat = new Uint32Array(32 << 5);
 for (let n = 0; n < 32; n++) {
-  chooseFlat[n * 32] = chooseFlat[n * 32 + n] = 1;
-  for (let k = 1; k < n; k++) chooseFlat[n * 32 + k] = chooseFlat[(n - 1) * 32 + k - 1] + chooseFlat[(n - 1) * 32 + k];
+  chooseFlat[n << 5] = chooseFlat[n << 5 | n] = 1;
+  for (let k = 1; k < n; k++) chooseFlat[n << 5 | k] = chooseFlat[(n - 1) << 5 | (k - 1)] + chooseFlat[(n - 1) << 5 | k];
 }
 
-// Precomputed popcount table for 16-bit values
-const popcount16 = new Uint8Array(65536);
-for (let i = 0; i < 65536; i++) {
-  popcount16[i] = (i & 1) + popcount16[i >> 1];
-}
+// Precomputed popcount for 8-bit values
+const popcount8 = new Uint8Array(256);
+for (let i = 1; i < 256; i++) popcount8[i] = (i & 1) + popcount8[i >> 1];
+
+// Precomputed 1 << j
+const bit = new Uint32Array(32);
+for (let i = 0; i < 32; i++) bit[i] = 1 << i;
 
 function popcount(n: number): number {
-  return popcount16[n & 0xffff] + popcount16[n >>> 16];
+  return popcount8[n & 255] + popcount8[(n >> 8) & 255] + popcount8[(n >> 16) & 255] + popcount8[n >>> 24];
 }
 
 function goedel(a: number, b: number, n: number): number {
   if (n === 0) return 0;
   const ab = a | b;
-  let posNum = 0, patNum = 0, pat = 0, patBit = 1 << (n - 1), nRed = (n + 1) >> 1;
+  let posNum = 0, patNum = 0, pat = 0, patBit = bit[n - 1], nRed = (n + 1) >> 1;
 
   for (let j = 0; j < SIZE; j++) {
-    if (ab & (1 << j)) {
-      if (b & (1 << j)) pat |= patBit;
+    const bj = bit[j];
+    if (ab & bj) {
+      if (b & bj) pat |= patBit;
       patBit >>>= 1;
-      posNum += chooseFlat[(SIZE - j - 1) * 32 + popcount(ab >>> j)];
+      posNum += chooseFlat[(24 - j) << 5 | (popcount8[(ab >>> j) & 255] + popcount8[(ab >>> (j + 8)) & 255] + popcount8[ab >>> (j + 16)])];
     }
   }
   for (let j = 0; j < n; j++) {
-    if (pat & (1 << j)) patNum += chooseFlat[(n - j - 1) * 32 + (nRed--)];
+    if (pat & bit[j]) patNum += chooseFlat[(n - j - 1) << 5 | (nRed--)];
   }
   return posNum + positions[n] * patNum;
 }

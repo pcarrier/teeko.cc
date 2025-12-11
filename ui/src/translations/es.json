@@ -62,8 +62,6 @@
     "hard": "Difícil",
     "perfect": "Perfecto",
     "letBotStart": "Bot empieza",
-    "start": "Empezar",
-    "thinking": "Pensando…",
     "downloading": "Descargando… {{progress}}%"
   }
 }

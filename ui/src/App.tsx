@@ -163,7 +163,6 @@ export const App: FunctionComponent = () => {
     () => (localStorage.getItem("botDifficulty") as Difficulty) || "medium"
   );
   const [botPlaysAs, setBotPlaysAs] = useState<BotPlayer>("b");
-  const [isBotThinking, setBotThinking] = useState(false);
   const [dbProgress, setDbProgress] = useState(0);
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
@@ -226,27 +225,18 @@ export const App: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    if (!isBotTurn || isBotThinking) return;
-    setBotThinking(true);
-    const timeout = setTimeout(async () => {
-      try {
-        const move = await getBotMove(board, botDifficulty);
-        if (move) {
-          const newBoard =
-            board.m.length < 8
-              ? computePlace(board, move.to)
-              : move.from !== undefined
-              ? computeMove(board, move.from, move.to)
-              : undefined;
-          if (newBoard) moveToBoard(newBoard);
-        }
-      } catch (e) {
-        console.error("Bot move failed:", e);
-      } finally {
-        setBotThinking(false);
+    if (!isBotTurn) return;
+    getBotMove(board, botDifficulty).then((move) => {
+      if (move) {
+        const newBoard =
+          board.m.length < 8
+            ? computePlace(board, move.to)
+            : move.from !== undefined
+            ? computeMove(board, move.from, move.to)
+            : undefined;
+        if (newBoard) moveToBoard(newBoard);
       }
-    }, 500);
-    return () => clearTimeout(timeout);
+    });
   }, [isBotTurn, board, botDifficulty]);
 
   const displayBoard = !board.p && !roomPath ? { ...board, p: true } : board;
@@ -490,7 +480,7 @@ export const App: FunctionComponent = () => {
               board={displayBoard}
               roomPath={roomPath}
               moveToBoard={moveToBoard}
-              disabled={isBotGame && (isBotTurn || isBotThinking)}
+              disabled={isBotGame && isBotTurn}
               isBotGame={isBotGame}
             />
           </section>

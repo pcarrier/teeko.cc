@@ -62,8 +62,6 @@
     "hard": "Malfacila",
     "perfect": "Perfekta",
     "letBotStart": "Roboto komencas",
-    "start": "Komenci",
-    "thinking": "Pensante…",
     "downloading": "Elŝutante… {{progress}}%"
   }
 }
