@@ -358,19 +358,6 @@ menu {
       }
     }
 
-    &.out.A {
-      fill: shade(@aColor, 50%);
-    }
-    &.out.B {
-      fill: shade(@bColor, 50%);
-    }
-    &.out.active.A {
-      fill: @aColor;
-    }
-    &.out.active.B {
-      fill: @bColor;
-    }
-
     &.last.A {
       fill: @aDark;
     }
@@ -429,6 +416,15 @@ menu {
   #arrowheadB {
     fill: shade(@bColor, 50%);
   }
+
+  .analysisScore {
+    font-size: 0.28px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+    text-shadow: 0 0 0.05px @bg, 0 0 0.05px @bg, 0 0 0.05px @bg;
+  }
 }
 
 .labeledButtons {
@@ -460,13 +456,100 @@ menu {
 .botControls,
 .matchingOverlay {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 1em;
+  gap: 0.5em;
   margin-top: 1em;
 
   select {
+    height: 3em;
     margin: 0;
+    padding: 0 1em;
+  }
+}
+
+.delayInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    width: 100%;
+    color: @color;
+  }
+
+  input[type="number"] {
+    flex: 1;
+    height: 3em;
+    text-align: right;
+  }
+}
+
+.botGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+
+  button {
+    margin: 0;
+  }
+
+  select {
+    margin: 0;
+  }
+
+  &.blue {
+    button {
+      color: @aColor;
+      border-color: @aColor;
+
+      &:hover:enabled {
+        background-color: shade(@aColor, 50%);
+      }
+
+      &.selected {
+        background-color: shade(@aColor, 50%);
+        border-color: @aColor;
+      }
+    }
+
+    select {
+      color: @aColor;
+      border-color: @aColor;
+
+      &:hover {
+        background-color: shade(@aColor, 50%);
+      }
+    }
+  }
+
+  &.red {
+    button {
+      color: @bColor;
+      border-color: @bColor;
+
+      &:hover:enabled {
+        background-color: shade(@bColor, 50%);
+      }
+
+      &.selected {
+        background-color: shade(@bColor, 50%);
+        border-color: @bColor;
+      }
+    }
+
+    select {
+      color: @bColor;
+      border-color: @bColor;
+
+      &:hover {
+        background-color: shade(@bColor, 50%);
+      }
+    }
   }
 }
 

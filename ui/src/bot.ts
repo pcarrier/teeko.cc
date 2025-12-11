@@ -139,14 +139,28 @@ async function loadDatabase(): Promise<void> {
   return dbLoading;
 }
 
-function generateMoves(
-  board: Board
-): { from?: number; to: number; score: number }[] {
+export type Move = { from?: number; to: number; score: number };
+
+// Convert raw database score to number of moves to win/lose
+// Returns positive number = moves to outcome (0 = instant win/loss)
+// Use raw score sign to determine if winning (>0) or losing (<0)
+export function formatScore(rawScore: number): number {
+  if (rawScore === 0) return 0;
+  if (rawScore > 0) {
+    // Win: 127 = instant win (0), 126 = win in 1, 125 = win in 2, etc.
+    return 127 - rawScore;
+  } else {
+    // Loss: -127 = instant loss (0), -126 = lose in 1, etc.
+    return 127 + rawScore;
+  }
+}
+
+export function generateMoves(board: Board): Move[] {
   const { a, b, m } = board;
   const n = popcount(a) + popcount(b);
   const [mover, other] = m.length % 2 === 0 ? [a, b] : [b, a];
   const ab = a | b;
-  const moves: { from?: number; to: number; score: number }[] = [];
+  const moves: Move[] = [];
 
   if (n === 8) {
     for (let sq = 0; sq < SIZE; sq++) {
@@ -195,10 +209,13 @@ function weightedRandom<T>(arr: T[], bias: number): T {
   return arr[arr.length - 1];
 }
 
-function selectMove(
-  moves: { from?: number; to: number; score: number }[],
-  difficulty: Difficulty
-) {
+export function isDbLoaded(): boolean {
+  return dbLoaded;
+}
+
+export { loadDatabase };
+
+function selectMove(moves: Move[], difficulty: Difficulty) {
   const sorted = shuffle([...moves]).sort((a, b) => b.score - a.score);
 
   if (difficulty === "perfect") return sorted[0];
@@ -218,23 +235,23 @@ function selectMove(
   switch (difficulty) {
     case "hard":
       return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.2))),
         3
       );
     case "medium":
       return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.15))),
-        3
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.25))),
+        2
       );
     case "easy":
       return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.2))),
-        2
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.3))),
+        1
       );
     case "beginner":
       return weightedRandom(
         sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))),
-        2
+        1
       );
     default:
       return sorted[0];

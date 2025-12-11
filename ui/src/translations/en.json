@@ -14,7 +14,8 @@
     "discord": "Discord",
     "wikipedia": "Wikipedia",
     "undo": "Undo",
-    "restart": "Restart"
+    "restart": "Restart",
+    "analysis": "Analyze"
   },
   "titleBar": {
     "local": "Local",
@@ -33,8 +34,8 @@
     "pop": "{{pop}}P"
   },
   "status": {
-    "aWin": "Teeko! Blue won.",
-    "bWin": "Teeko! Red won.",
+    "aWin": "Teeko! Blue won in {{turns}} turns.",
+    "bWin": "Teeko! Red won in {{turns}} turns.",
     "aDrop": "Blue places piece {{piece}} out of 4…",
     "bDrop": "Red places piece {{piece}} out of 4…",
     "aMoveFrom": "Blue moves from…",
@@ -46,22 +47,21 @@
   },
   "menu": {
     "rules": "Rules",
-    "playLocally": "Play locally",
+    "playLocally": "Play offline",
     "findPlayer": "Find a player",
     "playWithFriends": "Play with friends",
     "install": "Install",
     "offline": "Currently offline"
   },
   "bot": {
-    "playVsBot": "Play vs Bot",
-    "title": "Play vs Bot",
+    "title": "Bot",
     "difficulty": "Difficulty:",
     "beginner": "Beginner",
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard",
     "perfect": "Perfect",
-    "letBotStart": "Let bot start",
-    "loading": "Loading database… {{progress}}%"
+    "loading": "Loading database… {{progress}}%",
+    "delay": "Bot delay (ms):"
   }
 }

@@ -14,7 +14,8 @@
     "discord": "Discord",
     "wikipedia": "Wikipédia",
     "undo": "Desfazer",
-    "restart": "Reiniciar"
+    "restart": "Reiniciar",
+    "analysis": "Analisar"
   },
   "titleBar": {
     "local": "Local",
@@ -33,8 +34,8 @@
     "pop": "{{pop}}J"
   },
   "status": {
-    "aWin": "Teeko! Azul ganhou.",
-    "bWin": "Teeko! Vermelho ganhou.",
+    "aWin": "Teeko! Azul ganhou em {{turns}} turnos.",
+    "bWin": "Teeko! Vermelho ganhou em {{turns}} turnos.",
     "aDrop": "Azul coloca a peça {{piece}} de 4…",
     "bDrop": "Vermelho coloca a peça {{piece}} de 4…",
     "aMoveFrom": "Azul move de…",
@@ -46,22 +47,21 @@
   },
   "menu": {
     "rules": "Regras",
-    "playLocally": "Jogar localmente",
+    "playLocally": "Jogar offline",
     "findPlayer": "Procurar jogador",
     "playWithFriends": "Jogar com amigos",
     "install": "Instalar",
     "offline": "Sem conexão"
   },
   "bot": {
-    "playVsBot": "Jogar vs Bot",
-    "title": "Jogar vs Bot",
+    "title": "Bot",
     "difficulty": "Dificuldade:",
     "beginner": "Iniciante",
     "easy": "Fácil",
     "medium": "Médio",
     "hard": "Difícil",
     "perfect": "Perfeito",
-    "letBotStart": "Bot começa",
-    "loading": "Carregando banco de dados… {{progress}}%"
+    "loading": "Carregando banco de dados… {{progress}}%",
+    "delay": "Atraso do bot (ms):"
   }
 }

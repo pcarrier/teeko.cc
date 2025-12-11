@@ -24,14 +24,13 @@ import {
   LARGE_CROWN_RADIUS,
   LAST_ACTION_RADIUS,
   LINE_MARGIN,
-  OUT_RADIUS,
   PIECE_RADIUS,
   SLOT_RADIUS,
 } from "./sizing";
 import { Piece } from "./Piece";
+import { Move, formatScore } from "./bot";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
-const OUT_ARRAY = Array.from(Array(8).keys());
 
 type BoardArrow = {
   from: number;
@@ -46,6 +45,8 @@ type BoardViewAttrs = {
   klass?: string;
   showStatus?: boolean;
   arrows?: BoardArrow[];
+  analysis?: Move[];
+  botSelection?: number;
 };
 
 export const BoardBackground = (
@@ -90,6 +91,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   klass,
   showStatus,
   arrows,
+  analysis,
+  botSelection,
 }) => {
   const [selected, setSelected] = useState<number | undefined>(undefined);
   const [dragTurn, setDragTurn] = useState<number | undefined>(undefined);
@@ -203,9 +206,23 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         })
       );
     }
+    // Show arrows for bot selection
+    if (botSelection !== undefined && selected === undefined) {
+      const botEmptyNeighbors = [...pieces(NEIGHS_BY_POSITION[botSelection])].filter(
+        (x) => !allPieces.has(x)
+      );
+      botEmptyNeighbors.forEach((to) =>
+        result.push({
+          from: botSelection,
+          to,
+          player: t === 0 ? Player.A : Player.B,
+        })
+      );
+    }
     return result;
-  }, [arrows, selected, releasePos, dragPos]);
+  }, [arrows, selected, releasePos, dragPos, botSelection, allPieces, t, placing]);
 
+  const turnNumber = board.m.length + 1;
   const status = showStatus && (
     <p
       class={classnames("status", t === 0 ? "A" : "B", {
@@ -213,10 +230,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         win,
       })}
     >
+      {!win && <span class="turnNumber">{turnNumber}. </span>}
       {aWin ? (
-        <Text id="status.aWin" />
+        <Text id="status.aWin" fields={{ turns: board.m.length }} />
       ) : bWin ? (
-        <Text id="status.bWin" />
+        <Text id="status.bWin" fields={{ turns: board.m.length }} />
       ) : alreadyPlayed < 4 ? (
         t === 0 ? (
           <Text id="status.aDrop" fields={{ piece: alreadyPlayed + 1 }} />
@@ -224,13 +242,19 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           <Text id="status.bDrop" fields={{ piece: alreadyPlayed + 1 }} />
         )
       ) : board.p ? (
-        selected === undefined ? (
+        selected === undefined && botSelection === undefined ? (
           t === 0 ? (
             <Text id="status.aMoveFrom" />
           ) : (
             <Text id="status.bMoveFrom" />
           )
         ) : t === 0 ? (
+          <Text id="status.aMoveTo" />
+        ) : (
+          <Text id="status.bMoveTo" />
+        )
+      ) : botSelection !== undefined ? (
+        t === 0 ? (
           <Text id="status.aMoveTo" />
         ) : (
           <Text id="status.bMoveTo" />
@@ -249,7 +273,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`${-LARGE_CROWN_RADIUS} ${-LARGE_CROWN_RADIUS} ${
           4 + 2 * LARGE_CROWN_RADIUS
-        } ${4 + 2 * LARGE_CROWN_RADIUS + 2 * OUT_RADIUS}`}
+        } ${4 + 2 * LARGE_CROWN_RADIUS}`}
         className={classnames("board", klass)}
         ref={svgRef}
       >
@@ -312,12 +336,12 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
         </g>
 
         <g>
-          {selected && (
+          {(selected || botSelection !== undefined) && (
             <circle
               key="selected"
               r={LARGE_CROWN_RADIUS}
-              cx={x(selected)}
-              cy={y(selected)}
+              cx={x(selected ?? botSelection!)}
+              cy={y(selected ?? botSelection!)}
               class="selected"
             />
           )}
@@ -389,22 +413,6 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           ))}
         </g>
 
-        <g id="out">
-          {showStatus &&
-            OUT_ARRAY.slice(allPieces.size).map((i) => {
-              return (
-                <circle
-                  key={i}
-                  cx={0.25 + i / 2}
-                  cy={4 + LARGE_CROWN_RADIUS + OUT_RADIUS}
-                  r={OUT_RADIUS}
-                  class={classnames("out", i % 2 === 0 ? "A" : "B", {
-                    active: i === allPieces.size,
-                  })}
-                />
-              );
-            })}
-        </g>
         <g>
           {[...aPieces, ...bPieces].map((pos) => {
             return (
@@ -444,6 +452,84 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
             />
           )}
         </g>
+
+        {analysis && analysis.length > 0 && (
+          <g class="analysis">
+            {(() => {
+              // Use actual game state for analysis, not local player's turn
+              const isPlacementPhase = allPieces.size < 8;
+
+              // Convert number to subscript
+              const toSubscript = (n: number): string => {
+                const subscripts = "₀₁₂₃₄₅₆₇₈₉";
+                return String(n).split("").map(d => subscripts[parseInt(d)]).join("");
+              };
+
+              // Format score with symbol and subscript number
+              const scoreDisplay = (score: number) => {
+                const moves = formatScore(score);
+                if (score > 0) return `✓${toSubscript(moves)}`;
+                if (score < 0) return `✗${toSubscript(moves)}`;
+                return "=";
+              };
+
+              if (isPlacementPhase) {
+                // Show scores on empty slots during placement
+                return analysis.map((m) => (
+                  <text
+                    key={m.to}
+                    x={x(m.to)}
+                    y={y(m.to)}
+                    class="analysisScore"
+                    fill="white"
+                  >
+                    {scoreDisplay(m.score)}
+                  </text>
+                ));
+              } else {
+                const effectiveSelection = selected ?? botSelection;
+                if (effectiveSelection === undefined) {
+                  // Show best score for each movable piece
+                  const pieceScores = new Map<number, number>();
+                  for (const m of analysis) {
+                    if (m.from !== undefined) {
+                      const current = pieceScores.get(m.from);
+                      if (current === undefined || m.score > current) {
+                        pieceScores.set(m.from, m.score);
+                      }
+                    }
+                  }
+                  return [...pieceScores].map(([pos, score]) => (
+                    <text
+                      key={pos}
+                      x={x(pos)}
+                      y={y(pos)}
+                      class="analysisScore"
+                      fill="white"
+                    >
+                      {scoreDisplay(score)}
+                    </text>
+                  ));
+                } else {
+                  // Show scores on destination squares for selected piece (user or bot)
+                  return analysis
+                    .filter((m) => m.from === effectiveSelection)
+                    .map((m) => (
+                      <text
+                        key={m.to}
+                        x={x(m.to)}
+                        y={y(m.to)}
+                        class="analysisScore"
+                        fill="white"
+                      >
+                        {scoreDisplay(m.score)}
+                      </text>
+                    ));
+                }
+              }
+            })()}
+          </g>
+        )}
       </svg>
       {status}
     </>

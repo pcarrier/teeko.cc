@@ -20,6 +20,7 @@ import {
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
 import { TitleBar } from "./TitleBar";
+import { BotControls } from "./BotControls";
 import { wsUrl } from "./env.js";
 import Sockette from "sockette";
 import { randomID } from "./random";
@@ -29,7 +30,6 @@ import { faBars } from "@fortawesome/free-solid-svg-icons/faBars";
 import { faClose } from "@fortawesome/free-solid-svg-icons/faClose";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons/faUserPlus";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons/faClipboardCheck";
-import { faRobot } from "@fortawesome/free-solid-svg-icons/faRobot";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { faBook } from "@fortawesome/free-solid-svg-icons/faBook";
@@ -42,7 +42,6 @@ import {
   getBotMove,
   isGameOver,
   Difficulty,
-  BotPlayer,
   onDbProgress,
 } from "./bot";
 import { useVoiceChat } from "./useVoiceChat";
@@ -56,7 +55,6 @@ type Route =
   | { type: "menu" }
   | { type: "rules" }
   | { type: "play" }
-  | { type: "bot" }
   | { type: "friends" }
   | { type: "room"; id: string };
 
@@ -64,7 +62,6 @@ function parseRoute(pathname: string): Route {
   const path = pathname.substring(1);
   if (path === "rules") return { type: "rules" };
   if (path === "play") return { type: "play" };
-  if (path === "bot") return { type: "bot" };
   if (path === "friends") return { type: "friends" };
   if (path.startsWith("room/")) return { type: "room", id: path.substring(5) };
   return { type: "menu" };
@@ -80,35 +77,6 @@ function loadBoard(key: string): Board {
   } catch {}
   return emptyBoard();
 }
-
-const DifficultySelect: FunctionComponent<{
-  value: Difficulty;
-  onChange: (d: Difficulty) => void;
-}> = ({ value, onChange }) => (
-  <select
-    aria-label="Difficulty"
-    value={value}
-    onChange={(e) =>
-      onChange((e.target as HTMLSelectElement).value as Difficulty)
-    }
-  >
-    <option value="beginner">
-      <Text id="bot.beginner" />
-    </option>
-    <option value="easy">
-      <Text id="bot.easy" />
-    </option>
-    <option value="medium">
-      <Text id="bot.medium" />
-    </option>
-    <option value="hard">
-      <Text id="bot.hard" />
-    </option>
-    <option value="perfect">
-      <Text id="bot.perfect" />
-    </option>
-  </select>
-);
 
 const FooterLinks: FunctionComponent<{ onInstall?: () => void }> = ({
   onInstall,
@@ -183,10 +151,24 @@ export const App: FunctionComponent = () => {
   const [ws, setWs] = useState<Sockette>();
   const [onlineStatus, setOnlineStatus] = useState(OnlineStatus.OFFLINE);
   const [board, setBoard] = useState<Board>(() => loadBoard("localBoard"));
-  const [botDifficulty, _setBotDifficulty] = useState<Difficulty>(
-    () => (localStorage.getItem("botDifficulty") as Difficulty) || "medium"
+  const [botAEnabled, _setBotAEnabled] = useState<boolean>(
+    () => localStorage.getItem("botAEnabled") === "true"
   );
-  const [botPlaysAs, setBotPlaysAs] = useState<BotPlayer>("b");
+  const [botBEnabled, _setBotBEnabled] = useState<boolean>(
+    () => localStorage.getItem("botBEnabled") === "true"
+  );
+  const [botADifficulty, _setBotADifficulty] = useState<Difficulty>(
+    () => (localStorage.getItem("botADifficulty") as Difficulty) || "medium"
+  );
+  const [botBDifficulty, _setBotBDifficulty] = useState<Difficulty>(
+    () => (localStorage.getItem("botBDifficulty") as Difficulty) || "medium"
+  );
+  const [botDelay, _setBotDelay] = useState<number>(
+    () => parseInt(localStorage.getItem("botDelay") || "0", 10)
+  );
+  const botDelayRef = useRef(botDelay);
+  botDelayRef.current = botDelay;
+  const [botSelection, setBotSelection] = useState<number | undefined>(undefined);
   const [dbProgress, setDbProgress] = useState(0);
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
@@ -209,16 +191,40 @@ export const App: FunctionComponent = () => {
   );
 
   const roomPath = route.type === "room" ? route.id : undefined;
-  const isBotGame = route.type === "bot";
-  const showGame = route.type === "play" || isBotGame || (roomPath && nickname);
+  const isLocalGame = route.type === "play";
+  const showGame = isLocalGame || (roomPath && nickname);
+  const currentPlayer = board.m.length % 2 === 0 ? "a" : "b";
   const isBotTurn =
-    isBotGame &&
+    isLocalGame &&
     !isGameOver(board) &&
-    (board.m.length % 2 === 0 ? "a" : "b") === botPlaysAs;
+    ((currentPlayer === "a" && botAEnabled) ||
+      (currentPlayer === "b" && botBEnabled));
+  const currentBotDifficulty =
+    currentPlayer === "a" ? botADifficulty : botBDifficulty;
 
-  const setBotDifficulty = (d: Difficulty) => {
-    localStorage.setItem("botDifficulty", d);
-    _setBotDifficulty(d);
+  const setBotAEnabled = (enabled: boolean) => {
+    localStorage.setItem("botAEnabled", String(enabled));
+    _setBotAEnabled(enabled);
+  };
+
+  const setBotBEnabled = (enabled: boolean) => {
+    localStorage.setItem("botBEnabled", String(enabled));
+    _setBotBEnabled(enabled);
+  };
+
+  const setBotADifficulty = (d: Difficulty) => {
+    localStorage.setItem("botADifficulty", d);
+    _setBotADifficulty(d);
+  };
+
+  const setBotBDifficulty = (d: Difficulty) => {
+    localStorage.setItem("botBDifficulty", d);
+    _setBotBDifficulty(d);
+  };
+
+  const setBotDelay = (ms: number) => {
+    localStorage.setItem("botDelay", String(ms));
+    _setBotDelay(ms);
   };
 
   const navigate = (path: string) => {
@@ -236,18 +242,16 @@ export const App: FunctionComponent = () => {
   useEvent("popstate", () => setRoute(parseRoute(window.location.pathname)));
 
   useEffect(() => {
-    if (route.type === "play") setBoard(loadBoard("localBoard"));
-    else if (isBotGame) setBoard(emptyBoard());
-  }, [route.type, isBotGame]);
+    if (isLocalGame) setBoard(loadBoard("localBoard"));
+  }, [isLocalGame]);
 
   useEffect(() => {
-    if (!isBotGame) return;
+    if (!botAEnabled && !botBEnabled) return;
     return onDbProgress(setDbProgress);
-  }, [isBotGame]);
+  }, [botAEnabled, botBEnabled]);
 
   const moveToBoard = (newBoard: Board, propagate = true) => {
     setBoard(newBoard);
-    if (newBoard.m.length === 0) setBotPlaysAs("b");
     if (route.type === "play")
       localStorage.setItem("localBoard", JSON.stringify(newBoard));
     if (propagate && ws)
@@ -255,19 +259,55 @@ export const App: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    if (!isBotTurn) return;
-    getBotMove(board, botDifficulty).then((move) => {
-      if (move) {
-        const newBoard =
-          board.m.length < 8
-            ? computePlace(board, move.to)
-            : move.from !== undefined
-            ? computeMove(board, move.from, move.to)
-            : undefined;
+    if (!isBotTurn) {
+      setBotSelection(undefined);
+      return;
+    }
+    let cancelled = false;
+    let timeout1: ReturnType<typeof setTimeout>;
+    let timeout2: ReturnType<typeof setTimeout>;
+    let timeout3: ReturnType<typeof setTimeout>;
+    getBotMove(board, currentBotDifficulty).then((move) => {
+      if (cancelled || !move) return;
+      const isPlacement = board.m.length < 8;
+      const delay = botDelayRef.current;
+      const execute = () => {
+        if (cancelled) return;
+        setBotSelection(undefined);
+        const newBoard = isPlacement
+          ? computePlace(board, move.to)
+          : move.from !== undefined
+          ? computeMove(board, move.from, move.to)
+          : undefined;
         if (newBoard) moveToBoard(newBoard);
+      };
+      if (delay > 0) {
+        if (!isPlacement && move.from !== undefined) {
+          // Three-phase: delay, select piece, delay, move
+          timeout1 = setTimeout(() => {
+            if (cancelled) return;
+            setBotSelection(move.from);
+            timeout2 = setTimeout(() => {
+              if (cancelled) return;
+              execute();
+            }, delay);
+          }, delay);
+        } else {
+          // Placement: just delay then place
+          timeout3 = setTimeout(execute, delay);
+        }
+      } else {
+        execute();
       }
     });
-  }, [isBotTurn, board, botDifficulty]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+      setBotSelection(undefined);
+    };
+  }, [isBotTurn, board, currentBotDifficulty]);
 
   const displayBoard = !board.p && !roomPath ? { ...board, p: true } : board;
 
@@ -386,11 +426,6 @@ export const App: FunctionComponent = () => {
               <button onClick={() => navigate("/play")}>
                 <FontAwesomeIcon icon={faHouse} />{" "}
                 <Text id="menu.playLocally" />
-              </button>
-            </li>
-            <li>
-              <button onClick={() => navigate("/bot")}>
-                <FontAwesomeIcon icon={faRobot} /> <Text id="bot.playVsBot" />
               </button>
             </li>
             {isOffline && (
@@ -514,36 +549,33 @@ export const App: FunctionComponent = () => {
               board={displayBoard}
               roomPath={roomPath}
               moveToBoard={moveToBoard}
-              disabled={isBotGame && isBotTurn}
-              isBotGame={isBotGame}
+              disabled={isBotTurn}
+              isBotGame={isLocalGame && (botAEnabled || botBEnabled)}
+              singleBotMode={isLocalGame && (botAEnabled !== botBEnabled)}
+              botSelection={botSelection}
             />
           </section>
         )}
 
-        {isBotGame && (
-          <footer class="botControls">
-            {dbProgress < 1 ? (
-              <p class="dbProgress">
-                {spinner}{" "}
-                <Text
-                  id="bot.loading"
-                  fields={{ progress: Math.round(dbProgress * 100) }}
-                />
-              </p>
-            ) : (
-              <>
-                <DifficultySelect
-                  value={botDifficulty}
-                  onChange={setBotDifficulty}
-                />
-                {board.m.length === 0 && (
-                  <button onClick={() => setBotPlaysAs("a")}>
-                    <Text id="bot.letBotStart" />
-                  </button>
-                )}
-              </>
-            )}
-          </footer>
+        {isLocalGame && (
+          <BotControls
+            bot={{
+              botAEnabled,
+              botBEnabled,
+              botADifficulty,
+              botBDifficulty,
+              botDelay,
+              botSelection,
+              dbProgress,
+              isBotTurn,
+              singleBotMode: botAEnabled !== botBEnabled,
+              setBotAEnabled,
+              setBotBEnabled,
+              setBotADifficulty,
+              setBotBDifficulty,
+              setBotDelay,
+            }}
+          />
         )}
 
         {isMatching && (

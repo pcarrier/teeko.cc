@@ -14,7 +14,8 @@
     "discord": "Discord",
     "wikipedia": "Wikipédia",
     "undo": "Annuler",
-    "restart": "Recommencer"
+    "restart": "Recommencer",
+    "analysis": "Analyser"
   },
   "titleBar": {
     "local": "Local",
@@ -33,8 +34,8 @@
     "pop": "{{pop}}J"
   },
   "status": {
-    "aWin": "Teeko ! Bleu gagne.",
-    "bWin": "Teeko ! Rouge gagne.",
+    "aWin": "Teeko ! Bleu gagne en {{turns}} coups.",
+    "bWin": "Teeko ! Rouge gagne en {{turns}} coups.",
     "aDrop": "Bleu pose le pion {{piece}} sur 4…",
     "bDrop": "Rouge pose le pion {{piece}} sur 4…",
     "aMoveFrom": "Bleu bouge de…",
@@ -46,22 +47,21 @@
   },
   "menu": {
     "rules": "Règles",
-    "playLocally": "Jouer localement",
+    "playLocally": "Jouer hors ligne",
     "findPlayer": "Chercher un·e adversaire",
     "playWithFriends": "Jouer avec des ami·es",
     "install": "Installer",
     "offline": "Hors ligne"
   },
   "bot": {
-    "playVsBot": "Jouer contre le bot",
-    "title": "Jouer contre le bot",
+    "title": "Bot",
     "difficulty": "Difficulté :",
     "beginner": "Débutant",
     "easy": "Facile",
     "medium": "Moyen",
     "hard": "Difficile",
     "perfect": "Parfait",
-    "letBotStart": "Le bot commence",
-    "loading": "Chargement de la base… {{progress}}%"
+    "loading": "Chargement de la base… {{progress}}%",
+    "delay": "Délai du bot (ms) :"
   }
 }

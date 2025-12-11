@@ -14,7 +14,8 @@
     "discord": "Discord",
     "wikipedia": "Vikipedio",
     "undo": "Malfari",
-    "restart": "Rekomenci"
+    "restart": "Rekomenci",
+    "analysis": "Analizi"
   },
   "titleBar": {
     "local": "Loka",
@@ -33,8 +34,8 @@
     "pop": "{{pop}}L"
   },
   "status": {
-    "aWin": "Teeko! Bluo gajnis.",
-    "bWin": "Teeko! Ruĝo gajnis.",
+    "aWin": "Teeko! Bluo gajnis en {{turns}} movoj.",
+    "bWin": "Teeko! Ruĝo gajnis en {{turns}} movoj.",
     "aDrop": "Bluo metas pecon {{piece}} el 4…",
     "bDrop": "Ruĝo metas pecon {{piece}} el 4…",
     "aMoveFrom": "Bluo movas de…",
@@ -46,22 +47,21 @@
   },
   "menu": {
     "rules": "Reguloj",
-    "playLocally": "Ludi loke",
+    "playLocally": "Ludi senrete",
     "findPlayer": "Trovi ludanton",
     "playWithFriends": "Ludi kun amikoj",
     "install": "Instali",
     "offline": "Nuntempe senreta"
   },
   "bot": {
-    "playVsBot": "Ludi kontraŭ roboto",
-    "title": "Ludi kontraŭ roboto",
+    "title": "Roboto",
     "difficulty": "Malfacilo:",
     "beginner": "Komencanto",
     "easy": "Facila",
     "medium": "Meza",
     "hard": "Malfacila",
     "perfect": "Perfekta",
-    "letBotStart": "Roboto komencas",
-    "loading": "Ŝargante datumbazon… {{progress}}%"
+    "loading": "Ŝargante datumbazon… {{progress}}%",
+    "delay": "Robota prokrasto (ms):"
   }
 }

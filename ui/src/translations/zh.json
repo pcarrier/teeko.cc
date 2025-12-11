@@ -14,7 +14,8 @@
     "discord": "Discord",
     "wikipedia": "维基百科",
     "undo": "撤销",
-    "restart": "重新开始"
+    "restart": "重新开始",
+    "analysis": "分析"
   },
   "titleBar": {
     "local": "本地",
@@ -33,8 +34,8 @@
     "pop": "{{pop}}P"
   },
   "status": {
-    "aWin": "Teeko! 蓝方获胜.",
-    "bWin": "Teeko! 红方获胜.",
+    "aWin": "Teeko! 蓝方在{{turns}}回合内获胜。",
+    "bWin": "Teeko! 红方在{{turns}}回合内获胜。",
     "aDrop": "蓝方放置第 {{piece}} 块棋子。共有4子…",
     "bDrop": "红方放置第 {{piece}} 块棋子。共有4子…",
     "aMoveFrom": "蓝方移动自…",
@@ -46,22 +47,21 @@
   },
   "menu": {
     "rules": "规则",
-    "playLocally": "本地对战",
+    "playLocally": "离线游戏",
     "findPlayer": "寻找对手",
     "playWithFriends": "与好友对战",
     "install": "安装",
     "offline": "当前离线"
   },
   "bot": {
-    "playVsBot": "人机对战",
-    "title": "人机对战",
+    "title": "机器人",
     "difficulty": "难度：",
     "beginner": "入门",
     "easy": "简单",
     "medium": "中等",
     "hard": "困难",
     "perfect": "完美",
-    "letBotStart": "电脑先走",
-    "loading": "加载数据库… {{progress}}%"
+    "loading": "加载数据库… {{progress}}%",
+    "delay": "机器人延迟（毫秒）："
   }
 }
