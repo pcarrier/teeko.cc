@@ -34,6 +34,7 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons/faDiscord";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 import { faWikipediaW } from "@fortawesome/free-brands-svg-icons/faWikipediaW";
 import { faBook } from "@fortawesome/free-solid-svg-icons/faBook";
+import { faDownload } from "@fortawesome/free-solid-svg-icons/faDownload";
 import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
@@ -134,18 +135,26 @@ export const App: FunctionComponent = () => {
     const preferred = navigator.languages.map((l) => l.split("-")[0]);
     return preferred.find((l) => l in translations) || "en";
   }, []);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isOffline, setIsOffline] = useState(() => {
+    window.addEventListener("online", () => setIsOffline(false));
+    window.addEventListener("offline", () => setIsOffline(true));
+    return !navigator.onLine;
+  });
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+  if (!installPrompt && !isStandalone) {
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    }, { once: true });
+  }
 
-  useEffect(() => {
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") setInstallPrompt(null);
+  };
 
   const [lang, setLang] = useState(startLang);
   const [nickname, setNickname] = useState(
@@ -347,6 +356,13 @@ export const App: FunctionComponent = () => {
 
         {route.type === "menu" && (
           <menu>
+            {installPrompt && !isStandalone && (
+              <li>
+                <button onClick={handleInstall}>
+                  <FontAwesomeIcon icon={faDownload} /> <Text id="menu.install" />
+                </button>
+              </li>
+            )}
             <li>
               <button onClick={() => navigate("/rules")}>
                 <FontAwesomeIcon icon={faBook} /> <Text id="menu.rules" />

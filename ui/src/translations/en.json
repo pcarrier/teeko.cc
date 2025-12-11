@@ -50,6 +50,7 @@
     "playLocally": "Play locally",
     "findPlayer": "Find a player",
     "playWithFriends": "Play with friends",
+    "install": "Install app",
     "offline": "Currently offline"
   },
   "bot": {
