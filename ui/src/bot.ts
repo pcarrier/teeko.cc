@@ -4,161 +4,140 @@ import {
   NEIGHS_BY_POSITION,
 } from "teeko-cc-common/src/model.js";
 
-const DB_URL = "/assets/db";
-const EDGE = 5;
-const SIZE = EDGE * EDGE;
-
 export type Difficulty = "beginner" | "easy" | "medium" | "hard" | "perfect";
 export type BotPlayer = "a" | "b";
 
-type Move = { from?: number; to: number; score: number };
-
-// Precomputed values for Goedel numbering
-const patterns = [1, 1, 2, 3, 6, 10, 20, 35, 70];
+const SIZE = 25;
 const positions = [1, 25, 300, 2300, 12650, 53130, 177100, 480700, 1081575];
-const configs = patterns.map((p, i) => p * positions[i]);
+const configs = [1, 1, 2, 3, 6, 10, 20, 35, 70].map((p, i) => p * positions[i]);
 
-// Pascal's triangle for combinations
-const choose: number[][] = Array.from({ length: 32 }, () => Array(32).fill(0));
+// Flattened choose table for cache locality: choose[n][k] -> chooseFlat[n * 32 + k]
+const chooseFlat = new Uint32Array(32 * 32);
 for (let n = 0; n < 32; n++) {
-  choose[n][0] = 1;
-  choose[n][n] = 1;
-  for (let k = 1; k < n; k++) {
-    choose[n][k] = choose[n - 1][k - 1] + choose[n - 1][k];
-  }
+  chooseFlat[n * 32] = chooseFlat[n * 32 + n] = 1;
+  for (let k = 1; k < n; k++) chooseFlat[n * 32 + k] = chooseFlat[(n - 1) * 32 + k - 1] + chooseFlat[(n - 1) * 32 + k];
+}
+
+// Precomputed popcount table for 16-bit values
+const popcount16 = new Uint8Array(65536);
+for (let i = 0; i < 65536; i++) {
+  popcount16[i] = (i & 1) + popcount16[i >> 1];
 }
 
 function popcount(n: number): number {
-  n = n - ((n >>> 1) & 0x55555555);
-  n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
-  return (((n + (n >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
+  return popcount16[n & 0xffff] + popcount16[n >>> 16];
 }
 
-// Goedel numbering - encode (a, b) position to index
 function goedel(a: number, b: number, n: number): number {
   if (n === 0) return 0;
-
   const ab = a | b;
-  let posNum = 0,
-    patNum = 0;
-  let pat = 0;
-  let patBit = 1 << (n - 1);
-  let nRed = Math.floor((n + 1) / 2);
+  let posNum = 0, patNum = 0, pat = 0, patBit = 1 << (n - 1), nRed = (n + 1) >> 1;
 
   for (let j = 0; j < SIZE; j++) {
-    const remaining = popcount(ab >>> j);
     if (ab & (1 << j)) {
-      if (b & (1 << j)) {
-        pat |= patBit;
-      }
+      if (b & (1 << j)) pat |= patBit;
       patBit >>>= 1;
-      posNum += choose[SIZE - j - 1][remaining];
+      posNum += chooseFlat[(SIZE - j - 1) * 32 + popcount(ab >>> j)];
     }
   }
-
   for (let j = 0; j < n; j++) {
-    if (pat & (1 << j)) {
-      nRed--;
-      patNum += choose[n - j - 1][nRed + 1];
-    }
+    if (pat & (1 << j)) patNum += chooseFlat[(n - j - 1) * 32 + (nRed--)];
   }
-
   return posNum + positions[n] * patNum;
 }
 
-// Database state
+// Database
 let dbLoading: Promise<void> | null = null;
 let dbLoaded = false;
 const scores: Int8Array[] = [];
+const progressListeners: Set<(p: number) => void> = new Set();
+let progress = 0;
+
+function notify(p: number) {
+  progress = p;
+  for (const l of progressListeners) l(p);
+}
+
+export function onDbProgress(listener: (p: number) => void): () => void {
+  loadDatabase();
+  listener(dbLoaded ? 1 : progress);
+  progressListeners.add(listener);
+  return () => progressListeners.delete(listener);
+}
 
 async function loadDatabase(): Promise<void> {
-  if (dbLoaded) return;
-  if (dbLoading) return dbLoading;
+  if (dbLoaded || dbLoading) return dbLoading ?? undefined;
 
   dbLoading = (async () => {
-    const response = await fetch(DB_URL);
-    if (!response.ok)
-      throw new Error(`Failed to fetch database: ${response.status}`);
-    const buffer = await response.arrayBuffer();
+    notify(0);
+    const res = await fetch("/assets/db");
+    if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+
+    const total = parseInt(res.headers.get("Content-Length") || "0", 10);
+    let buffer: ArrayBuffer;
+
+    if (total && res.body) {
+      const reader = res.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let received = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        notify(received / total);
+      }
+      const combined = new Uint8Array(received);
+      let pos = 0;
+      for (const c of chunks) { combined.set(c, pos); pos += c.length; }
+      buffer = combined.buffer;
+    } else {
+      buffer = await res.arrayBuffer();
+      notify(1);
+    }
+
     const view = new DataView(buffer);
+    const magic = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3));
+    if (magic !== "TEEK") throw new Error("Invalid database");
+    if (view.getUint32(4, true) !== 1) throw new Error("Unsupported version");
 
-    // Verify header
-    const magic = String.fromCharCode(
-      view.getUint8(0),
-      view.getUint8(1),
-      view.getUint8(2),
-      view.getUint8(3)
-    );
-    if (magic !== "TEEK") throw new Error("Invalid database magic");
-    const version = view.getUint32(4, true);
-    if (version !== 1)
-      throw new Error(`Unsupported database version: ${version}`);
-
-    // Read scores for each piece count
     let offset = 8;
     for (let n = 0; n < 9; n++) {
       const size = view.getUint32(offset, true);
       offset += 4;
-      if (size !== configs[n])
-        throw new Error(`Size mismatch for ${n} pieces`);
+      if (size !== configs[n]) throw new Error(`Size mismatch for ${n} pieces`);
       scores[n] = new Int8Array(buffer, offset, size);
       offset += size;
     }
-
     dbLoaded = true;
   })();
 
   return dbLoading;
 }
 
-function generateMoves(board: Board): Move[] {
-  const a = board.a;
-  const b = board.b;
+function generateMoves(board: Board): { from?: number; to: number; score: number }[] {
+  const { a, b, m } = board;
   const n = popcount(a) + popcount(b);
-  const aTurn = board.m.length % 2 === 0;
-  const [mover, other] = aTurn ? [a, b] : [b, a];
+  const [mover, other] = m.length % 2 === 0 ? [a, b] : [b, a];
   const ab = a | b;
-  const moves: Move[] = [];
+  const moves: { from?: number; to: number; score: number }[] = [];
 
   if (n === 8) {
-    // Play phase - move pieces
-    const table = scores[8];
     for (let sq = 0; sq < SIZE; sq++) {
       if (!(mover & (1 << sq))) continue;
-      const piece = 1 << sq;
-      const newMover = mover ^ piece;
-      const dests = NEIGHS_BY_POSITION[sq] & ~ab;
+      const newMover = mover ^ (1 << sq);
       for (let dest = 0; dest < SIZE; dest++) {
-        if (!(dests & (1 << dest))) continue;
-        const ng = goedel(other, newMover | (1 << dest), 8);
-        const ms = -table[ng];
-        moves.push({ from: sq, to: dest, score: ms });
+        if (!(NEIGHS_BY_POSITION[sq] & ~ab & (1 << dest))) continue;
+        moves.push({ from: sq, to: dest, score: -scores[8][goedel(other, newMover | (1 << dest), 8)] });
       }
     }
   } else {
-    // Drop phase - place new pieces
-    const next = scores[n + 1];
     for (let sq = 0; sq < SIZE; sq++) {
       if (ab & (1 << sq)) continue;
-      const ng = goedel(other, mover | (1 << sq), n + 1);
-      const ms = -next[ng];
-      moves.push({ to: sq, score: ms });
+      moves.push({ to: sq, score: -scores[n + 1][goedel(other, mover | (1 << sq), n + 1)] });
     }
   }
-
   return moves;
-}
-
-function weightedRandom(moves: Move[], bias = 1): Move {
-  if (moves.length === 1) return moves[0];
-  const weights = moves.map((_, i) => Math.pow(moves.length - i, bias));
-  const total = weights.reduce((a, b) => a + b, 0);
-  let r = Math.random() * total;
-  for (let i = 0; i < moves.length; i++) {
-    r -= weights[i];
-    if (r <= 0) return moves[i];
-  }
-  return moves[moves.length - 1];
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -169,51 +148,39 @@ function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
-function selectMove(moves: Move[], difficulty: Difficulty): Move {
-  if (moves.length === 0) throw new Error("No moves available");
-  const sorted = shuffle([...moves]).sort((m1, m2) => m2.score - m1.score);
+function weightedRandom<T>(arr: T[], bias: number): T {
+  if (arr.length === 1) return arr[0];
+  let total = 0;
+  const weights = arr.map((_, i) => { const w = Math.pow(arr.length - i, bias); total += w; return w; });
+  let r = Math.random() * total;
+  for (let i = 0; i < arr.length; i++) if ((r -= weights[i]) <= 0) return arr[i];
+  return arr[arr.length - 1];
+}
 
-  const missBlunders =
-    (difficulty === "beginner" && Math.random() < 0.25) ||
-    (difficulty === "easy" && Math.random() < 0.1);
+function selectMove(moves: { from?: number; to: number; score: number }[], difficulty: Difficulty) {
+  const sorted = shuffle([...moves]).sort((a, b) => b.score - a.score);
+
+  if (difficulty === "perfect") return sorted[0];
+
+  const missBlunders = (difficulty === "beginner" && Math.random() < 0.25) || (difficulty === "easy" && Math.random() < 0.1);
   const dominated = sorted.filter((m) => {
-    if (m.score <= -125) {
-      if (missBlunders) return true;
-      if (difficulty === "beginner" || difficulty === "easy") return false;
-      return false;
-    }
-    if (m.score <= -123 && difficulty === "hard") {
-      return false;
-    }
+    if (m.score <= -125) return missBlunders;
+    if (m.score <= -123 && difficulty === "hard") return false;
     return true;
   });
-  const candidates = dominated.length > 0 ? dominated : sorted;
+  const candidates = dominated.length ? dominated : sorted;
 
   switch (difficulty) {
-    case "perfect":
-      return candidates[0];
     case "hard":
-      return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
-        5
-      );
+      return weightedRandom(candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))), 5);
     case "medium":
-      return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))),
-        4
-      );
+      return weightedRandom(candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.1))), 4);
     case "easy":
-      return weightedRandom(
-        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.2))),
-        3
-      );
+      return weightedRandom(candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.2))), 3);
     case "beginner":
-      return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))),
-        2
-      );
+      return weightedRandom(sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))), 2);
     default:
-      return candidates[0];
+      return sorted[0];
   }
 }
 
@@ -221,20 +188,16 @@ export function isGameOver(board: Board): boolean {
   return WINNING_POSITIONS.has(board.a) || WINNING_POSITIONS.has(board.b);
 }
 
-export async function getBotMove(
-  board: Board,
-  difficulty: Difficulty
-): Promise<{ from?: number; to: number } | null> {
+export async function getBotMove(board: Board, difficulty: Difficulty): Promise<{ from?: number; to: number } | null> {
   if (isGameOver(board)) return null;
-
   try {
     await loadDatabase();
     const moves = generateMoves(board);
-    if (moves.length === 0) return null;
-    const move = selectMove(moves, difficulty);
-    return { from: move.from, to: move.to };
+    if (!moves.length) return null;
+    const { from, to } = selectMove(moves, difficulty);
+    return { from, to };
   } catch (e) {
-    console.error("Failed to get bot move:", e);
+    console.error("Bot move failed:", e);
     return null;
   }
 }

@@ -49,7 +49,8 @@
     "rules": "Regras",
     "playLocally": "Jogar localmente",
     "findPlayer": "Procurar jogador",
-    "playWithFriends": "Jogar com amigos"
+    "playWithFriends": "Jogar com amigos",
+    "offline": "Sem conexão"
   },
   "bot": {
     "playVsBot": "Jogar vs Bot",
@@ -62,6 +63,7 @@
     "perfect": "Perfeito",
     "letBotStart": "Bot começa",
     "start": "Começar",
-    "thinking": "Pensando…"
+    "thinking": "Pensando…",
+    "downloading": "Baixando… {{progress}}%"
   }
 }

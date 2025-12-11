@@ -38,7 +38,7 @@ import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
-import { getBotMove, isGameOver, Difficulty, BotPlayer } from "./bot";
+import { getBotMove, isGameOver, Difficulty, BotPlayer, onDbProgress } from "./bot";
 import { useVoiceChat } from "./useVoiceChat";
 
 export enum OnlineStatus {
@@ -134,6 +134,18 @@ export const App: FunctionComponent = () => {
     const preferred = navigator.languages.map((l) => l.split("-")[0]);
     return preferred.find((l) => l in translations) || "en";
   }, []);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const [lang, setLang] = useState(startLang);
   const [nickname, setNickname] = useState(
@@ -152,6 +164,7 @@ export const App: FunctionComponent = () => {
   );
   const [botPlaysAs, setBotPlaysAs] = useState<BotPlayer>("b");
   const [isBotThinking, setBotThinking] = useState(false);
+  const [dbProgress, setDbProgress] = useState(0);
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
   const [voicePeers, setVoicePeers] = useState<string[]>([]);
@@ -197,6 +210,11 @@ export const App: FunctionComponent = () => {
     if (route.type === "play") setBoard(loadBoard("localBoard"));
     else if (isBotGame) setBoard(emptyBoard());
   }, [route.type, isBotGame]);
+
+  useEffect(() => {
+    if (!isBotGame) return;
+    return onDbProgress(setDbProgress);
+  }, [isBotGame]);
 
   const moveToBoard = (newBoard: Board, propagate = true) => {
     setBoard(newBoard);
@@ -355,38 +373,47 @@ export const App: FunctionComponent = () => {
                 <FontAwesomeIcon icon={faRobot} /> <Text id="bot.playVsBot" />
               </button>
             </li>
-            <li>
-              <Localizer>
-                <input
-                  type="text"
-                  value={nickname}
-                  placeholder={<Text id="titleBar.nicknamePlaceholder" />}
-                  maxLength={256}
-                  onInput={(e: Event) =>
-                    setNicknameAndSave((e.target as HTMLInputElement).value)
-                  }
-                />
-              </Localizer>
-            </li>
-            <li class="row">
-              <button
-                disabled={!nickname.trim() || isMatching}
-                onClick={() => setMatching(true)}
-              >
-                <FontAwesomeIcon icon={faSearch} />{" "}
-                <Text id="menu.findPlayer" />
-              </button>
-              <button
-                disabled={!nickname.trim()}
-                onClick={() => navigate("/friends")}
-              >
-                <FontAwesomeIcon icon={faUsers} />{" "}
-                <Text id="menu.playWithFriends" />
-              </button>
-            </li>
-            <li>
-              <ExternalLinks />
-            </li>
+            {isOffline && (
+              <li class="offlineNotice">
+                <Text id="menu.offline" />
+              </li>
+            )}
+            {!isOffline && (
+              <>
+                <li>
+                  <Localizer>
+                    <input
+                      type="text"
+                      value={nickname}
+                      placeholder={<Text id="titleBar.nicknamePlaceholder" />}
+                      maxLength={256}
+                      onInput={(e: Event) =>
+                        setNicknameAndSave((e.target as HTMLInputElement).value)
+                      }
+                    />
+                  </Localizer>
+                </li>
+                <li class="row">
+                  <button
+                    disabled={!nickname.trim() || isMatching}
+                    onClick={() => setMatching(true)}
+                  >
+                    <FontAwesomeIcon icon={faSearch} />{" "}
+                    <Text id="menu.findPlayer" />
+                  </button>
+                  <button
+                    disabled={!nickname.trim()}
+                    onClick={() => navigate("/friends")}
+                  >
+                    <FontAwesomeIcon icon={faUsers} />{" "}
+                    <Text id="menu.playWithFriends" />
+                  </button>
+                </li>
+                <li>
+                  <ExternalLinks />
+                </li>
+              </>
+            )}
           </menu>
         )}
 
@@ -471,14 +498,22 @@ export const App: FunctionComponent = () => {
 
         {isBotGame && (
           <footer class="botControls">
-            <DifficultySelect
-              value={botDifficulty}
-              onChange={setBotDifficulty}
-            />
-            {board.m.length === 0 && (
-              <button onClick={() => setBotPlaysAs("a")}>
-                <Text id="bot.letBotStart" />
-              </button>
+            {dbProgress < 1 ? (
+              <p class="dbProgress">
+                {spinner} <Text id="bot.downloading" fields={{ progress: Math.round(dbProgress * 100) }} />
+              </p>
+            ) : (
+              <>
+                <DifficultySelect
+                  value={botDifficulty}
+                  onChange={setBotDifficulty}
+                />
+                {board.m.length === 0 && (
+                  <button onClick={() => setBotPlaysAs("a")}>
+                    <Text id="bot.letBotStart" />
+                  </button>
+                )}
+              </>
             )}
           </footer>
         )}

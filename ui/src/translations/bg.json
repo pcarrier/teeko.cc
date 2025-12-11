@@ -49,7 +49,8 @@
     "rules": "Правила",
     "playLocally": "Играй локално",
     "findPlayer": "Намери противник",
-    "playWithFriends": "Играй с приятели"
+    "playWithFriends": "Играй с приятели",
+    "offline": "В момента сте офлайн"
   },
   "bot": {
     "playVsBot": "Срещу бот",
@@ -62,6 +63,7 @@
     "perfect": "Перфектно",
     "letBotStart": "Ботът започва",
     "start": "Старт",
-    "thinking": "Мисли…"
+    "thinking": "Мисли…",
+    "downloading": "Изтегляне… {{progress}}%"
   }
 }

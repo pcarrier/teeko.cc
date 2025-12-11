@@ -49,7 +49,8 @@
     "rules": "Reguloj",
     "playLocally": "Ludi loke",
     "findPlayer": "Trovi ludanton",
-    "playWithFriends": "Ludi kun amikoj"
+    "playWithFriends": "Ludi kun amikoj",
+    "offline": "Nuntempe senreta"
   },
   "bot": {
     "playVsBot": "Ludi kontraŭ roboto",
@@ -62,6 +63,7 @@
     "perfect": "Perfekta",
     "letBotStart": "Roboto komencas",
     "start": "Komenci",
-    "thinking": "Pensante…"
+    "thinking": "Pensante…",
+    "downloading": "Elŝutante… {{progress}}%"
   }
 }

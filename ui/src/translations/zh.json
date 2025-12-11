@@ -49,7 +49,8 @@
     "rules": "规则",
     "playLocally": "本地对战",
     "findPlayer": "寻找对手",
-    "playWithFriends": "与好友对战"
+    "playWithFriends": "与好友对战",
+    "offline": "当前离线"
   },
   "bot": {
     "playVsBot": "人机对战",
@@ -62,6 +63,7 @@
     "perfect": "完美",
     "letBotStart": "电脑先走",
     "start": "开始",
-    "thinking": "思考中…"
+    "thinking": "思考中…",
+    "downloading": "下载中… {{progress}}%"
   }
 }
