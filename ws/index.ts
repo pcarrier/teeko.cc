@@ -37,7 +37,11 @@ type Room = {
 const rooms = new Map<string, Room>();
 let waiting: [string, ServerWebSocket<LobbyData>[]] | undefined;
 
-type RoomData = { pill: string | undefined; roomPath: string; sessionId: string };
+type RoomData = {
+  pill: string | undefined;
+  roomPath: string;
+  sessionId: string;
+};
 type LobbyData = { pill: string | undefined };
 
 function getRoom(path: string): Room {
@@ -105,11 +109,7 @@ function sendState(room: Room, client: Client) {
   client.socket.send(JSON.stringify({ st: stateForPlayer(room, client.pill) }));
 }
 
-function attemptAction(
-  room: Room,
-  state: State,
-  fromClient: Client
-) {
+function attemptAction(room: Room, state: State, fromClient: Client) {
   const pill = fromClient.pill;
   const abort = () => sendState(room, fromClient);
 
@@ -206,11 +206,7 @@ function relayRTC(room: Room, signal: RTCSignal) {
   });
 }
 
-function roomMessage(
-  sessionId: string,
-  roomPath: string,
-  data: string
-) {
+function roomMessage(sessionId: string, roomPath: string, data: string) {
   const room = getRoom(roomPath);
   const client = room.clients.get(sessionId);
   if (!client) return;
@@ -218,7 +214,8 @@ function roomMessage(
   try {
     const msg = JSON.parse(data) as RoomMessage;
     if (msg.st) attemptAction(room, msg.st, client);
-    if (msg.rtc && client.pill) relayRTC(room, { ...msg.rtc, from: client.pill });
+    if (msg.rtc && client.pill)
+      relayRTC(room, { ...msg.rtc, from: client.pill });
     if (msg.voice !== undefined && client.pill) {
       if (msg.voice) {
         room.voicePeers.add(client.pill);

@@ -38,7 +38,13 @@ import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
-import { getBotMove, isGameOver, Difficulty, BotPlayer, onDbProgress } from "./bot";
+import {
+  getBotMove,
+  isGameOver,
+  Difficulty,
+  BotPlayer,
+  onDbProgress,
+} from "./bot";
 import { useVoiceChat } from "./useVoiceChat";
 
 export enum OnlineStatus {
@@ -104,10 +110,18 @@ const DifficultySelect: FunctionComponent<{
   </select>
 );
 
-const FooterLinks: FunctionComponent<{ onInstall?: () => void }> = ({ onInstall }) => (
+const FooterLinks: FunctionComponent<{ onInstall?: () => void }> = ({
+  onInstall,
+}) => (
   <nav class="footerLinks" aria-label="Footer links">
     {onInstall && (
-      <a href="#" onClick={(e) => { e.preventDefault(); onInstall(); }}>
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          onInstall();
+        }}
+      >
         <FontAwesomeIcon icon={faDownload} /> <Text id="menu.install" />
       </a>
     )}
@@ -140,10 +154,14 @@ export const App: FunctionComponent = () => {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
   if (!installPrompt && !isStandalone) {
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-    }, { once: true });
+    window.addEventListener(
+      "beforeinstallprompt",
+      (e) => {
+        e.preventDefault();
+        setInstallPrompt(e);
+      },
+      { once: true }
+    );
   }
 
   const handleInstall = async () => {
@@ -182,7 +200,13 @@ export const App: FunctionComponent = () => {
   }, []);
 
   const isConnected = onlineStatus === OnlineStatus.ONLINE;
-  const voiceChat = useVoiceChat(ws, isConnected, nickname, voicePeers, onRTCSignal);
+  const voiceChat = useVoiceChat(
+    ws,
+    isConnected,
+    nickname,
+    voicePeers,
+    onRTCSignal
+  );
 
   const roomPath = route.type === "room" ? route.id : undefined;
   const isBotGame = route.type === "bot";
@@ -406,7 +430,11 @@ export const App: FunctionComponent = () => {
                   </button>
                 </li>
                 <li>
-                  <FooterLinks onInstall={installPrompt && !isStandalone ? handleInstall : undefined} />
+                  <FooterLinks
+                    onInstall={
+                      installPrompt && !isStandalone ? handleInstall : undefined
+                    }
+                  />
                 </li>
               </>
             )}
@@ -496,7 +524,11 @@ export const App: FunctionComponent = () => {
           <footer class="botControls">
             {dbProgress < 1 ? (
               <p class="dbProgress">
-                {spinner} <Text id="bot.loading" fields={{ progress: Math.round(dbProgress * 100) }} />
+                {spinner}{" "}
+                <Text
+                  id="bot.loading"
+                  fields={{ progress: Math.round(dbProgress * 100) }}
+                />
               </p>
             ) : (
               <>

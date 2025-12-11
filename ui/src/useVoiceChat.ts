@@ -52,21 +52,24 @@ export function useVoiceChat(
   const isConnectedRef = useRef(isConnected);
   const nicknameRef = useRef(nickname);
 
-  useEffect(() => { wsRef.current = ws; }, [ws]);
-  useEffect(() => { isConnectedRef.current = isConnected; }, [isConnected]);
-  useEffect(() => { nicknameRef.current = nickname; }, [nickname]);
+  useEffect(() => {
+    wsRef.current = ws;
+  }, [ws]);
+  useEffect(() => {
+    isConnectedRef.current = isConnected;
+  }, [isConnected]);
+  useEffect(() => {
+    nicknameRef.current = nickname;
+  }, [nickname]);
 
-  const sendSignal = useCallback(
-    (signal: Omit<RTCSignal, "from">) => {
-      if (wsRef.current && isConnectedRef.current) {
-        const msg: RoomMessage = {
-          rtc: { ...signal, from: nicknameRef.current } as RTCSignal,
-        };
-        wsRef.current.send(JSON.stringify(msg));
-      }
-    },
-    []
-  );
+  const sendSignal = useCallback((signal: Omit<RTCSignal, "from">) => {
+    if (wsRef.current && isConnectedRef.current) {
+      const msg: RoomMessage = {
+        rtc: { ...signal, from: nicknameRef.current } as RTCSignal,
+      };
+      wsRef.current.send(JSON.stringify(msg));
+    }
+  }, []);
 
   const createPeerConnection = useCallback(
     (peerId: string, isInitiator: boolean): RTCPeerConnection => {
@@ -298,7 +301,12 @@ export function useVoiceChat(
 
   // Auto-start voice chat if #voice hash is present
   useEffect(() => {
-    if (hasVoiceHash() && state === "off" && !hasAutoStarted.current && isConnected) {
+    if (
+      hasVoiceHash() &&
+      state === "off" &&
+      !hasAutoStarted.current &&
+      isConnected
+    ) {
       hasAutoStarted.current = true;
       startVoiceChat();
     }
