@@ -31,6 +31,7 @@ type Room = {
   p1: string | undefined;
   p2: string | undefined;
   state: State | null;
+  analyzed: boolean;
   timeout?: Timer;
 };
 
@@ -52,6 +53,7 @@ function getRoom(path: string): Room {
       clients: new Map(),
       voicePeers: new Set(),
       state: null,
+      analyzed: false,
       p1: undefined,
       p2: undefined,
     };
@@ -101,15 +103,32 @@ function canPlay(room: Room, pill: string | undefined): boolean {
 }
 
 function stateForPlayer(room: Room, pill: string | undefined): State | null {
-  if (!room.state) return null;
-  return { board: { ...room.state.board, p: canPlay(room, pill) } };
+  if (!room.state) return room.analyzed ? { analyzed: true } : null;
+  return {
+    board: { ...room.state.board, p: canPlay(room, pill) },
+    analyzed: room.analyzed || undefined,
+  };
 }
 
 function sendState(room: Room, client: Client) {
   client.socket.send(JSON.stringify({ st: stateForPlayer(room, client.pill) }));
 }
 
+function broadcastAnalyzed(room: Room) {
+  const msg = JSON.stringify({ st: { analyzed: true } });
+  room.clients.forEach((client) => client.socket.send(msg));
+}
+
 function attemptAction(room: Room, state: State, fromClient: Client) {
+  // Handle analysis notification (no board required)
+  if (state.analyzed && !room.analyzed) {
+    room.analyzed = true;
+    broadcastAnalyzed(room);
+    if (!state.board) return; // Analysis-only message
+  }
+
+  if (!state.board) return; // No board action to process
+
   const pill = fromClient.pill;
   const abort = () => sendState(room, fromClient);
 
@@ -117,6 +136,7 @@ function attemptAction(room: Room, state: State, fromClient: Client) {
   if (
     actions !== 0 &&
     room.state !== null &&
+    room.state.board &&
     actions !== room.state.board.m.length + 1 &&
     actions !== room.state.board.m.length - 1
   ) {
@@ -129,6 +149,7 @@ function attemptAction(room: Room, state: State, fromClient: Client) {
   if (actions === 0) {
     room.p1 = undefined;
     room.p2 = undefined;
+    room.analyzed = false; // Reset on game restart
   } else {
     const p1Playing = actions % 2 === 1;
     const currentPlayer = p1Playing ? room.p1 : room.p2;
@@ -147,7 +168,7 @@ function attemptAction(room: Room, state: State, fromClient: Client) {
         room.p2 = pill;
       }
     } else if (
-      (room.state === null || actions !== room.state.board.m.length - 1) &&
+      (room.state === null || !room.state.board || actions !== room.state.board.m.length - 1) &&
       pill !== currentPlayer
     ) {
       console.log(
@@ -157,7 +178,7 @@ function attemptAction(room: Room, state: State, fromClient: Client) {
     }
   }
 
-  room.state = state;
+  room.state = { board: state.board };
   room.clients.forEach((client) => {
     const st = stateForPlayer(room, client.pill);
     if (client.socket !== fromClient.socket) {

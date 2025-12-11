@@ -1,5 +1,5 @@
 import { FunctionComponent } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Text } from "preact-i18n";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faBackwardStep } from "@fortawesome/free-solid-svg-icons/faBackwardStep";
@@ -20,25 +20,39 @@ export const Game: FunctionComponent<{
   roomPath?: string;
   moveToBoard: (board: Board) => void;
   disabled?: boolean;
-  isBotGame?: boolean;
   singleBotMode?: boolean;
   botSelection?: number;
-}> = ({ board, roomPath, moveToBoard, disabled, isBotGame, singleBotMode, botSelection }) => {
-  const [analysisEnabled, setAnalysisEnabled] = useState(false);
-  const { moves: analysisMoves } = useAnalysis(board, analysisEnabled);
+  analysisUsed?: boolean;
+  onAnalysisUsed?: () => void;
+}> = ({ board, roomPath, moveToBoard, disabled, singleBotMode, botSelection, analysisUsed, onAnalysisUsed }) => {
+  const [analysisOn, setAnalysisOn] = useState(false);
+  const { moves: analysisMoves } = useAnalysis(board, analysisOn);
+
+  const reportAnalysis = () => {
+    if (analysisOn && onAnalysisUsed) onAnalysisUsed();
+  };
+
+  // Report if analysis is on when game resets
+  const prevBoardA = useRef(board.a);
+  useEffect(() => {
+    const wasReset = prevBoardA.current !== 0 && board.a === 0;
+    prevBoardA.current = board.a;
+    if (wasReset) reportAnalysis();
+  }, [board.a, analysisOn, onAnalysisUsed]);
+
+  const play = (after: Board | undefined) => {
+    if (!after) return;
+    if (roomPath) after.p = false;
+    reportAnalysis();
+    moveToBoard(after);
+  };
 
   const move = (from: number, to: number) => {
-    if (disabled) return;
-    const after = computeMove(board, from, to);
-    if (after && roomPath) after.p = false;
-    if (after) moveToBoard(after);
+    if (!disabled) play(computeMove(board, from, to));
   };
 
   const place = (pos: number) => {
-    if (disabled) return;
-    const after = computePlace(board, pos);
-    if (after && roomPath) after.p = false;
-    if (after) moveToBoard(after);
+    if (!disabled) play(computePlace(board, pos));
   };
 
   const undo = () => {
@@ -56,7 +70,7 @@ export const Game: FunctionComponent<{
         move={move}
         klass="full"
         showStatus={true}
-        analysis={analysisEnabled ? analysisMoves : undefined}
+        analysis={analysisOn ? analysisMoves : undefined}
         botSelection={botSelection}
       />
       <div class="labeledButtons">
@@ -70,8 +84,15 @@ export const Game: FunctionComponent<{
           <FontAwesomeIcon icon={faRotateBack} /> <Text id="buttons.restart" />
         </button>
         <button
-          onClick={() => setAnalysisEnabled(!analysisEnabled)}
-          class={analysisEnabled ? "selected" : undefined}
+          onClick={() => {
+            if (analysisOn) {
+              setAnalysisOn(false);
+            } else {
+              setAnalysisOn(true);
+              onAnalysisUsed?.();
+            }
+          }}
+          class={`${analysisOn ? "selected" : ""} ${analysisUsed ? "used" : ""}`.trim() || undefined}
         >
           <FontAwesomeIcon icon={faMagnifyingGlass} />{" "}
           <Text id="buttons.analysis" />

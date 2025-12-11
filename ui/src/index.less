@@ -141,8 +141,14 @@ header {
     text-transform: uppercase;
   }
 
+  button {
+    margin: 0;
+  }
+
   select {
     font-size: 10pt;
+    margin: 0;
+    padding: 0.5em;
   }
 }
 
@@ -418,12 +424,11 @@ menu {
   }
 
   .analysisScore {
-    font-size: 0.28px;
+    font-size: 0.25px;
     font-weight: bold;
     text-anchor: middle;
     dominant-baseline: central;
     pointer-events: none;
-    text-shadow: 0 0 0.05px @bg, 0 0 0.05px @bg, 0 0 0.05px @bg;
   }
 }
 
@@ -446,6 +451,20 @@ menu {
     padding: 0.75em 1em;
     margin: 0;
     white-space: nowrap;
+
+    &.used {
+      color: #fc0;
+      border-color: #fc0;
+
+      &:hover:enabled {
+        background-color: fade(#fc0, 25%);
+      }
+
+      &.selected {
+        background-color: fade(#fc0, 25%);
+        border-color: #fc0;
+      }
+    }
   }
 }
 

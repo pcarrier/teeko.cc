@@ -121,16 +121,16 @@ export const App: FunctionComponent = () => {
   });
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-  if (!installPrompt && !isStandalone) {
-    window.addEventListener(
-      "beforeinstallprompt",
-      (e) => {
-        e.preventDefault();
-        setInstallPrompt(e);
-      },
-      { once: true }
-    );
-  }
+
+  useEffect(() => {
+    if (isStandalone) return;
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, [isStandalone]);
 
   const handleInstall = async () => {
     if (!installPrompt) return;
@@ -173,6 +173,7 @@ export const App: FunctionComponent = () => {
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
   const [voicePeers, setVoicePeers] = useState<string[]>([]);
+  const [analysisUsed, setAnalysisUsed] = useState(false);
 
   const rtcSignalHandlerRef = useRef<((signal: RTCSignal) => void) | null>(
     null
@@ -250,13 +251,26 @@ export const App: FunctionComponent = () => {
     return onDbProgress(setDbProgress);
   }, [botAEnabled, botBEnabled]);
 
+  const analysisUsedRef = useRef(analysisUsed);
+  analysisUsedRef.current = analysisUsed;
+
   const moveToBoard = (newBoard: Board, propagate = true) => {
     setBoard(newBoard);
+    if (newBoard.a === 0) setAnalysisUsed(false);
     if (route.type === "play")
       localStorage.setItem("localBoard", JSON.stringify(newBoard));
     if (propagate && ws)
-      ws.send(JSON.stringify({ st: { board: newBoard } } as Message));
+      ws.send(JSON.stringify({ st: { board: newBoard, analyzed: analysisUsedRef.current } } as Message));
   };
+
+  const wsRef = useRef(ws);
+  wsRef.current = ws;
+
+  const handleAnalysisUsed = useCallback(() => {
+    if (analysisUsedRef.current) return;
+    setAnalysisUsed(true);
+    wsRef.current?.send(JSON.stringify({ st: { analyzed: true } } as Message));
+  }, []);
 
   useEffect(() => {
     if (!isBotTurn) {
@@ -338,6 +352,7 @@ export const App: FunctionComponent = () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
         setPeers([]);
         setVoicePeers([]);
+        setAnalysisUsed(false); // Server will resend current state
       },
       onclose: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
@@ -347,8 +362,9 @@ export const App: FunctionComponent = () => {
       onmessage: (evt: MessageEvent) => {
         const msg = JSON.parse(evt.data) as RoomMessage & Message;
         if (msg.st === null)
-          ws?.send(JSON.stringify({ st: { board } } as Message));
+          ws?.send(JSON.stringify({ st: { board, analyzed: analysisUsedRef.current } } as Message));
         if (msg.st?.board) moveToBoard(msg.st.board, false);
+        if (msg.st?.analyzed) setAnalysisUsed(true);
         if (msg.peers !== undefined) setPeers(msg.peers);
         if (msg.voicePeers !== undefined) setVoicePeers(msg.voicePeers);
         if (msg.rtc && rtcSignalHandlerRef.current)
@@ -550,9 +566,10 @@ export const App: FunctionComponent = () => {
               roomPath={roomPath}
               moveToBoard={moveToBoard}
               disabled={isBotTurn}
-              isBotGame={isLocalGame && (botAEnabled || botBEnabled)}
               singleBotMode={isLocalGame && (botAEnabled !== botBEnabled)}
               botSelection={botSelection}
+              analysisUsed={analysisUsed}
+              onAnalysisUsed={handleAnalysisUsed}
             />
           </section>
         )}

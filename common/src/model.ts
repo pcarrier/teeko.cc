@@ -84,7 +84,8 @@ export function y(pos: number) {
 }
 
 export type State = {
-  board: Board;
+  board?: Board;
+  analyzed?: boolean; // true if player used analysis
 };
 
 export type Message = {
