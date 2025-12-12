@@ -15,7 +15,8 @@
     "wikipedia": "Wikipedia",
     "undo": "Undo",
     "restart": "Restart",
-    "analysis": "Analyze"
+    "analysis": "Analyze",
+    "jumpBack": "Jump back"
   },
   "titleBar": {
     "local": "Local",

@@ -15,7 +15,8 @@
     "wikipedia": "Уикипедия",
     "undo": "Отмяна",
     "restart": "Рестарт",
-    "analysis": "Анализ"
+    "analysis": "Анализ",
+    "jumpBack": "Назад"
   },
   "titleBar": {
     "local": "Местно табло",

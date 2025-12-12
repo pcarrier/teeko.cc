@@ -468,10 +468,18 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
               // Format score with symbol and subscript number
               const scoreDisplay = (score: number) => {
                 const moves = formatScore(score);
-                if (score > 0) return `✓${toSubscript(moves)}`;
-                if (score < 0) return `✗${toSubscript(moves)}`;
+                if (moves !== null) {
+                  // Forced win/loss - show moves to outcome
+                  if (score > 0) return `✓${toSubscript(moves)}`;
+                  return `✗${toSubscript(moves)}`;
+                }
+                // Heuristic score - show strength as +/- subscript
+                if (score > 0) return `+${toSubscript(score)}`;
+                if (score < 0) return `−${toSubscript(-score)}`;
                 return "=";
               };
+
+              const bestScore = Math.max(...analysis.map(m => m.score));
 
               if (isPlacementPhase) {
                 // Show scores on empty slots during placement
@@ -481,7 +489,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                     x={x(m.to)}
                     y={y(m.to)}
                     class="analysisScore"
-                    fill="white"
+                    fill={m.score === bestScore ? "#0f0" : "white"}
                   >
                     {scoreDisplay(m.score)}
                   </text>
@@ -505,22 +513,22 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                       x={x(pos)}
                       y={y(pos)}
                       class="analysisScore"
-                      fill="white"
+                      fill={score === bestScore ? "#0f0" : "white"}
                     >
                       {scoreDisplay(score)}
                     </text>
                   ));
                 } else {
                   // Show scores on destination squares for selected piece (user or bot)
-                  return analysis
-                    .filter((m) => m.from === effectiveSelection)
-                    .map((m) => (
+                  const pieceMoves = analysis.filter((m) => m.from === effectiveSelection);
+                  const pieceBest = Math.max(...pieceMoves.map(m => m.score));
+                  return pieceMoves.map((m) => (
                       <text
                         key={m.to}
                         x={x(m.to)}
                         y={y(m.to)}
                         class="analysisScore"
-                        fill="white"
+                        fill={m.score === pieceBest ? "#0f0" : "white"}
                       >
                         {scoreDisplay(m.score)}
                       </text>

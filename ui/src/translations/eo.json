@@ -15,7 +15,8 @@
     "wikipedia": "Vikipedio",
     "undo": "Malfari",
     "restart": "Rekomenci",
-    "analysis": "Analizi"
+    "analysis": "Analizi",
+    "jumpBack": "Reveni"
   },
   "titleBar": {
     "local": "Loka",

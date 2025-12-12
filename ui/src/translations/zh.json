@@ -15,7 +15,8 @@
     "wikipedia": "维基百科",
     "undo": "撤销",
     "restart": "重新开始",
-    "analysis": "分析"
+    "analysis": "分析",
+    "jumpBack": "返回"
   },
   "titleBar": {
     "local": "本地",

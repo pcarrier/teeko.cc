@@ -272,6 +272,9 @@ export const App: FunctionComponent = () => {
     wsRef.current?.send(JSON.stringify({ st: { analyzed: true } } as Message));
   }, []);
 
+  const boardRef = useRef(board);
+  boardRef.current = board;
+
   useEffect(() => {
     if (!isBotTurn) {
       setBotSelection(undefined);
@@ -281,47 +284,55 @@ export const App: FunctionComponent = () => {
     let timeout1: ReturnType<typeof setTimeout>;
     let timeout2: ReturnType<typeof setTimeout>;
     let timeout3: ReturnType<typeof setTimeout>;
-    getBotMove(board, currentBotDifficulty).then((move) => {
-      if (cancelled || !move) return;
-      const isPlacement = board.m.length < 8;
-      const delay = botDelayRef.current;
-      const execute = () => {
-        if (cancelled) return;
-        setBotSelection(undefined);
-        const newBoard = isPlacement
-          ? computePlace(board, move.to)
-          : move.from !== undefined
-          ? computeMove(board, move.from, move.to)
-          : undefined;
-        if (newBoard) moveToBoard(newBoard);
-      };
-      if (delay > 0) {
-        if (!isPlacement && move.from !== undefined) {
-          // Three-phase: delay, select piece, delay, move
-          timeout1 = setTimeout(() => {
-            if (cancelled) return;
-            setBotSelection(move.from);
-            timeout2 = setTimeout(() => {
+    let frameId: number;
+
+    const run = () => {
+      const currentBoard = boardRef.current;
+      getBotMove(currentBoard, currentBotDifficulty).then((move) => {
+        if (cancelled || !move) return;
+        const isPlacement = currentBoard.m.length < 8;
+        const delay = botDelayRef.current;
+        const execute = () => {
+          if (cancelled) return;
+          setBotSelection(undefined);
+          const newBoard = isPlacement
+            ? computePlace(currentBoard, move.to)
+            : move.from !== undefined
+            ? computeMove(currentBoard, move.from, move.to)
+            : undefined;
+          if (newBoard) moveToBoard(newBoard);
+        };
+        if (delay > 0) {
+          if (!isPlacement && move.from !== undefined) {
+            timeout1 = setTimeout(() => {
               if (cancelled) return;
-              execute();
+              setBotSelection(move.from);
+              timeout2 = setTimeout(() => {
+                if (cancelled) return;
+                execute();
+              }, delay);
             }, delay);
-          }, delay);
+          } else {
+            timeout3 = setTimeout(execute, delay);
+          }
         } else {
-          // Placement: just delay then place
-          timeout3 = setTimeout(execute, delay);
+          execute();
         }
-      } else {
-        execute();
-      }
-    });
+      });
+    };
+
+    // Defer to next frame to avoid blocking UI
+    frameId = requestAnimationFrame(run);
+
     return () => {
       cancelled = true;
+      cancelAnimationFrame(frameId);
       clearTimeout(timeout1);
       clearTimeout(timeout2);
       clearTimeout(timeout3);
       setBotSelection(undefined);
     };
-  }, [isBotTurn, board, currentBotDifficulty]);
+  }, [isBotTurn, board.m.length, currentBotDifficulty, dbProgress === 100]);
 
   const displayBoard = !board.p && !roomPath ? { ...board, p: true } : board;
 

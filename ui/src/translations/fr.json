@@ -15,7 +15,8 @@
     "wikipedia": "Wikipédia",
     "undo": "Annuler",
     "restart": "Recommencer",
-    "analysis": "Analyser"
+    "analysis": "Analyser",
+    "jumpBack": "Revenir"
   },
   "titleBar": {
     "local": "Local",

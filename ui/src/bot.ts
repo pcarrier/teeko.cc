@@ -141,18 +141,28 @@ async function loadDatabase(): Promise<void> {
 
 export type Move = { from?: number; to: number; score: number };
 
+// Heuristic range for drawn positions
+const HEURISTIC_MAX = 50;
+
 // Convert raw database score to number of moves to win/lose
 // Returns positive number = moves to outcome (0 = instant win/loss)
+// For heuristic scores (-50 to +50), returns null (no forced outcome)
 // Use raw score sign to determine if winning (>0) or losing (<0)
-export function formatScore(rawScore: number): number {
-  if (rawScore === 0) return 0;
-  if (rawScore > 0) {
-    // Win: 127 = instant win (0), 126 = win in 1, 125 = win in 2, etc.
-    return 127 - rawScore;
-  } else {
-    // Loss: -127 = instant loss (0), -126 = lose in 1, etc.
-    return 127 + rawScore;
+export function formatScore(rawScore: number): number | null {
+  if (rawScore > HEURISTIC_MAX) {
+    // Win: 126 = instant win (0), 125 = win in 1, etc.
+    return 126 - rawScore;
+  } else if (rawScore < -HEURISTIC_MAX) {
+    // Loss: -126 = instant loss (0), -125 = lose in 1, etc.
+    return 126 + rawScore;
   }
+  // Heuristic score - no forced outcome
+  return null;
+}
+
+// Check if a score represents a forced win/loss (not just heuristic)
+export function isForced(score: number): boolean {
+  return score > HEURISTIC_MAX || score < -HEURISTIC_MAX;
 }
 
 export function generateMoves(board: Board): Move[] {
@@ -220,17 +230,33 @@ function selectMove(moves: Move[], difficulty: Difficulty) {
 
   if (difficulty === "perfect") return sorted[0];
 
+  // Check if position has forced wins/losses (outside heuristic range)
+  const hasForced = sorted.some(m => m.score > HEURISTIC_MAX || m.score < -HEURISTIC_MAX);
+
   const missBlunders =
     (difficulty === "beginner" && Math.random() < 0.3) ||
     (difficulty === "easy" && Math.random() < 0.2) ||
     (difficulty === "medium" && Math.random() < 0.1) ||
     (difficulty === "hard" && Math.random() < 0.05);
+
+  // Filter out losing moves (forced losses)
   const dominated = sorted.filter((m) => {
-    if (m.score <= -125) return missBlunders;
-    if (m.score <= -123 && difficulty === "hard") return false;
+    if (m.score < -HEURISTIC_MAX) return missBlunders;
     return true;
   });
   const candidates = dominated.length ? dominated : sorted;
+
+  // For positions with only heuristic scores, lower difficulties play more randomly
+  const heuristicRandomness = !hasForced ? {
+    beginner: 0.7,  // 70% chance to pick randomly
+    easy: 0.5,      // 50% chance
+    medium: 0.2,    // 20% chance
+    hard: 0.05,     // 5% chance
+  }[difficulty] ?? 0 : 0;
+
+  if (Math.random() < heuristicRandomness) {
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
 
   switch (difficulty) {
     case "hard":
@@ -250,8 +276,8 @@ function selectMove(moves: Move[], difficulty: Difficulty) {
       );
     case "beginner":
       return weightedRandom(
-        sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.3))),
-        1
+        candidates.slice(0, Math.max(1, Math.ceil(candidates.length * 0.5))),
+        0.5
       );
     default:
       return sorted[0];
