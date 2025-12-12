@@ -1,5 +1,11 @@
 import { FunctionComponent } from "preact";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "preact/hooks";
 import { Text } from "preact-i18n";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faBackwardStep } from "@fortawesome/free-solid-svg-icons/faBackwardStep";
@@ -31,9 +37,10 @@ function boardAtMove(moves: Move[], index: number): Board {
   let board = emptyBoard();
   for (let i = 0; i <= index; i++) {
     const m = moves[i];
-    board = (typeof m === "number"
-      ? computePlace(board, m)
-      : computeMove(board, m[0], m[1])) ?? board;
+    board =
+      (typeof m === "number"
+        ? computePlace(board, m)
+        : computeMove(board, m[0], m[1])) ?? board;
   }
   return board;
 }
@@ -43,7 +50,7 @@ function getMoveScore(board: Board, m: Move): number | null {
   const moves = generateMoves(board);
   if (moves.length === 0) return null;
 
-  const played = moves.find(mv =>
+  const played = moves.find((mv) =>
     typeof m === "number"
       ? mv.from === undefined && mv.to === m
       : mv.from === m[0] && mv.to === m[1]
@@ -55,7 +62,9 @@ function getMoveScore(board: Board, m: Move): number | null {
 const FORCED_THRESHOLD = 50;
 
 function isForced(score: number | null): boolean {
-  return score !== null && (score > FORCED_THRESHOLD || score < -FORCED_THRESHOLD);
+  return (
+    score !== null && (score > FORCED_THRESHOLD || score < -FORCED_THRESHOLD)
+  );
 }
 
 export const Game: FunctionComponent<{
@@ -67,16 +76,27 @@ export const Game: FunctionComponent<{
   botSelection?: number;
   analysisUsed?: boolean;
   onAnalysisUsed?: () => void;
-}> = ({ board, roomPath, moveToBoard, disabled, singleBotMode, botSelection, analysisUsed, onAnalysisUsed }) => {
+}> = ({
+  board,
+  roomPath,
+  moveToBoard,
+  disabled,
+  singleBotMode,
+  botSelection,
+  analysisUsed,
+  onAnalysisUsed,
+}) => {
   const [analysisOn, setAnalysisOn] = useState(false);
   const [viewingMove, setViewingMove] = useState<number | null>(null);
   const [scores, setScores] = useState<(number | null)[]>([]);
   const moveListRef = useRef<HTMLOListElement>(null);
 
   const gameOver = isGameOver(board);
-  const safeViewingMove = viewingMove !== null && viewingMove < board.m.length ? viewingMove : null;
+  const safeViewingMove =
+    viewingMove !== null && viewingMove < board.m.length ? viewingMove : null;
   const viewingBoard = useMemo(
-    () => safeViewingMove !== null ? boardAtMove(board.m, safeViewingMove) : board,
+    () =>
+      safeViewingMove !== null ? boardAtMove(board.m, safeViewingMove) : board,
     [safeViewingMove, board.a, board.b, board.m.length]
   );
   const { moves: analysisMoves } = useAnalysis(viewingBoard, analysisOn);
@@ -103,7 +123,7 @@ export const Game: FunctionComponent<{
       setScores([]);
       return;
     }
-    setScores(prev => {
+    setScores((prev) => {
       if (prev.length > board.m.length) return prev.slice(0, board.m.length);
       if (prev.length === board.m.length) return prev;
 
@@ -174,7 +194,8 @@ export const Game: FunctionComponent<{
       }}
       class={classNames(selected && "selected", analysisUsed && "used")}
     >
-      <FontAwesomeIcon icon={faMagnifyingGlass} /> <Text id="buttons.analysis" />
+      <FontAwesomeIcon icon={faMagnifyingGlass} />{" "}
+      <Text id="buttons.analysis" />
     </button>
   );
 
@@ -204,7 +225,10 @@ export const Game: FunctionComponent<{
         <ol class="moveHistory" ref={moveListRef} onScroll={onMoveListScroll}>
           {board.m.map((m, i) => (
             <li
-              class={classNames(safeViewingMove === i && "selected", isForcedMove(i) && "forced")}
+              class={classNames(
+                safeViewingMove === i && "selected",
+                isForcedMove(i) && "forced"
+              )}
               onClick={() => setViewingMove(i)}
             >
               {i + 1}. {formatMove(m)}
@@ -213,12 +237,16 @@ export const Game: FunctionComponent<{
         </ol>
         <nav class="labeledButtons">
           {gameOver ? (
-            <button onClick={() => setViewingMove(null)} disabled={safeViewingMove === null}>
+            <button
+              onClick={() => setViewingMove(null)}
+              disabled={safeViewingMove === null}
+            >
               <FontAwesomeIcon icon={faPlay} /> <Text id="buttons.jumpBack" />
             </button>
           ) : (
             <button onClick={undo} disabled={board.m.length === 0}>
-              <FontAwesomeIcon icon={faBackwardStep} /> <Text id="buttons.undo" />
+              <FontAwesomeIcon icon={faBackwardStep} />{" "}
+              <Text id="buttons.undo" />
             </button>
           )}
           {restartButton}

@@ -38,12 +38,7 @@ import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
-import {
-  getBotMove,
-  isGameOver,
-  Difficulty,
-  onDbProgress,
-} from "./bot";
+import { getBotMove, isGameOver, Difficulty, onDbProgress } from "./bot";
 import { useVoiceChat } from "./useVoiceChat";
 
 export enum OnlineStatus {
@@ -163,12 +158,14 @@ export const App: FunctionComponent = () => {
   const [botBDifficulty, _setBotBDifficulty] = useState<Difficulty>(
     () => (localStorage.getItem("botBDifficulty") as Difficulty) || "medium"
   );
-  const [botDelay, _setBotDelay] = useState<number>(
-    () => parseInt(localStorage.getItem("botDelay") || "0", 10)
+  const [botDelay, _setBotDelay] = useState<number>(() =>
+    parseInt(localStorage.getItem("botDelay") || "0", 10)
   );
   const botDelayRef = useRef(botDelay);
   botDelayRef.current = botDelay;
-  const [botSelection, setBotSelection] = useState<number | undefined>(undefined);
+  const [botSelection, setBotSelection] = useState<number | undefined>(
+    undefined
+  );
   const [dbProgress, setDbProgress] = useState(0);
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
@@ -260,7 +257,11 @@ export const App: FunctionComponent = () => {
     if (route.type === "play")
       localStorage.setItem("localBoard", JSON.stringify(newBoard));
     if (propagate && ws)
-      ws.send(JSON.stringify({ st: { board: newBoard, analyzed: analysisUsedRef.current } } as Message));
+      ws.send(
+        JSON.stringify({
+          st: { board: newBoard, analyzed: analysisUsedRef.current },
+        } as Message)
+      );
   };
 
   const wsRef = useRef(ws);
@@ -377,7 +378,11 @@ export const App: FunctionComponent = () => {
       onmessage: (evt: MessageEvent) => {
         const msg = JSON.parse(evt.data) as RoomMessage & Message;
         if (msg.st === null)
-          ws?.send(JSON.stringify({ st: { board, analyzed: analysisUsedRef.current } } as Message));
+          ws?.send(
+            JSON.stringify({
+              st: { board, analyzed: analysisUsedRef.current },
+            } as Message)
+          );
         if (msg.st?.board) moveToBoard(msg.st.board, false);
         if (msg.st?.analyzed) setAnalysisUsed(true);
         if (msg.peers !== undefined) setPeers(msg.peers);
@@ -581,7 +586,7 @@ export const App: FunctionComponent = () => {
               roomPath={roomPath}
               moveToBoard={moveToBoard}
               disabled={isBotTurn}
-              singleBotMode={isLocalGame && (botAEnabled !== botBEnabled)}
+              singleBotMode={isLocalGame && botAEnabled !== botBEnabled}
               botSelection={botSelection}
               analysisUsed={analysisUsed}
               onAnalysisUsed={handleAnalysisUsed}

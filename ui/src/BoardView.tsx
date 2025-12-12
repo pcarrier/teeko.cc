@@ -208,9 +208,9 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
     }
     // Show arrows for bot selection
     if (botSelection !== undefined && selected === undefined) {
-      const botEmptyNeighbors = [...pieces(NEIGHS_BY_POSITION[botSelection])].filter(
-        (x) => !allPieces.has(x)
-      );
+      const botEmptyNeighbors = [
+        ...pieces(NEIGHS_BY_POSITION[botSelection]),
+      ].filter((x) => !allPieces.has(x));
       botEmptyNeighbors.forEach((to) =>
         result.push({
           from: botSelection,
@@ -220,7 +220,16 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
       );
     }
     return result;
-  }, [arrows, selected, releasePos, dragPos, botSelection, allPieces, t, placing]);
+  }, [
+    arrows,
+    selected,
+    releasePos,
+    dragPos,
+    botSelection,
+    allPieces,
+    t,
+    placing,
+  ]);
 
   const turnNumber = board.m.length + 1;
   const status = showStatus && (
@@ -462,7 +471,10 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
               // Convert number to subscript
               const toSubscript = (n: number): string => {
                 const subscripts = "₀₁₂₃₄₅₆₇₈₉";
-                return String(n).split("").map(d => subscripts[parseInt(d)]).join("");
+                return String(n)
+                  .split("")
+                  .map((d) => subscripts[parseInt(d)])
+                  .join("");
               };
 
               // Format score with symbol and subscript number
@@ -479,7 +491,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 return "=";
               };
 
-              const bestScore = Math.max(...analysis.map(m => m.score));
+              const bestScore = Math.max(...analysis.map((m) => m.score));
 
               if (isPlacementPhase) {
                 // Show scores on empty slots during placement
@@ -520,19 +532,21 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                   ));
                 } else {
                   // Show scores on destination squares for selected piece (user or bot)
-                  const pieceMoves = analysis.filter((m) => m.from === effectiveSelection);
-                  const pieceBest = Math.max(...pieceMoves.map(m => m.score));
+                  const pieceMoves = analysis.filter(
+                    (m) => m.from === effectiveSelection
+                  );
+                  const pieceBest = Math.max(...pieceMoves.map((m) => m.score));
                   return pieceMoves.map((m) => (
-                      <text
-                        key={m.to}
-                        x={x(m.to)}
-                        y={y(m.to)}
-                        class="analysisScore"
-                        fill={m.score === pieceBest ? "#0f0" : "white"}
-                      >
-                        {scoreDisplay(m.score)}
-                      </text>
-                    ));
+                    <text
+                      key={m.to}
+                      x={x(m.to)}
+                      y={y(m.to)}
+                      class="analysisScore"
+                      fill={m.score === pieceBest ? "#0f0" : "white"}
+                    >
+                      {scoreDisplay(m.score)}
+                    </text>
+                  ));
                 }
               }
             })()}

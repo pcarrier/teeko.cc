@@ -315,11 +315,9 @@ menu {
 .status {
   color: @boardColor;
   margin: 0;
-
   &.playing {
     color: @strong;
   }
-
   &.win {
     color: @bColor;
   }
@@ -347,14 +345,22 @@ menu {
       text-align: left;
       color: @aColor;
 
-      &:nth-child(even) { color: @bColor; }
-      &.selected { text-decoration: underline; }
+      &:nth-child(even) {
+        color: @bColor;
+      }
+      &.selected {
+        text-decoration: underline;
+      }
       &.forced {
         color: white;
         background: @aColor;
-        &:nth-child(even) { background: @bColor; }
+        &:nth-child(even) {
+          background: @bColor;
+        }
       }
-      &:hover { opacity: 0.7; }
+      &:hover {
+        opacity: 0.7;
+      }
     }
   }
 }
@@ -380,7 +386,6 @@ menu {
   circle {
     &.bg {
       fill: @boardColor;
-
       &.release.A {
         fill: @aColor;
       }
@@ -388,18 +393,15 @@ menu {
         fill: @bColor;
       }
     }
-
     &.last.A {
       fill: @aDark;
     }
     &.last.B {
       fill: @bDark;
     }
-
     &.selected {
       fill: @selectionColor;
     }
-
     &.target.A {
       fill: shade(@aColor, 50%);
     }
@@ -516,16 +518,14 @@ menu {
 .delayInput {
   display: flex;
   align-items: center;
-  width: 100%;
+  justify-content: center;
 
   label {
     display: flex;
     align-items: center;
     gap: 0.5em;
-    width: 100%;
     color: @color;
   }
-
   input[type="number"] {
     width: 5em;
     height: 3em;
@@ -538,61 +538,34 @@ menu {
   align-items: center;
   gap: 0.25em;
 
-  button {
-    margin: 0;
-  }
-
+  button,
   select {
     margin: 0;
   }
 
   &.blue {
-    button {
-      color: @aColor;
-      border-color: @aColor;
-
-      &:hover:enabled {
-        background-color: shade(@aColor, 50%);
-      }
-
-      &.selected {
-        background-color: shade(@aColor, 50%);
-        border-color: @aColor;
-      }
-    }
-
+    button,
     select {
       color: @aColor;
       border-color: @aColor;
-
-      &:hover {
-        background-color: shade(@aColor, 50%);
-      }
+    }
+    button:hover:enabled,
+    button.selected,
+    select:hover {
+      background-color: shade(@aColor, 50%);
     }
   }
 
   &.red {
-    button {
-      color: @bColor;
-      border-color: @bColor;
-
-      &:hover:enabled {
-        background-color: shade(@bColor, 50%);
-      }
-
-      &.selected {
-        background-color: shade(@bColor, 50%);
-        border-color: @bColor;
-      }
-    }
-
+    button,
     select {
       color: @bColor;
       border-color: @bColor;
-
-      &:hover {
-        background-color: shade(@bColor, 50%);
-      }
+    }
+    button:hover:enabled,
+    button.selected,
+    select:hover {
+      background-color: shade(@bColor, 50%);
     }
   }
 }
@@ -601,13 +574,11 @@ menu {
   display: flex;
   gap: 0.5em;
 }
-
 .offlineNotice {
   color: @boardColor;
   font-style: italic;
   padding: 0.5em;
 }
-
 .dbProgress {
   color: @color;
   margin: 0;

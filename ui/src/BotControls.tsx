@@ -46,9 +46,11 @@ const DelayInput: FunctionComponent<{
         type="number"
         min="0"
         max="10000"
-        step="10"
+        step="100"
         value={value}
-        onInput={(e) => onChange(parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+        onInput={(e) =>
+          onChange(parseInt((e.target as HTMLInputElement).value, 10) || 0)
+        }
       />
     </label>
   </div>

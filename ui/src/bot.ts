@@ -231,7 +231,9 @@ function selectMove(moves: Move[], difficulty: Difficulty) {
   if (difficulty === "perfect") return sorted[0];
 
   // Check if position has forced wins/losses (outside heuristic range)
-  const hasForced = sorted.some(m => m.score > HEURISTIC_MAX || m.score < -HEURISTIC_MAX);
+  const hasForced = sorted.some(
+    (m) => m.score > HEURISTIC_MAX || m.score < -HEURISTIC_MAX
+  );
 
   const missBlunders =
     (difficulty === "beginner" && Math.random() < 0.3) ||
@@ -247,12 +249,14 @@ function selectMove(moves: Move[], difficulty: Difficulty) {
   const candidates = dominated.length ? dominated : sorted;
 
   // For positions with only heuristic scores, lower difficulties play more randomly
-  const heuristicRandomness = !hasForced ? {
-    beginner: 0.7,  // 70% chance to pick randomly
-    easy: 0.5,      // 50% chance
-    medium: 0.2,    // 20% chance
-    hard: 0.05,     // 5% chance
-  }[difficulty] ?? 0 : 0;
+  const heuristicRandomness = !hasForced
+    ? {
+        beginner: 0.7, // 70% chance to pick randomly
+        easy: 0.5, // 50% chance
+        medium: 0.2, // 20% chance
+        hard: 0.05, // 5% chance
+      }[difficulty] ?? 0
+    : 0;
 
   if (Math.random() < heuristicRandomness) {
     return candidates[Math.floor(Math.random() * candidates.length)];
