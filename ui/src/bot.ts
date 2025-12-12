@@ -142,11 +142,12 @@ async function loadDatabase(): Promise<void> {
 export type Move = { from?: number; to: number; score: number };
 
 // Heuristic range for drawn positions
-const HEURISTIC_MAX = 50;
+// ±81 to ±126 are reserved for forced wins (up to 45 moves)
+const HEURISTIC_MAX = 80;
 
 // Convert raw database score to number of moves to win/lose
 // Returns positive number = moves to outcome (0 = instant win/loss)
-// For heuristic scores (-50 to +50), returns null (no forced outcome)
+// For heuristic scores (-80 to +80), returns null (no forced outcome)
 // Use raw score sign to determine if winning (>0) or losing (<0)
 export function formatScore(rawScore: number): number | null {
   if (rawScore > HEURISTIC_MAX) {

@@ -492,8 +492,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
               };
 
               const bestScore = Math.max(...analysis.map((m) => m.score));
-              // Only highlight in green if there's a winning move (score > 50)
-              const canWin = bestScore > 50;
+              // Only highlight in green if there's a winning move (score > 80)
+              const canWin = bestScore > 80;
 
               if (isPlacementPhase) {
                 // Show scores on empty slots during placement

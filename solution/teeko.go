@@ -41,8 +41,9 @@ const (
 	ScoreAWin    int8 = 126
 	ScoreNone    int8 = -127
 	ScoreIllegal int8 = -128
-	// Heuristic scores for drawn positions (range -50 to +50)
-	ScoreHeuristicMax int8 = 50
+	// Heuristic scores for drawn positions (range -80 to +80)
+	// ±81 to ±126 are reserved for forced wins (up to 45 moves)
+	ScoreHeuristicMax int8 = 80
 )
 
 // Player constants
@@ -88,20 +89,77 @@ var winPatterns = []uint32{
 	17043520, 34952, 69904, 1118464, 2236928,
 }
 
-// Heuristic evaluation for drawn positions
-// Returns a score from -50 to +50 based on positional advantage
+// Square priority for move ordering (center = best)
+// Stored as bitmasks for each priority level (4=best, 0=worst)
+var priorityMasks = [5]uint32{
+	0b1000100000000000000010001, // priority 0: corners
+	0b0111010001100011000101110, // priority 1: edges
+	0b0000001010000000101000000, // priority 2: inner ring corners
+	0b0000000100010100010000000, // priority 3: inner ring edges
+	0b0000000000001000000000000, // priority 4: center
+}
+
+// Negamax with alpha-beta pruning for heuristic evaluation
+// mover = pieces of player to move, other = opponent pieces
+// Returns score from mover's perspective
+func negamax(mover, other uint32, depth, alpha, beta int) int {
+	if depth == 0 {
+		return evalPosition(mover, other) - evalPosition(other, mover)
+	}
+
+	occupied := mover | other
+	// Try moves in priority order (best destinations first)
+	for pri := 4; pri >= 0; pri-- {
+		destMask := priorityMasks[pri] &^ occupied
+		for p := mover; p != 0; {
+			piece := p & -p
+			p ^= piece
+			pos := bits.TrailingZeros32(piece)
+			newMover := mover ^ piece
+			for dests := neighs[pos] & destMask; dests != 0; {
+				dest := dests & -dests
+				dests ^= dest
+				score := -negamax(other, newMover|dest, depth-1, -beta, -alpha)
+				if score > alpha {
+					alpha = score
+				}
+				if alpha >= beta {
+					return alpha
+				}
+			}
+		}
+	}
+	return alpha
+}
+
+// Heuristic evaluation for drawn positions with 4-ply alpha-beta search
+// Returns a score from -80 to +80 based on positional advantage
 func heuristic(a, b uint32) int8 {
-	aScore := evalPosition(a, b)
-	bScore := evalPosition(b, a)
-	diff := aScore - bScore
-	// Clamp to heuristic range
-	if diff > int(ScoreHeuristicMax) {
+	score := negamax(a, b, 4, -1000, 1000)
+	if score > int(ScoreHeuristicMax) {
 		return ScoreHeuristicMax
 	}
-	if diff < -int(ScoreHeuristicMax) {
+	if score < -int(ScoreHeuristicMax) {
 		return -ScoreHeuristicMax
 	}
-	return int8(diff)
+	return int8(score)
+}
+
+// Precomputed: for each square, which patterns include it
+var squarePatterns [25][]uint32
+
+// Precomputed: central squares bitmask
+const centralSquares = uint32(0b0000001110011100111000000)
+
+func init() {
+	for sq := 0; sq < 25; sq++ {
+		bit := uint32(1) << sq
+		for _, pattern := range winPatterns {
+			if pattern&bit != 0 {
+				squarePatterns[sq] = append(squarePatterns[sq], pattern)
+			}
+		}
+	}
 }
 
 // Evaluate how good a position is for the player with pieces 'mine'
@@ -109,36 +167,43 @@ func evalPosition(mine, theirs uint32) int {
 	score := 0
 	occupied := mine | theirs
 
-	for _, pattern := range winPatterns {
-		// Skip patterns blocked by opponent
-		if pattern&theirs != 0 {
-			continue
-		}
-		// Count how many of my pieces are in this pattern
-		myPieces := bits.OnesCount32(pattern & mine)
-		// Weight by pieces in pattern (exponential: 3 pieces much better than 2)
-		switch myPieces {
-		case 4:
-			score += 100 // Already winning, shouldn't happen in draws
-		case 3:
-			// Check if the 4th square is empty (can complete next move)
-			empty := pattern &^ occupied
-			if bits.OnesCount32(empty) == 1 {
-				score += 20 // One move from winning
-			} else {
-				score += 8
+	// Track which patterns we've already scored
+	var scored uint64
+
+	// Only check patterns that include at least one of my pieces
+	for m := mine; m != 0; {
+		sq := bits.TrailingZeros32(m)
+		m &= m - 1
+		for i, pattern := range squarePatterns[sq] {
+			idx := uint64(sq*16 + i) // Unique index for this (square, pattern) pair
+			if scored&(1<<idx) != 0 {
+				continue
 			}
-		case 2:
-			score += 2
-		case 1:
-			score += 1
+			scored |= 1 << idx
+
+			// Skip patterns blocked by opponent
+			if pattern&theirs != 0 {
+				continue
+			}
+			myPieces := bits.OnesCount32(pattern & mine)
+			switch myPieces {
+			case 4:
+				score += 100
+			case 3:
+				if bits.OnesCount32(pattern&^occupied) == 1 {
+					score += 20
+				} else {
+					score += 8
+				}
+			case 2:
+				score += 2
+			case 1:
+				score += 1
+			}
 		}
 	}
 
-	// Bonus for central control (center and adjacent squares)
-	centralSquares := uint32(0b0000001110011100111000000) // positions 6,7,8,11,12,13,16,17,18
 	score += bits.OnesCount32(mine&centralSquares) * 2
-
 	return score
 }
 
@@ -149,7 +214,7 @@ var (
 
 // Precomputed positions (a, b pairs) for each piece count
 var (
-	posCache    [9][]uint64 // packed as (a << 32) | b
+	posCache      [9][]uint64 // packed as (a << 32) | b
 	posCacheReady bool
 )
 
@@ -482,7 +547,15 @@ func computePlay() {
 
 	// Compute heuristics for drawn positions (parallel)
 	fmt.Println("  Computing heuristics for draws…")
-	var draws atomic.Int64
+	var draws, progress atomic.Int64
+	// Count total draws first
+	var totalDraws int64
+	for g := 0; g < configs[8]; g++ {
+		if table[g] == ScoreTie {
+			totalDraws++
+		}
+	}
+	fmt.Printf("    0%% (0/%d)\r", totalDraws)
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
 		startIdx := w * chunkSize
@@ -495,13 +568,19 @@ func computePlay() {
 					a, b := getPos(g, 8)
 					table[g] = heuristic(a, b)
 					localDraws++
+					if localDraws%1000 == 0 {
+						cur := progress.Add(1000)
+						pct := cur * 100 / totalDraws
+						fmt.Printf("    %d%% (%d/%d)\r", pct, cur, totalDraws)
+					}
 				}
 			}
 			draws.Add(localDraws)
+			progress.Add(localDraws % 1000)
 		}(startIdx, endIdx)
 	}
 	wg.Wait()
-	fmt.Printf("  Computed heuristics for %d draw positions\n", draws.Load())
+	fmt.Printf("    100%% (%d/%d)\n", draws.Load(), totalDraws)
 
 	countStats("Play", table)
 	fmt.Printf("  Play phase completed in %v\n", time.Since(start).Round(time.Millisecond))
@@ -615,14 +694,14 @@ func findLongestWins() {
 	for n := range 9 {
 		table := scores[n]
 		for g, s := range table {
-			// A win: smaller score = longer win (score 1 is longest)
-			if s > 0 && s <= ScoreAWin && s < longestAWin {
+			// A win: smaller score = longer win (96 is longest forced win)
+			if s > ScoreHeuristicMax && s <= ScoreAWin && s < longestAWin {
 				longestAWin = s
 				longestAIdx = g
 				longestAPieces = n
 			}
-			// B win: larger score (closer to 0) = longer win (score -1 is longest)
-			if s < 0 && s >= ScoreBWin && s > longestBWin {
+			// B win: larger score (closer to 0) = longer win (-96 is longest)
+			if s < -ScoreHeuristicMax && s >= ScoreBWin && s > longestBWin {
 				longestBWin = s
 				longestBIdx = g
 				longestBPieces = n
@@ -630,7 +709,7 @@ func findLongestWins() {
 		}
 	}
 
-	if longestAWin <= ScoreAWin && longestAWin > 0 {
+	if longestAWin <= ScoreAWin && longestAWin > ScoreHeuristicMax {
 		a, b := degoedel(longestAIdx, longestAPieces)
 		dist := int(ScoreAWin - longestAWin)
 		fmt.Printf("\nLongest forced win for Blue (A):\n")
@@ -641,7 +720,7 @@ func findLongestWins() {
 		printBoard(a, b)
 	}
 
-	if longestBWin >= ScoreBWin && longestBWin < 0 {
+	if longestBWin >= ScoreBWin && longestBWin < -ScoreHeuristicMax {
 		a, b := degoedel(longestBIdx, longestBPieces)
 		dist := int(longestBWin - ScoreBWin)
 		fmt.Printf("\nLongest forced win for Red (B):\n")

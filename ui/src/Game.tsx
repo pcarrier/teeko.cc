@@ -59,8 +59,8 @@ function getMoveScore(board: Board, m: Move): number | null {
   return played?.score ?? null;
 }
 
-// Threshold for forced win/loss (heuristics are in -50 to +50 range)
-const FORCED_THRESHOLD = 50;
+// Threshold for forced win/loss (heuristics are in -80 to +80 range)
+const FORCED_THRESHOLD = 80;
 
 function isForced(score: number | null): boolean {
   return (
@@ -264,7 +264,10 @@ export const Game: FunctionComponent<{
         ))}
       </ol>
       <div class="labeledButtons">
-        <button onClick={undo} disabled={board.m.length === 0 || bothBotsEnabled}>
+        <button
+          onClick={undo}
+          disabled={board.m.length === 0 || bothBotsEnabled}
+        >
           <FontAwesomeIcon icon={faBackwardStep} /> <Text id="buttons.undo" />
         </button>
         {restartButton}
