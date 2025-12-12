@@ -41,6 +41,11 @@ import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
 import { getBotMove, isGameOver, Difficulty, onDbProgress } from "./bot";
 import { useVoiceChat } from "./useVoiceChat";
+import {
+  usePersistentState,
+  boolDeserialize,
+  intDeserialize,
+} from "./usePersistentState";
 
 export enum OnlineStatus {
   OFFLINE,
@@ -136,9 +141,7 @@ export const App: FunctionComponent = () => {
   };
 
   const [lang, setLang] = useState(startLang);
-  const [nickname, setNickname] = useState(
-    () => localStorage.getItem("nickname") || ""
-  );
+  const [nickname, setNickname] = usePersistentState("nickname", "");
   const [route, setRoute] = useState<Route>(() =>
     parseRoute(window.location.pathname)
   );
@@ -147,20 +150,28 @@ export const App: FunctionComponent = () => {
   const [ws, setWs] = useState<Sockette>();
   const [onlineStatus, setOnlineStatus] = useState(OnlineStatus.OFFLINE);
   const [board, setBoard] = useState<Board>(() => loadBoard("localBoard"));
-  const [botAEnabled, _setBotAEnabled] = useState<boolean>(
-    () => localStorage.getItem("botAEnabled") === "true"
+  const [botAEnabled, setBotAEnabled] = usePersistentState(
+    "botAEnabled",
+    false,
+    boolDeserialize
   );
-  const [botBEnabled, _setBotBEnabled] = useState<boolean>(
-    () => localStorage.getItem("botBEnabled") === "true"
+  const [botBEnabled, setBotBEnabled] = usePersistentState(
+    "botBEnabled",
+    false,
+    boolDeserialize
   );
-  const [botADifficulty, _setBotADifficulty] = useState<Difficulty>(
-    () => (localStorage.getItem("botADifficulty") as Difficulty) || "medium"
+  const [botADifficulty, setBotADifficulty] = usePersistentState<Difficulty>(
+    "botADifficulty",
+    "beginner"
   );
-  const [botBDifficulty, _setBotBDifficulty] = useState<Difficulty>(
-    () => (localStorage.getItem("botBDifficulty") as Difficulty) || "medium"
+  const [botBDifficulty, setBotBDifficulty] = usePersistentState<Difficulty>(
+    "botBDifficulty",
+    "beginner"
   );
-  const [botDelay, _setBotDelay] = useState<number>(() =>
-    parseInt(localStorage.getItem("botDelay") || "0", 10)
+  const [botDelay, setBotDelay] = usePersistentState(
+    "botDelay",
+    0,
+    intDeserialize(0)
   );
   const botDelayRef = useRef(botDelay);
   botDelayRef.current = botDelay;
@@ -168,8 +179,10 @@ export const App: FunctionComponent = () => {
     undefined
   );
   const [dbProgress, setDbProgress] = useState(0);
-  const [autoRestart, _setAutoRestart] = useState<boolean>(
-    () => localStorage.getItem("autoRestart") === "true"
+  const [autoRestart, setAutoRestart] = usePersistentState(
+    "autoRestart",
+    false,
+    boolDeserialize
   );
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
@@ -204,47 +217,12 @@ export const App: FunctionComponent = () => {
   const currentBotDifficulty =
     currentPlayer === "a" ? botADifficulty : botBDifficulty;
 
-  const setBotAEnabled = (enabled: boolean) => {
-    localStorage.setItem("botAEnabled", String(enabled));
-    _setBotAEnabled(enabled);
-  };
-
-  const setBotBEnabled = (enabled: boolean) => {
-    localStorage.setItem("botBEnabled", String(enabled));
-    _setBotBEnabled(enabled);
-  };
-
-  const setBotADifficulty = (d: Difficulty) => {
-    localStorage.setItem("botADifficulty", d);
-    _setBotADifficulty(d);
-  };
-
-  const setBotBDifficulty = (d: Difficulty) => {
-    localStorage.setItem("botBDifficulty", d);
-    _setBotBDifficulty(d);
-  };
-
-  const setBotDelay = (ms: number) => {
-    localStorage.setItem("botDelay", String(ms));
-    _setBotDelay(ms);
-  };
-
-  const setAutoRestart = (enabled: boolean) => {
-    localStorage.setItem("autoRestart", String(enabled));
-    _setAutoRestart(enabled);
-  };
-
   const navigate = (path: string) => {
     history.pushState({}, "", path);
     setRoute(parseRoute(path));
   };
 
   const joinRoom = (roomId: string) => navigate(`/room/${roomId}`);
-
-  const setNicknameAndSave = (value: string) => {
-    setNickname(value);
-    localStorage.setItem("nickname", value);
-  };
 
   useEvent("popstate", () => setRoute(parseRoute(window.location.pathname)));
 
@@ -500,7 +478,7 @@ export const App: FunctionComponent = () => {
                       placeholder={<Text id="titleBar.nicknamePlaceholder" />}
                       maxLength={256}
                       onInput={(e: Event) =>
-                        setNicknameAndSave((e.target as HTMLInputElement).value)
+                        setNickname((e.target as HTMLInputElement).value)
                       }
                     />
                   </Localizer>
@@ -574,7 +552,7 @@ export const App: FunctionComponent = () => {
                 const input = (e.target as HTMLFormElement).elements.namedItem(
                   "nickname"
                 ) as HTMLInputElement;
-                if (input.value.trim()) setNicknameAndSave(input.value.trim());
+                if (input.value.trim()) setNickname(input.value.trim());
               }}
             >
               <Localizer>
@@ -612,6 +590,9 @@ export const App: FunctionComponent = () => {
               botSelection={botSelection}
               analysisUsed={analysisUsed}
               onAnalysisUsed={handleAnalysisUsed}
+              onDisableBot={(player) =>
+                player === "a" ? setBotAEnabled(false) : setBotBEnabled(false)
+              }
               dbLoaded={dbProgress === 1}
             />
           </section>

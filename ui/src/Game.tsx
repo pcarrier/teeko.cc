@@ -7,6 +7,7 @@ import {
   useState,
 } from "preact/hooks";
 import { Text } from "preact-i18n";
+import classnames from "classnames";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faBackwardStep } from "@fortawesome/free-solid-svg-icons/faBackwardStep";
 import { faRotateBack } from "@fortawesome/free-solid-svg-icons/faRotateBack";
@@ -77,6 +78,7 @@ export const Game: FunctionComponent<{
   botSelection?: number;
   analysisUsed?: boolean;
   onAnalysisUsed?: () => void;
+  onDisableBot?: (player: "a" | "b") => void;
   dbLoaded?: boolean;
 }> = ({
   board,
@@ -88,6 +90,7 @@ export const Game: FunctionComponent<{
   botSelection,
   analysisUsed,
   onAnalysisUsed,
+  onDisableBot,
   dbLoaded,
 }) => {
   const [analysisOn, setAnalysisOn] = useState(
@@ -187,6 +190,11 @@ export const Game: FunctionComponent<{
   const play = (after: Board | undefined) => {
     if (!after) return;
     if (roomPath) after.p = false;
+    // When playing from a past position, disable the bot for this player
+    if (safeViewingMove !== null && onDisableBot) {
+      const player = viewingBoard.m.length % 2 === 0 ? "a" : "b";
+      onDisableBot(player);
+    }
     reportAnalysis();
     moveToBoard(after);
   };
@@ -206,16 +214,13 @@ export const Game: FunctionComponent<{
     if (after) moveToBoard(after);
   };
 
-  const classNames = (...classes: (string | false | undefined)[]) =>
-    classes.filter(Boolean).join(" ") || undefined;
-
   const analysisButton = (selected: boolean) => (
     <button
       onClick={() => {
         setAnalysisOn(!analysisOn);
         if (!analysisOn) onAnalysisUsed?.();
       }}
-      class={classNames(selected && "selected", analysisUsed && "used")}
+      class={classnames({ selected, used: analysisUsed })}
     >
       {analysisLoading ? spinner : <FontAwesomeIcon icon={faMagnifyingGlass} />}{" "}
       <Text id="buttons.analysis" />
@@ -248,10 +253,10 @@ export const Game: FunctionComponent<{
       <ol class="moveHistory" ref={moveListRef} onScroll={onMoveListScroll}>
         {board.m.map((m, i) => (
           <li
-            class={classNames(
-              safeViewingMove === i && "selected",
-              analysisOn && isForcedMove(i) && "forced"
-            )}
+            class={classnames({
+              selected: safeViewingMove === i,
+              forced: analysisOn && isForcedMove(i),
+            })}
             onClick={() => setViewingMove(i)}
           >
             {i + 1}. {formatMove(m)}
