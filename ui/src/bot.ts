@@ -146,16 +146,16 @@ export type Move = { from?: number; to: number; score: number };
 const HEURISTIC_MAX = 80;
 
 // Convert raw database score to number of moves to win/lose
-// Returns positive number = moves to outcome (0 = instant win/loss)
+// Returns positive number = moves to outcome (1 = win/lose this move)
 // For heuristic scores (-80 to +80), returns null (no forced outcome)
 // Use raw score sign to determine if winning (>0) or losing (<0)
 export function formatScore(rawScore: number): number | null {
   if (rawScore > HEURISTIC_MAX) {
-    // Win: 126 = instant win (0), 125 = win in 1, etc.
-    return 126 - rawScore;
+    // Win: 126 = win in 1 move, 125 = win in 2, etc.
+    return 127 - rawScore;
   } else if (rawScore < -HEURISTIC_MAX) {
-    // Loss: -126 = instant loss (0), -125 = lose in 1, etc.
-    return 126 + rawScore;
+    // Loss: -126 = lose in 1 move, -125 = lose in 2, etc.
+    return 127 + rawScore;
   }
   // Heuristic score - no forced outcome
   return null;
