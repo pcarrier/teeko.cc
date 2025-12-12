@@ -15,8 +15,7 @@
     "wikipedia": "Wikipédia",
     "undo": "Annuler",
     "restart": "Recommencer",
-    "analysis": "Analyser",
-    "jumpBack": "Revenir"
+    "analysis": "Analyser"
   },
   "titleBar": {
     "local": "Local",
@@ -63,6 +62,7 @@
     "hard": "Difficile",
     "perfect": "Parfait",
     "loading": "Chargement de la base… {{progress}}%",
-    "delay": "Délai du bot (ms) :"
+    "delay": "Délai du bot (ms) :",
+    "autoRestart": "Redémarrage auto"
   }
 }

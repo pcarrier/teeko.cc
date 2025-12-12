@@ -7,19 +7,16 @@ export function useAnalysis(
   enabled: boolean
 ): { moves: Move[]; loading: boolean } {
   const [dbReady, setDbReady] = useState(isDbLoaded());
-  const [loading, setLoading] = useState(false);
 
   // Load database if needed
   useEffect(() => {
     if (!enabled || dbReady) return;
 
     let cancelled = false;
-    setLoading(true);
 
     loadDatabase().then(() => {
       if (!cancelled) {
         setDbReady(true);
-        setLoading(false);
       }
     });
 
@@ -34,5 +31,6 @@ export function useAnalysis(
     return generateMoves(board).sort((a, b) => b.score - a.score);
   }, [board.a, board.b, board.m.length, enabled, dbReady]);
 
-  return { moves, loading };
+  // Loading when enabled but DB not ready
+  return { moves, loading: enabled && !dbReady };
 }

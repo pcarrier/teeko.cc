@@ -11,7 +11,6 @@ import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faBackwardStep } from "@fortawesome/free-solid-svg-icons/faBackwardStep";
 import { faRotateBack } from "@fortawesome/free-solid-svg-icons/faRotateBack";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
-import { faPlay } from "@fortawesome/free-solid-svg-icons/faPlay";
 import {
   Board,
   emptyBoard,
@@ -24,6 +23,7 @@ import {
 import { BoardView } from "./BoardView";
 import { useAnalysis } from "./useAnalysis";
 import { generateMoves, isDbLoaded } from "./bot";
+import { spinner } from "./Spinner";
 
 type Move = number | [number, number];
 
@@ -73,25 +73,35 @@ export const Game: FunctionComponent<{
   moveToBoard: (board: Board) => void;
   disabled?: boolean;
   singleBotMode?: boolean;
+  bothBotsEnabled?: boolean;
   botSelection?: number;
   analysisUsed?: boolean;
   onAnalysisUsed?: () => void;
+  dbLoaded?: boolean;
 }> = ({
   board,
   roomPath,
   moveToBoard,
   disabled,
   singleBotMode,
+  bothBotsEnabled,
   botSelection,
   analysisUsed,
   onAnalysisUsed,
+  dbLoaded,
 }) => {
-  const [analysisOn, setAnalysisOn] = useState(false);
+  const [analysisOn, setAnalysisOn] = useState(
+    () => localStorage.getItem("analysisOn") === "true"
+  );
   const [viewingMove, setViewingMove] = useState<number | null>(null);
   const [scores, setScores] = useState<(number | null)[]>([]);
   const moveListRef = useRef<HTMLOListElement>(null);
 
-  const gameOver = isGameOver(board);
+  // Persist analysis state
+  useEffect(() => {
+    localStorage.setItem("analysisOn", String(analysisOn));
+  }, [analysisOn]);
+
   const safeViewingMove =
     viewingMove !== null && viewingMove < board.m.length ? viewingMove : null;
   const viewingBoard = useMemo(
@@ -99,7 +109,11 @@ export const Game: FunctionComponent<{
       safeViewingMove !== null ? boardAtMove(board.m, safeViewingMove) : board,
     [safeViewingMove, board.a, board.b, board.m.length]
   );
-  const { moves: analysisMoves } = useAnalysis(viewingBoard, analysisOn);
+  const viewingGameOver = isGameOver(viewingBoard);
+  const { moves: analysisMoves, loading: analysisLoading } = useAnalysis(
+    viewingBoard,
+    analysisOn && !viewingGameOver
+  );
 
   const reportAnalysis = () => {
     if (analysisOn && onAnalysisUsed) onAnalysisUsed();
@@ -125,18 +139,27 @@ export const Game: FunctionComponent<{
     }
     setScores((prev) => {
       if (prev.length > board.m.length) return prev.slice(0, board.m.length);
-      if (prev.length === board.m.length) return prev;
 
-      // Compute all missing scores
-      const newScores = [...prev];
-      for (let i = prev.length; i < board.m.length; i++) {
-        const move = board.m[i];
-        const prevBoard = i === 0 ? emptyBoard() : boardAtMove(board.m, i - 1);
-        newScores.push(getMoveScore(prevBoard, move));
+      // Compute missing scores or recompute nulls when DB loads
+      const needsUpdate =
+        prev.length < board.m.length ||
+        (dbLoaded && prev.some((s) => s === null));
+      if (!needsUpdate) return prev;
+
+      const newScores: (number | null)[] = [];
+      for (let i = 0; i < board.m.length; i++) {
+        if (prev[i] !== null && prev[i] !== undefined) {
+          newScores.push(prev[i]);
+        } else {
+          const move = board.m[i];
+          const prevBoard =
+            i === 0 ? emptyBoard() : boardAtMove(board.m, i - 1);
+          newScores.push(getMoveScore(prevBoard, move));
+        }
       }
       return newScores;
     });
-  }, [analysisOn, board.m.length]);
+  }, [analysisOn, board.m.length, dbLoaded]);
 
   const isForcedMove = (index: number) => isForced(scores[index]);
 
@@ -169,11 +192,11 @@ export const Game: FunctionComponent<{
   };
 
   const move = (from: number, to: number) => {
-    if (!disabled) play(computeMove(board, from, to));
+    if (!disabled) play(computeMove(viewingBoard, from, to));
   };
 
   const place = (pos: number) => {
-    if (!disabled) play(computePlace(board, pos));
+    if (!disabled) play(computePlace(viewingBoard, pos));
   };
 
   const undo = () => {
@@ -194,7 +217,7 @@ export const Game: FunctionComponent<{
       }}
       class={classNames(selected && "selected", analysisUsed && "used")}
     >
-      <FontAwesomeIcon icon={faMagnifyingGlass} />{" "}
+      {analysisLoading ? spinner : <FontAwesomeIcon icon={faMagnifyingGlass} />}{" "}
       <Text id="buttons.analysis" />
     </button>
   );
@@ -211,67 +234,36 @@ export const Game: FunctionComponent<{
     </button>
   );
 
-  if (analysisOn) {
-    return (
-      <section class="game">
-        <BoardView
-          board={viewingBoard}
-          place={gameOver ? () => {} : place}
-          move={gameOver ? () => {} : move}
-          klass="full"
-          showStatus
-          analysis={analysisMoves}
-        />
-        <ol class="moveHistory" ref={moveListRef} onScroll={onMoveListScroll}>
-          {board.m.map((m, i) => (
-            <li
-              class={classNames(
-                safeViewingMove === i && "selected",
-                isForcedMove(i) && "forced"
-              )}
-              onClick={() => setViewingMove(i)}
-            >
-              {i + 1}. {formatMove(m)}
-            </li>
-          ))}
-        </ol>
-        <nav class="labeledButtons">
-          {gameOver ? (
-            <button
-              onClick={() => setViewingMove(null)}
-              disabled={safeViewingMove === null}
-            >
-              <FontAwesomeIcon icon={faPlay} /> <Text id="buttons.jumpBack" />
-            </button>
-          ) : (
-            <button onClick={undo} disabled={board.m.length === 0}>
-              <FontAwesomeIcon icon={faBackwardStep} />{" "}
-              <Text id="buttons.undo" />
-            </button>
-          )}
-          {restartButton}
-          {analysisButton(true)}
-        </nav>
-      </section>
-    );
-  }
-
   return (
     <div class="game">
       <BoardView
-        board={board}
+        board={viewingBoard}
         place={place}
         move={move}
         klass="full"
         showStatus
+        analysis={analysisOn ? analysisMoves : undefined}
         botSelection={botSelection}
       />
+      <ol class="moveHistory" ref={moveListRef} onScroll={onMoveListScroll}>
+        {board.m.map((m, i) => (
+          <li
+            class={classNames(
+              safeViewingMove === i && "selected",
+              analysisOn && isForcedMove(i) && "forced"
+            )}
+            onClick={() => setViewingMove(i)}
+          >
+            {i + 1}. {formatMove(m)}
+          </li>
+        ))}
+      </ol>
       <div class="labeledButtons">
-        <button onClick={undo} disabled={board.m.length === 0}>
+        <button onClick={undo} disabled={board.m.length === 0 || bothBotsEnabled}>
           <FontAwesomeIcon icon={faBackwardStep} /> <Text id="buttons.undo" />
         </button>
         {restartButton}
-        {analysisButton(false)}
+        {analysisButton(analysisOn)}
       </div>
     </div>
   );

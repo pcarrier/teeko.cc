@@ -44,6 +44,7 @@ body {
   color: @color;
   background-color: @bg;
   font-size: 12pt;
+  line-height: 1;
 }
 
 h1,
@@ -320,6 +321,7 @@ menu {
   }
   &.win {
     color: @bColor;
+    font-weight: bold;
   }
 }
 
@@ -331,14 +333,24 @@ menu {
   }
 
   .moveHistory {
-    columns: 5;
-    column-gap: 0.5em;
+    columns: 4;
     column-fill: auto;
     list-style: none;
     margin: 0.5em 0;
-    padding: 0;
-    max-height: 20em;
+    padding-inline-start: 0;
+    height: 9em;
     overflow-x: auto;
+    border: 1px solid @boardColor;
+
+    &::-webkit-scrollbar {
+      height: 0.5em;
+    }
+    &::-webkit-scrollbar-track {
+      background: @bg;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: @boardColor;
+    }
 
     li {
       cursor: pointer;
@@ -516,10 +528,6 @@ menu {
 }
 
 .delayInput {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   label {
     display: flex;
     align-items: center;
@@ -574,12 +582,13 @@ menu {
   display: flex;
   gap: 0.5em;
 }
+
 .offlineNotice {
   color: @boardColor;
   font-style: italic;
   padding: 0.5em;
 }
+
 .dbProgress {
-  color: @color;
-  margin: 0;
+  flex-basis: 100%;
 }

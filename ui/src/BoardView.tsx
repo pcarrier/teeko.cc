@@ -492,6 +492,8 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
               };
 
               const bestScore = Math.max(...analysis.map((m) => m.score));
+              // Only highlight in green if there's a winning move (score > 50)
+              const canWin = bestScore > 50;
 
               if (isPlacementPhase) {
                 // Show scores on empty slots during placement
@@ -501,7 +503,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                     x={x(m.to)}
                     y={y(m.to)}
                     class="analysisScore"
-                    fill={m.score === bestScore ? "#0f0" : "white"}
+                    fill={canWin && m.score === bestScore ? "#0f0" : "white"}
                   >
                     {scoreDisplay(m.score)}
                   </text>
@@ -525,7 +527,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                       x={x(pos)}
                       y={y(pos)}
                       class="analysisScore"
-                      fill={score === bestScore ? "#0f0" : "white"}
+                      fill={canWin && score === bestScore ? "#0f0" : "white"}
                     >
                       {scoreDisplay(score)}
                     </text>
@@ -542,7 +544,7 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                       x={x(m.to)}
                       y={y(m.to)}
                       class="analysisScore"
-                      fill={m.score === pieceBest ? "#0f0" : "white"}
+                      fill={canWin && m.score === pieceBest ? "#0f0" : "white"}
                     >
                       {scoreDisplay(m.score)}
                     </text>

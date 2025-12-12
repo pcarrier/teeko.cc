@@ -2,9 +2,28 @@ import { FunctionComponent } from "preact";
 import { Text } from "preact-i18n";
 import { FontAwesomeIcon } from "@aduh95/preact-fontawesome";
 import { faRobot } from "@fortawesome/free-solid-svg-icons/faRobot";
+import { faRotate } from "@fortawesome/free-solid-svg-icons/faRotate";
 import { spinner } from "./Spinner";
 import { Difficulty } from "./bot";
-import { BotState } from "./useBotGame";
+
+export interface BotState {
+  botAEnabled: boolean;
+  botBEnabled: boolean;
+  botADifficulty: Difficulty;
+  botBDifficulty: Difficulty;
+  botDelay: number;
+  botSelection?: number;
+  dbProgress: number;
+  isBotTurn: boolean;
+  singleBotMode: boolean;
+  autoRestart: boolean;
+  setBotAEnabled: (enabled: boolean) => void;
+  setBotBEnabled: (enabled: boolean) => void;
+  setBotADifficulty: (d: Difficulty) => void;
+  setBotBDifficulty: (d: Difficulty) => void;
+  setBotDelay: (ms: number) => void;
+  setAutoRestart: (enabled: boolean) => void;
+}
 
 const DifficultySelect: FunctionComponent<{
   value: Difficulty;
@@ -84,7 +103,17 @@ export const BotControls: FunctionComponent<{
         onChange={bot.setBotBDifficulty}
       />
     </div>
-    <DelayInput value={bot.botDelay} onChange={bot.setBotDelay} />
+    {(bot.botAEnabled || bot.botBEnabled) && (
+      <>
+        <DelayInput value={bot.botDelay} onChange={bot.setBotDelay} />
+        <button
+          onClick={() => bot.setAutoRestart(!bot.autoRestart)}
+          class={bot.autoRestart ? "selected" : undefined}
+        >
+          <FontAwesomeIcon icon={faRotate} /> <Text id="bot.autoRestart" />
+        </button>
+      </>
+    )}
     {(bot.botAEnabled || bot.botBEnabled) && bot.dbProgress < 1 && (
       <p class="dbProgress">
         {spinner}{" "}

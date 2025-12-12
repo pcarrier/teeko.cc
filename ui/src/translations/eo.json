@@ -15,8 +15,7 @@
     "wikipedia": "Vikipedio",
     "undo": "Malfari",
     "restart": "Rekomenci",
-    "analysis": "Analizi",
-    "jumpBack": "Reveni"
+    "analysis": "Analizi"
   },
   "titleBar": {
     "local": "Loka",
@@ -63,6 +62,7 @@
     "hard": "Malfacila",
     "perfect": "Perfekta",
     "loading": "Ŝargante datumbazon… {{progress}}%",
-    "delay": "Robota prokrasto (ms):"
+    "delay": "Robota prokrasto (ms):",
+    "autoRestart": "Aŭto-rekomenci"
   }
 }

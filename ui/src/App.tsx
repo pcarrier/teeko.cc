@@ -16,6 +16,7 @@ import {
   RTCSignal,
   computePlace,
   computeMove,
+  computeReset,
 } from "teeko-cc-common/src/model.js";
 import { Game } from "./Game";
 import { Help } from "./Help.jsx";
@@ -167,6 +168,9 @@ export const App: FunctionComponent = () => {
     undefined
   );
   const [dbProgress, setDbProgress] = useState(0);
+  const [autoRestart, _setAutoRestart] = useState<boolean>(
+    () => localStorage.getItem("autoRestart") === "true"
+  );
   const [isMatching, setMatching] = useState(false);
   const [peers, setPeers] = useState<string[]>([]);
   const [voicePeers, setVoicePeers] = useState<string[]>([]);
@@ -223,6 +227,11 @@ export const App: FunctionComponent = () => {
   const setBotDelay = (ms: number) => {
     localStorage.setItem("botDelay", String(ms));
     _setBotDelay(ms);
+  };
+
+  const setAutoRestart = (enabled: boolean) => {
+    localStorage.setItem("autoRestart", String(enabled));
+    _setAutoRestart(enabled);
   };
 
   const navigate = (path: string) => {
@@ -333,7 +342,19 @@ export const App: FunctionComponent = () => {
       clearTimeout(timeout3);
       setBotSelection(undefined);
     };
-  }, [isBotTurn, board.m.length, currentBotDifficulty, dbProgress === 100]);
+  }, [isBotTurn, board.m.length, currentBotDifficulty, dbProgress === 1]);
+
+  // Auto-restart when game ends with bots playing
+  useEffect(() => {
+    if (!autoRestart || !isLocalGame) return;
+    if (!botAEnabled && !botBEnabled) return;
+    if (!isGameOver(board)) return;
+
+    const timeout = setTimeout(() => {
+      moveToBoard(computeReset(board));
+    }, botDelayRef.current);
+    return () => clearTimeout(timeout);
+  }, [autoRestart, isLocalGame, botAEnabled, botBEnabled, board.a, board.b]);
 
   const displayBoard = !board.p && !roomPath ? { ...board, p: true } : board;
 
@@ -587,9 +608,11 @@ export const App: FunctionComponent = () => {
               moveToBoard={moveToBoard}
               disabled={isBotTurn}
               singleBotMode={isLocalGame && botAEnabled !== botBEnabled}
+              bothBotsEnabled={isLocalGame && botAEnabled && botBEnabled}
               botSelection={botSelection}
               analysisUsed={analysisUsed}
               onAnalysisUsed={handleAnalysisUsed}
+              dbLoaded={dbProgress === 1}
             />
           </section>
         )}
@@ -606,11 +629,13 @@ export const App: FunctionComponent = () => {
               dbProgress,
               isBotTurn,
               singleBotMode: botAEnabled !== botBEnabled,
+              autoRestart,
               setBotAEnabled,
               setBotBEnabled,
               setBotADifficulty,
               setBotBDifficulty,
               setBotDelay,
+              setAutoRestart,
             }}
           />
         )}

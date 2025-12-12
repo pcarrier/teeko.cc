@@ -15,8 +15,7 @@
     "wikipedia": "维基百科",
     "undo": "撤销",
     "restart": "重新开始",
-    "analysis": "分析",
-    "jumpBack": "返回"
+    "analysis": "分析"
   },
   "titleBar": {
     "local": "本地",
@@ -63,6 +62,7 @@
     "hard": "困难",
     "perfect": "完美",
     "loading": "加载数据库… {{progress}}%",
-    "delay": "机器人延迟（毫秒）："
+    "delay": "机器人延迟（毫秒）：",
+    "autoRestart": "自动重启"
   }
 }

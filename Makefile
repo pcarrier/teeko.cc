@@ -1,5 +1,5 @@
 .PHONY: deploy
-deploy: deploy-ui deploy-ws deploy-solution
+deploy: deploy-ui deploy-ws
 
 ui/public/icon-512x512.png: ui/public/icon.svg
 	rsvg-convert --height 512 --output ui/public/icon-512x512.png ui/public/icon.svg
