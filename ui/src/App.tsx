@@ -347,12 +347,16 @@ export const App: FunctionComponent = () => {
   useEffect(() => {
     if (!roomPath || !nickname) return;
     const sockette = new Sockette(wsUrl(`room/${roomPath}`, nickname), {
-      onopen: () => setOnlineStatus(OnlineStatus.ONLINE),
+      onopen: () => {
+        setOnlineStatus(OnlineStatus.ONLINE);
+        if (analysisUsedRef.current) {
+          sockette.send(JSON.stringify({ st: { analyzed: true } } as Message));
+        }
+      },
       onreconnect: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
         setPeers([]);
         setVoicePeers([]);
-        setAnalysisUsed(false); // Server will resend current state
       },
       onclose: () => {
         setOnlineStatus(OnlineStatus.OFFLINE);
