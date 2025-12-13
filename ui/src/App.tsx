@@ -39,7 +39,13 @@ import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { faUsers } from "@fortawesome/free-solid-svg-icons/faUsers";
 import { spinner } from "./Spinner";
-import { getBotMove, isGameOver, Difficulty, onDbProgress } from "./bot";
+import {
+  getBotMove,
+  isGameOver,
+  Difficulty,
+  onDbProgress,
+  startDbLoad,
+} from "./bot";
 import { useVoiceChat } from "./useVoiceChat";
 import {
   usePersistentState,
@@ -178,7 +184,7 @@ export const App: FunctionComponent = () => {
   const [botSelection, setBotSelection] = useState<number | undefined>(
     undefined
   );
-  const [dbProgress, setDbProgress] = useState(0);
+  const [dbProgress, setDbProgress] = useState<number | undefined>(undefined);
   const [autoRestart, setAutoRestart] = usePersistentState(
     "autoRestart",
     false,
@@ -234,10 +240,13 @@ export const App: FunctionComponent = () => {
     if (isLocalGame) setBoard(loadBoard("localBoard"));
   }, [isLocalGame]);
 
-  useEffect(() => {
-    if (!botAEnabled && !botBEnabled) return;
-    return onDbProgress(setDbProgress);
-  }, [botAEnabled, botBEnabled]);
+  // Subscribe to DB progress (for bots and analysis)
+  // Use useRef to ensure we only subscribe once, synchronously
+  const dbProgressSubscribed = useRef(false);
+  if (!dbProgressSubscribed.current) {
+    dbProgressSubscribed.current = true;
+    onDbProgress(setDbProgress);
+  }
 
   const analysisUsedRef = useRef(analysisUsed);
   analysisUsedRef.current = analysisUsed;
@@ -600,7 +609,7 @@ export const App: FunctionComponent = () => {
               onDisableBot={(player) =>
                 player === "a" ? setBotAEnabled(false) : setBotBEnabled(false)
               }
-              dbLoaded={dbProgress === 1}
+              dbProgress={dbProgress}
             />
           </section>
         )}

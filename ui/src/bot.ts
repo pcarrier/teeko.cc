@@ -66,19 +66,24 @@ function goedel(a: number, b: number, n: number): number {
 let dbLoading: Promise<void> | null = null;
 let dbLoaded = false;
 const scores: Int8Array[] = [];
-const progressListeners: Set<(p: number) => void> = new Set();
-let progress = 0;
+const progressListeners: Set<(p: number | undefined) => void> = new Set();
+let progress: number | undefined = undefined;
 
 function notify(p: number) {
   progress = p;
   for (const l of progressListeners) l(p);
 }
 
-export function onDbProgress(listener: (p: number) => void): () => void {
-  loadDatabase();
+export function onDbProgress(
+  listener: (p: number | undefined) => void
+): () => void {
   listener(dbLoaded ? 1 : progress);
   progressListeners.add(listener);
   return () => progressListeners.delete(listener);
+}
+
+export function startDbLoad(): void {
+  loadDatabase();
 }
 
 const DB_SIZE = 96691520;
@@ -93,26 +98,26 @@ async function loadDatabase(): Promise<void> {
 
     let buffer: ArrayBuffer;
     if (res.body) {
+      // Stream with progress using known DB_SIZE
+      const data = new Uint8Array(DB_SIZE);
       const reader = res.body.getReader();
-      const chunks: Uint8Array[] = [];
       let received = 0;
+      let lastPct = 0;
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
-        chunks.push(value);
+        data.set(value, received);
         received += value.length;
-        notify(received / DB_SIZE);
+        const pct = Math.floor((received / DB_SIZE) * 100);
+        if (pct > lastPct) {
+          notify(received / DB_SIZE);
+          lastPct = pct;
+        }
       }
-      const combined = new Uint8Array(received);
-      let pos = 0;
-      for (const c of chunks) {
-        combined.set(c, pos);
-        pos += c.length;
-      }
-      buffer = combined.buffer;
+      buffer = data.buffer;
     } else {
+      // Fallback (shouldn't happen in modern browsers)
       buffer = await res.arrayBuffer();
-      notify(1);
     }
 
     const view = new DataView(buffer);
@@ -134,6 +139,7 @@ async function loadDatabase(): Promise<void> {
       offset += size;
     }
     dbLoaded = true;
+    notify(1);
   })();
 
   return dbLoading;
@@ -167,6 +173,7 @@ export function isForced(score: number): boolean {
 }
 
 export function generateMoves(board: Board): Move[] {
+  if (!dbLoaded) return [];
   const { a, b, m } = board;
   const n = popcount(a) + popcount(b);
   const [mover, other] = m.length % 2 === 0 ? [a, b] : [b, a];

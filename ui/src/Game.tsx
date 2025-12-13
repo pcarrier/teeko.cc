@@ -23,7 +23,7 @@ import {
 } from "teeko-cc-common/src/model";
 import { BoardView } from "./BoardView";
 import { useAnalysis } from "./useAnalysis";
-import { generateMoves, isDbLoaded } from "./bot";
+import { generateMoves, isDbLoaded, startDbLoad } from "./bot";
 import { spinner } from "./Spinner";
 
 type Move = number | [number, number];
@@ -79,7 +79,7 @@ export const Game: FunctionComponent<{
   analysisUsed?: boolean;
   onAnalysisUsed?: () => void;
   onDisableBot?: (player: "a" | "b") => void;
-  dbLoaded?: boolean;
+  dbProgress?: number;
 }> = ({
   board,
   roomPath,
@@ -91,7 +91,7 @@ export const Game: FunctionComponent<{
   analysisUsed,
   onAnalysisUsed,
   onDisableBot,
-  dbLoaded,
+  dbProgress,
 }) => {
   const [analysisOn, setAnalysisOn] = useState(
     () => localStorage.getItem("analysisOn") === "true"
@@ -99,10 +99,12 @@ export const Game: FunctionComponent<{
   const [viewingMove, setViewingMove] = useState<number | null>(null);
   const [scores, setScores] = useState<(number | null)[]>([]);
   const moveListRef = useRef<HTMLOListElement>(null);
+  const dbLoaded = dbProgress === 1;
 
-  // Persist analysis state
+  // Persist analysis state and trigger DB load when enabled
   useEffect(() => {
     localStorage.setItem("analysisOn", String(analysisOn));
+    if (analysisOn) startDbLoad();
   }, [analysisOn]);
 
   const safeViewingMove =
@@ -113,10 +115,11 @@ export const Game: FunctionComponent<{
     [safeViewingMove, board.a, board.b, board.m.length]
   );
   const viewingGameOver = isGameOver(viewingBoard);
-  const { moves: analysisMoves, loading: analysisLoading } = useAnalysis(
+  const analysisMoves = useAnalysis(
     viewingBoard,
-    analysisOn && !viewingGameOver
+    analysisOn && !viewingGameOver && dbLoaded
   );
+  const analysisLoading = analysisOn && !dbLoaded;
 
   const reportAnalysis = () => {
     if (analysisOn && onAnalysisUsed) onAnalysisUsed();
@@ -273,6 +276,14 @@ export const Game: FunctionComponent<{
         {restartButton}
         {analysisButton(analysisOn)}
       </div>
+      {analysisLoading && (
+        <p class="dbProgress">
+          <Text
+            id="bot.loading"
+            fields={{ progress: Math.round((dbProgress ?? 0) * 100) }}
+          />
+        </p>
+      )}
     </div>
   );
 };
