@@ -218,8 +218,12 @@ export const App: FunctionComponent = () => {
     currentPlayer === "a" ? botADifficulty : botBDifficulty;
 
   const navigate = (path: string) => {
+    const newRoute = parseRoute(path);
+    if (newRoute.type === "play" || newRoute.type === "room") {
+      localStorage.setItem("analysisOn", "false");
+    }
     history.pushState({}, "", path);
-    setRoute(parseRoute(path));
+    setRoute(newRoute);
   };
 
   const joinRoom = (roomId: string) => navigate(`/room/${roomId}`);
@@ -552,7 +556,10 @@ export const App: FunctionComponent = () => {
                 const input = (e.target as HTMLFormElement).elements.namedItem(
                   "nickname"
                 ) as HTMLInputElement;
-                if (input.value.trim()) setNickname(input.value.trim());
+                if (input.value.trim()) {
+                  localStorage.setItem("analysisOn", "false");
+                  setNickname(input.value.trim());
+                }
               }}
             >
               <Localizer>
