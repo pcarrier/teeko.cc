@@ -234,7 +234,9 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const turnNumber = board.m.length + 1;
   const status = showStatus && (
     <p
-      class={classnames("status", t === 0 ? "A" : "B", {
+      class={classnames("status", {
+        A: win ? aWin : t === 0,
+        B: win ? bWin : t !== 0,
         playing: board.p,
         win,
       })}

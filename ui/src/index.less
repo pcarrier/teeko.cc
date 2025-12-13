@@ -127,6 +127,7 @@ header {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+  gap: 0.25em;
   background-color: @navBg;
   height: 14mm;
   border-radius: 0.5em 0.5em 0 0;
@@ -319,8 +320,13 @@ menu {
     color: @strong;
   }
   &.win {
-    color: @bColor;
     font-weight: bold;
+    &.A {
+      color: @aColor;
+    }
+    &.B {
+      color: @bColor;
+    }
   }
 }
 
