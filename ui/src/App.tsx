@@ -483,6 +483,7 @@ export const App: FunctionComponent = () => {
             )}
             {!isOffline && (
               <>
+                <li class="dots">●</li>
                 <li>
                   <Localizer>
                     <input
@@ -512,6 +513,7 @@ export const App: FunctionComponent = () => {
                     <Text id="menu.playWithFriends" />
                   </button>
                 </li>
+                <li class="dots">●</li>
                 <li>
                   <FooterLinks
                     onInstall={

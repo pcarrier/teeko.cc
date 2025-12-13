@@ -198,6 +198,7 @@ export const Game: FunctionComponent<{
       const player = viewingBoard.m.length % 2 === 0 ? "a" : "b";
       onDisableBot(player);
     }
+    setViewingMove(null);
     reportAnalysis();
     moveToBoard(after);
   };
