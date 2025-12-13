@@ -1,5 +1,5 @@
 const CACHE_NAME = "teeko";
-const PRECACHE = ["/", "/index.html", "/bell.opus", "/icon.svg", "/assets/db"];
+const PRECACHE = ["/", "/index.html", "/bell.opus", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -25,6 +25,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
   if (url.protocol !== "http:" && url.protocol !== "https:") return;
+
+  // Don't cache the large DB file
+  if (url.pathname === "/assets/db") return;
 
   const req = event.request.mode === "navigate" ? "/index.html" : event.request;
 

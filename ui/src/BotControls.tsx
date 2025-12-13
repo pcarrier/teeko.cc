@@ -13,7 +13,7 @@ export interface BotState {
   botBDifficulty: Difficulty;
   botDelay: number;
   botSelection?: number;
-  dbProgress: number;
+  dbProgress?: number;
   isBotTurn: boolean;
   singleBotMode: boolean;
   autoRestart: boolean;
@@ -114,12 +114,12 @@ export const BotControls: FunctionComponent<{
         </button>
       </>
     )}
-    {(bot.botAEnabled || bot.botBEnabled) && bot.dbProgress < 1 && (
+    {(bot.botAEnabled || bot.botBEnabled) && bot.dbProgress !== 1 && (
       <p class="dbProgress">
         {spinner}{" "}
         <Text
           id="bot.loading"
-          fields={{ progress: Math.round(bot.dbProgress * 100) }}
+          fields={{ progress: Math.round((bot.dbProgress ?? 0) * 100) }}
         />
       </p>
     )}
