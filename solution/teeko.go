@@ -1,32 +1,21 @@
 // Teeko solver - computes complete game-theoretic solution
 // Original algorithm by Guy L. Steele Jr. (1998-2000)
-// Go port with HTTP API
+// Go port
 
 package main
 
 import (
-	"bytes"
 	"encoding/binary"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"math/bits"
-	"net/http"
 	"os"
 	"runtime"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
-	"unsafe"
 )
-
-var bufPool = sync.Pool{
-	New: func() interface{} {
-		return new(bytes.Buffer)
-	},
-}
 
 // Board constants
 const (
@@ -46,11 +35,6 @@ const (
 	ScoreHeuristicMax int8 = 80
 )
 
-// Player constants
-const (
-	PlayerA = "a"
-	PlayerB = "b"
-)
 
 // Precomputed values
 var (
@@ -97,6 +81,127 @@ var priorityMasks = [5]uint32{
 	0b0000001010000000101000000, // priority 2: inner ring corners
 	0b0000000100010100010000000, // priority 3: inner ring edges
 	0b0000000000001000000000000, // priority 4: center
+}
+
+// D4 symmetry transformation tables (8 symmetries of the square)
+// symTables[sym][pos] = new position after applying symmetry
+var symTables = [8][25]int{
+	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24},          // identity
+	{20, 15, 10, 5, 0, 21, 16, 11, 6, 1, 22, 17, 12, 7, 2, 23, 18, 13, 8, 3, 24, 19, 14, 9, 4},          // rot90 CCW
+	{24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0},          // rot180
+	{4, 9, 14, 19, 24, 3, 8, 13, 18, 23, 2, 7, 12, 17, 22, 1, 6, 11, 16, 21, 0, 5, 10, 15, 20},          // rot270 CCW
+	{4, 3, 2, 1, 0, 9, 8, 7, 6, 5, 14, 13, 12, 11, 10, 19, 18, 17, 16, 15, 24, 23, 22, 21, 20},          // flip H
+	{20, 21, 22, 23, 24, 15, 16, 17, 18, 19, 10, 11, 12, 13, 14, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4},          // flip V
+	{0, 5, 10, 15, 20, 1, 6, 11, 16, 21, 2, 7, 12, 17, 22, 3, 8, 13, 18, 23, 4, 9, 14, 19, 24},          // reflect main diagonal
+	{24, 19, 14, 9, 4, 23, 18, 13, 8, 3, 22, 17, 12, 7, 2, 21, 16, 11, 6, 1, 20, 15, 10, 5, 0},          // reflect anti-diagonal
+}
+
+// Transform a bitmask using symmetry table
+func transformMask(mask uint32, sym int) uint32 {
+	var result uint32
+	for p := mask; p != 0; {
+		bit := p & -p
+		p ^= bit
+		result |= 1 << symTables[sym][bits.TrailingZeros32(bit)]
+	}
+	return result
+}
+
+// Find canonical form (minimum Goedel index among all 8 variants)
+func canonical(a, b uint32, n int) int {
+	minG := goedel(a, b, n)
+	for s := 1; s < 8; s++ {
+		if g := goedel(transformMask(a, s), transformMask(b, s), n); g < minG {
+			minG = g
+		}
+	}
+	return minG
+}
+
+// Check if a Goedel index is canonical
+func isCanonical(g, n int) bool {
+	a, b := degoedel(g, n)
+	return canonical(a, b, n) == g
+}
+
+// Rank query: count canonical positions with Goedel index < canonG
+func rankQuery(n, canonG int) int {
+	blockIdx := canonG / BLOCK_SIZE
+	rank := checkpoints[n][blockIdx]
+
+	// Scan from block start to canonG, counting canonicals
+	for g := blockIdx * BLOCK_SIZE; g < canonG; g++ {
+		if isCanonical(g, n) {
+			rank++
+		}
+	}
+	return rank
+}
+
+// Lookup score for a position using canonical form
+func lookupScore(a, b uint32, n int) int8 {
+	canonG := canonical(a, b, n)
+	return canonicalScores[n][rankQuery(n, canonG)]
+}
+
+// Store score for a position using canonical form
+func storeScore(a, b uint32, n int, score int8) {
+	canonG := canonical(a, b, n)
+	canonicalScores[n][rankQuery(n, canonG)] = score
+}
+
+// Build checkpoints for piece count n
+func buildCheckpoints(n int) {
+	numBlocks := (configs[n] + BLOCK_SIZE - 1) / BLOCK_SIZE
+	checkpoints[n] = make([]int, numBlocks+1)
+
+	rank := 0
+	for g := 0; g < configs[n]; g++ {
+		if g%BLOCK_SIZE == 0 {
+			checkpoints[n][g/BLOCK_SIZE] = rank
+		}
+		if isCanonical(g, n) {
+			rank++
+		}
+	}
+	checkpoints[n][numBlocks] = rank
+	canonicalCounts[n] = rank
+	canonicalScores[n] = make([]int8, rank)
+}
+
+// Compress full score table into canonical format
+// Called after computation, before saving
+func compressScores() {
+	fmt.Println("Compressing to canonical format…")
+	start := time.Now()
+
+	// Need position cache for degoedel
+	initPosCache()
+
+	var totalFull, totalCanonical int
+	for n := range 9 {
+		totalFull += configs[n]
+		buildCheckpoints(n)
+		totalCanonical += canonicalCounts[n]
+
+		// Copy scores from full table to canonical table
+		rank := 0
+		for g := 0; g < configs[n]; g++ {
+			if isCanonical(g, n) {
+				canonicalScores[n][rank] = scores[n][g]
+				rank++
+			}
+		}
+	}
+
+	// Clear the full score tables to free memory
+	for n := range 9 {
+		scores[n] = nil
+	}
+
+	fmt.Printf("  Compressed %d -> %d positions (%.1fx)\n",
+		totalFull, totalCanonical, float64(totalFull)/float64(totalCanonical))
+	fmt.Printf("  Compression completed in %v\n", time.Since(start).Round(time.Millisecond))
 }
 
 // Negamax with alpha-beta pruning for heuristic evaluation
@@ -207,9 +312,19 @@ func evalPosition(mine, theirs uint32) int {
 	return score
 }
 
-// Score tables
+// Score tables (v1: full, v2: canonical only)
 var (
 	scores [9][]int8
+)
+
+// Symmetry reduction constants
+const BLOCK_SIZE = 1024
+
+// Canonical position data (for v2 format)
+var (
+	checkpoints     [9][]int   // checkpoints[n][i] = rank at i*BLOCK_SIZE
+	canonicalScores [9][]int8  // dense array of canonical scores only
+	canonicalCounts [9]int     // count of canonical positions per piece count
 )
 
 // Precomputed positions (a, b pairs) for each piece count
@@ -368,10 +483,6 @@ func initPosCache() {
 // Fast position lookup from cache
 func getPos(g, n int) (a, b uint32) {
 	return unpackPos(posCache[n][g])
-}
-
-func bitToSquare(bit uint32) int {
-	return bits.TrailingZeros32(bit)
 }
 
 // Score combination for minimax
@@ -682,6 +793,16 @@ func countStats(label string, table []int8) {
 		label, aAdvantage+ties+bAdvantage, aAdvantage, ties, bAdvantage, aWins, bWins)
 }
 
+func maskToSquares(m uint32) []int {
+	var sq []int
+	for i := range Size {
+		if m&(1<<i) != 0 {
+			sq = append(sq, i)
+		}
+	}
+	return sq
+}
+
 func findLongestWins() {
 	fmt.Println("Finding longest forced wins…")
 
@@ -752,7 +873,9 @@ func printBoard(a, b uint32) {
 }
 
 // Database I/O
-const dbMagic, dbVersion = "TEEK", uint32(1)
+const dbMagic = "TEEK"
+const dbVersionV1 = uint32(1)
+const dbVersionV2 = uint32(2)
 
 func saveDB(filename string) error {
 	f, err := os.Create(filename)
@@ -762,370 +885,36 @@ func saveDB(filename string) error {
 	defer f.Close()
 
 	f.Write([]byte(dbMagic))
-	binary.Write(f, binary.LittleEndian, dbVersion)
+	binary.Write(f, binary.LittleEndian, dbVersionV2)
 
 	for n := range 9 {
-		binary.Write(f, binary.LittleEndian, uint32(len(scores[n])))
-		buf := make([]byte, len(scores[n]))
-		for i, s := range scores[n] {
+		// Write canonical count
+		binary.Write(f, binary.LittleEndian, uint32(canonicalCounts[n]))
+		// Write number of checkpoints
+		binary.Write(f, binary.LittleEndian, uint32(len(checkpoints[n])))
+		// Write checkpoints
+		for _, cp := range checkpoints[n] {
+			binary.Write(f, binary.LittleEndian, uint32(cp))
+		}
+		// Write scores
+		buf := make([]byte, len(canonicalScores[n]))
+		for i, s := range canonicalScores[n] {
 			buf[i] = byte(s)
 		}
 		f.Write(buf)
 	}
 	return nil
 }
-
-// Memory-mapped database for efficient serving
-var mmapData []byte
-
-func mmapDB(filename string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	fi, err := f.Stat()
-	if err != nil {
-		return err
-	}
-
-	mmapData, err = syscall.Mmap(int(f.Fd()), 0, int(fi.Size()),
-		syscall.PROT_READ, syscall.MAP_SHARED)
-	if err != nil {
-		return fmt.Errorf("mmap failed: %w", err)
-	}
-
-	// Verify header
-	if len(mmapData) < 8 || string(mmapData[:4]) != dbMagic {
-		return fmt.Errorf("invalid database")
-	}
-	ver := binary.LittleEndian.Uint32(mmapData[4:8])
-	if ver != dbVersion {
-		return fmt.Errorf("unsupported version: %d", ver)
-	}
-
-	// Point score slices directly into mmap'd memory
-	offset := 8
-	for n := range 9 {
-		if offset+4 > len(mmapData) {
-			return fmt.Errorf("truncated database")
-		}
-		size := int(binary.LittleEndian.Uint32(mmapData[offset:]))
-		offset += 4
-		if size != configs[n] {
-			return fmt.Errorf("size mismatch for %d pieces", n)
-		}
-		if offset+size > len(mmapData) {
-			return fmt.Errorf("truncated database")
-		}
-		// Reinterpret []byte as []int8 (safe: same size, same representation)
-		scores[n] = unsafe.Slice((*int8)(unsafe.Pointer(&mmapData[offset])), size)
-		offset += size
-	}
-	return nil
-}
-
-// HTTP API
-type Request struct {
-	A    []int  `json:"a"`
-	B    []int  `json:"b"`
-	Turn string `json:"turn,omitempty"`
-}
-
-type LogEntry struct {
-	Timestamp string   `json:"timestamp"`
-	Method    string   `json:"method"`
-	Path      string   `json:"path"`
-	Request   *Request `json:"request,omitempty"`
-	Status    int      `json:"status"`
-	Error     string   `json:"error,omitempty"`
-	Positions int      `json:"positions,omitempty"`
-	Duration  float64  `json:"duration"`
-}
-
-type requestLogger struct {
-	start time.Time
-	r     *http.Request
-	req   *Request
-	entry LogEntry
-}
-
-func newRequestLogger(r *http.Request) *requestLogger {
-	return &requestLogger{
-		start: time.Now(),
-		r:     r,
-	}
-}
-
-func (l *requestLogger) log() {
-	l.entry.Timestamp = l.start.Format(time.RFC3339)
-	l.entry.Method = l.r.Method
-	l.entry.Path = l.r.URL.Path
-	l.entry.Request = l.req
-	l.entry.Duration = time.Since(l.start).Seconds()
-	json.NewEncoder(os.Stdout).Encode(l.entry)
-}
-
-type Move struct {
-	From     *int   `json:"from,omitempty"`
-	To       int    `json:"to"`
-	Score    int    `json:"score"`
-	Outcome  string `json:"outcome"`
-	Distance int    `json:"distance,omitempty"`
-}
-
-type Response struct {
-	A        []int  `json:"a"`
-	B        []int  `json:"b"`
-	Turn     string `json:"turn"`
-	Phase    string `json:"phase"`
-	Pieces   int    `json:"pieces"`
-	Score    int    `json:"score"`
-	Outcome  string `json:"outcome"`
-	Distance int    `json:"distance,omitempty"`
-	Moves    []Move `json:"moves"`
-	Error    string `json:"error,omitempty"`
-}
-
-// Pre-allocated move slices per piece count (max moves possible)
-var moveCapacity = [9]int{25, 24, 23, 22, 21, 20, 19, 18, 32}
-
-func outcome(s int8) (string, int) {
-	switch {
-	case s == ScoreIllegal:
-		return "illegal", 0
-	case s > ScoreHeuristicMax:
-		return PlayerA, int(ScoreAWin - s)
-	case s < -ScoreHeuristicMax:
-		return PlayerB, int(s - ScoreBWin)
-	default:
-		// Heuristic score in range -50 to +50 (draw with advantage indicator)
-		return "draw", int(s)
-	}
-}
-
-func maskToSquares(m uint32) []int {
-	var sq []int
-	for i := range Size {
-		if m&(1<<i) != 0 {
-			sq = append(sq, i)
-		}
-	}
-	return sq
-}
-
-var corsHeaders = map[string]string{
-	"Content-Type":                 "application/json",
-	"Access-Control-Allow-Origin":  "*",
-	"Access-Control-Allow-Methods": "POST, OPTIONS",
-	"Access-Control-Allow-Headers": "Content-Type",
-	"Access-Control-Max-Age":       "86400",
-}
-
-func setCORS(w http.ResponseWriter) {
-	h := w.Header()
-	for k, v := range corsHeaders {
-		h.Set(k, v)
-	}
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	l := newRequestLogger(r)
-	defer l.log()
-	setCORS(w)
-
-	if r.Method == http.MethodOptions {
-		l.entry.Status = 200
-		return
-	}
-
-	if r.Method != http.MethodPost {
-		l.entry.Status = 405
-		l.entry.Error = "POST required"
-		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-		return
-	}
-
-	var req Request
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		l.entry.Status = 400
-		l.entry.Error = "invalid JSON"
-		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-		return
-	}
-	l.req = &req
-
-	var a, b uint32
-	for _, sq := range req.A {
-		if sq < 0 || sq > 24 {
-			l.entry.Status = 400
-			l.entry.Error = fmt.Sprintf("invalid square: %d", sq)
-			json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-			return
-		}
-		a |= 1 << sq
-	}
-	for _, sq := range req.B {
-		if sq < 0 || sq > 24 {
-			l.entry.Status = 400
-			l.entry.Error = fmt.Sprintf("invalid square: %d", sq)
-			json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-			return
-		}
-		b |= 1 << sq
-	}
-
-	if a&b != 0 {
-		l.entry.Status = 400
-		l.entry.Error = "overlapping pieces"
-		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-		return
-	}
-	aCount, bCount := bits.OnesCount32(a), bits.OnesCount32(b)
-	if aCount > 4 || bCount > 4 {
-		l.entry.Status = 400
-		l.entry.Error = "too many pieces"
-		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-		return
-	}
-	if aCount < bCount || aCount-bCount > 1 {
-		l.entry.Status = 400
-		l.entry.Error = fmt.Sprintf("invalid counts: A=%d, B=%d", aCount, bCount)
-		json.NewEncoder(w).Encode(Response{Error: l.entry.Error})
-		return
-	}
-
-	n := aCount + bCount
-	phase := "drop"
-	if n == 8 {
-		phase = "play"
-	}
-
-	// Determine turn
-	aTurn := n%2 == 0
-	if n == 8 {
-		aTurn = req.Turn != PlayerB
-	}
-
-	// Get score
-	var g int
-	if aTurn {
-		g = goedel(a, b, n)
-	} else {
-		g = goedel(b, a, n)
-	}
-	score := scores[n][g]
-	out, dist := outcome(score)
-
-	// Generate moves with pre-allocated capacity
-	moves := make([]Move, 0, moveCapacity[n])
-	var mover, other uint32
-	if aTurn {
-		mover, other = a, b
-	} else {
-		mover, other = b, a
-	}
-	ab := a | b
-
-	if n == 8 {
-		// Play phase moves
-		table := scores[8]
-		for p := mover; p != 0; {
-			piece := p & -p
-			p ^= piece
-			from := bitToSquare(piece)
-			newMover := mover ^ piece
-			for dests := neighs[from] &^ ab; dests != 0; {
-				dest := dests & -dests
-				dests ^= dest
-				ng := goedel(other, newMover|dest, 8)
-				ms := -table[ng]
-				mo, md := outcome(ms)
-				fromCopy := from
-				moves = append(moves, Move{&fromCopy, bitToSquare(dest), int(ms), mo, md})
-			}
-		}
-	} else {
-		// Drop phase moves
-		next := scores[n+1]
-		for sq := uint32(1); sq < (1 << Size); sq <<= 1 {
-			if sq&ab == 0 {
-				ng := goedel(other, mover|sq, n+1)
-				ms := -next[ng]
-				mo, md := outcome(ms)
-				moves = append(moves, Move{To: bitToSquare(sq), Score: int(ms), Outcome: mo, Distance: md})
-			}
-		}
-	}
-
-	turn := PlayerA
-	if !aTurn {
-		turn = PlayerB
-	}
-
-	buf := bufPool.Get().(*bytes.Buffer)
-	buf.Reset()
-	json.NewEncoder(buf).Encode(Response{
-		A: maskToSquares(a), B: maskToSquares(b),
-		Turn: turn, Phase: phase, Pieces: n,
-		Score: int(score), Outcome: out, Distance: dist,
-		Moves: moves,
-	})
-	w.Write(buf.Bytes())
-	bufPool.Put(buf)
-
-	l.entry.Status = 200
-	l.entry.Positions = len(moves)
-}
-
 func main() {
 	dbFile := flag.String("db", "teeko.db", "database file")
-	compute := flag.Bool("compute", false, "compute database")
-	serve := flag.Bool("serve", false, "start server")
-	stats := flag.Bool("stats", false, "show longest wins from database")
-	addr := flag.String("addr", ":8080", "server address")
 	flag.Parse()
 
-	switch {
-	case *compute:
-		computePlay()
-		computeDrop()
-		fmt.Printf("Saving %s…\n", *dbFile)
-		if err := saveDB(*dbFile); err != nil {
-			log.Fatal(err)
-		}
-	case *stats:
-		fmt.Printf("Loading %s…\n", *dbFile)
-		if err := mmapDB(*dbFile); err != nil {
-			log.Fatal(err)
-		}
-		findLongestWins()
-	case *serve:
-		fmt.Printf("Mmapping %s…\n", *dbFile)
-		if err := mmapDB(*dbFile); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Listening on %s\n", *addr)
-		http.HandleFunc("/query", handler)
-		log.Fatal(http.ListenAndServe(*addr, nil))
-	default:
-		fmt.Println(`Teeko Solver
-
-Usage:
-  teeko -compute [-db FILE]   Compute and save database
-  teeko -serve [-db FILE]     Start HTTP server
-  teeko -stats [-db FILE]     Show longest forced wins
-
-API:
-  POST /query
-  Body: {"a": [squares], "b": [squares], "turn": "a"|"b"}
-
-  Squares are 0-24. Turn is auto-detected during drop phase.
-
-Examples:
-  {"a": [], "b": []}                              Empty board
-  {"a": [0], "b": []}                             After a's first drop
-  {"a": [0,1,2,3], "b": [4,5,6,7], "turn": "a"}   Play phase`)
+	computePlay()
+	computeDrop()
+	findLongestWins()
+	compressScores()
+	fmt.Printf("Saving %s…\n", *dbFile)
+	if err := saveDB(*dbFile); err != nil {
+		log.Fatal(err)
 	}
 }

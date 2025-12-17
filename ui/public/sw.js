@@ -27,7 +27,7 @@ self.addEventListener("fetch", (event) => {
   if (url.protocol !== "http:" && url.protocol !== "https:") return;
 
   // Don't cache the large DB file
-  if (url.pathname === "/assets/db") return;
+  if (url.pathname === "/assets/db2") return;
 
   const req = event.request.mode === "navigate" ? "/index.html" : event.request;
 

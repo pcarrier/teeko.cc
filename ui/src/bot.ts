@@ -62,7 +62,110 @@ function goedel(a: number, b: number, n: number): number {
   return posNum + positions[n] * patNum;
 }
 
+const patterns = [1, 1, 2, 3, 6, 10, 20, 35, 70];
+
+function degoedel(idx: number, n: number): [number, number] {
+  if (n === 0) return [0, 0];
+  let patNum = Math.floor(idx / positions[n]);
+  let posNum = idx % positions[n];
+
+  // Decode pattern
+  let patWalk = patterns[n];
+  let pat = 0;
+  let nRed = (n + 1) >> 1;
+  for (let j = 0; j < n; j++) {
+    const pcs = n - j;
+    const temp = Math.floor((patWalk * (pcs - nRed)) / pcs);
+    if (patNum >= temp) {
+      patNum -= temp;
+      patWalk = Math.floor((patWalk * nRed) / pcs);
+      nRed--;
+      pat |= 1 << j;
+    } else {
+      patWalk = temp;
+    }
+  }
+
+  // Decode position
+  let posWalk = positions[n];
+  let pcs = n;
+  let patBit = bit[n - 1];
+  let a = 0,
+    b = 0;
+  for (let j = 0; j < SIZE; j++) {
+    const locs = SIZE - j;
+    const temp = Math.floor((posWalk * (locs - pcs)) / locs);
+    if (posNum >= temp) {
+      posNum -= temp;
+      posWalk = Math.floor((posWalk * pcs) / locs);
+      pcs--;
+      if (pat & patBit) {
+        b |= 1 << j;
+      } else {
+        a |= 1 << j;
+      }
+      patBit >>>= 1;
+    } else {
+      posWalk = temp;
+    }
+  }
+  return [a, b];
+}
+
+// D4 symmetry transformation tables (8 symmetries of the square)
+const SYM_TABLES: number[][] = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], // identity
+  [20, 15, 10, 5, 0, 21, 16, 11, 6, 1, 22, 17, 12, 7, 2, 23, 18, 13, 8, 3, 24, 19, 14, 9, 4], // rot90 CCW
+  [24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0], // rot180
+  [4, 9, 14, 19, 24, 3, 8, 13, 18, 23, 2, 7, 12, 17, 22, 1, 6, 11, 16, 21, 0, 5, 10, 15, 20], // rot270 CCW
+  [4, 3, 2, 1, 0, 9, 8, 7, 6, 5, 14, 13, 12, 11, 10, 19, 18, 17, 16, 15, 24, 23, 22, 21, 20], // flip H
+  [20, 21, 22, 23, 24, 15, 16, 17, 18, 19, 10, 11, 12, 13, 14, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4], // flip V
+  [0, 5, 10, 15, 20, 1, 6, 11, 16, 21, 2, 7, 12, 17, 22, 3, 8, 13, 18, 23, 4, 9, 14, 19, 24], // reflect main diagonal
+  [24, 19, 14, 9, 4, 23, 18, 13, 8, 3, 22, 17, 12, 7, 2, 21, 16, 11, 6, 1, 20, 15, 10, 5, 0], // reflect anti-diagonal
+];
+
+const BLOCK_SIZE = 1024;
+
+function transformMask(mask: number, sym: number): number {
+  let result = 0;
+  for (let i = 0; i < 25; i++) {
+    if (mask & (1 << i)) result |= 1 << SYM_TABLES[sym][i];
+  }
+  return result;
+}
+
+function canonical(a: number, b: number, n: number): number {
+  let minG = goedel(a, b, n);
+  for (let s = 1; s < 8; s++) {
+    const g = goedel(transformMask(a, s), transformMask(b, s), n);
+    if (g < minG) minG = g;
+  }
+  return minG;
+}
+
+function isCanonical(g: number, n: number): boolean {
+  const [a, b] = degoedel(g, n);
+  return canonical(a, b, n) === g;
+}
+
+function rankQuery(n: number, canonG: number): number {
+  const blockIdx = Math.floor(canonG / BLOCK_SIZE);
+  let rank = checkpoints[n][blockIdx];
+  for (let g = blockIdx * BLOCK_SIZE; g < canonG; g++) {
+    if (isCanonical(g, n)) rank++;
+  }
+  return rank;
+}
+
+function lookupScoreV2(a: number, b: number, n: number): number {
+  const canonG = canonical(a, b, n);
+  return canonicalScores[n][rankQuery(n, canonG)];
+}
+
 // Database
+let checkpoints: Int32Array[] = [];
+let canonicalScores: Int8Array[] = [];
+let dbVersion = 0;
 let dbLoading: Promise<void> | null = null;
 let dbLoaded = false;
 const scores: Int8Array[] = [];
@@ -86,20 +189,22 @@ export function startDbLoad(): void {
   loadDatabase();
 }
 
-const DB_SIZE = 96691520;
-
 async function loadDatabase(): Promise<void> {
   if (dbLoaded || dbLoading) return dbLoading ?? undefined;
 
   dbLoading = (async () => {
     notify(0);
-    const res = await fetch("/assets/db");
+    const res = await fetch("/assets/db2");
     if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
 
+    // Get content length for progress
+    const contentLength = res.headers.get("content-length");
+    const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+
     let buffer: ArrayBuffer;
-    if (res.body) {
-      // Stream with progress using known DB_SIZE
-      const data = new Uint8Array(DB_SIZE);
+    if (res.body && totalSize > 0) {
+      // Stream with progress
+      const data = new Uint8Array(totalSize);
       const reader = res.body.getReader();
       let received = 0;
       let lastPct = 0;
@@ -108,15 +213,15 @@ async function loadDatabase(): Promise<void> {
         if (done) break;
         data.set(value, received);
         received += value.length;
-        const pct = Math.floor((received / DB_SIZE) * 100);
+        const pct = Math.floor((received / totalSize) * 100);
         if (pct > lastPct) {
-          notify(received / DB_SIZE);
+          notify(received / totalSize);
           lastPct = pct;
         }
       }
       buffer = data.buffer;
     } else {
-      // Fallback (shouldn't happen in modern browsers)
+      // Fallback
       buffer = await res.arrayBuffer();
     }
 
@@ -128,16 +233,43 @@ async function loadDatabase(): Promise<void> {
       view.getUint8(3)
     );
     if (magic !== "TEEK") throw new Error("Invalid database");
-    if (view.getUint32(4, true) !== 1) throw new Error("Unsupported version");
 
+    dbVersion = view.getUint32(4, true);
     let offset = 8;
-    for (let n = 0; n < 9; n++) {
-      const size = view.getUint32(offset, true);
-      offset += 4;
-      if (size !== configs[n]) throw new Error(`Size mismatch for ${n} pieces`);
-      scores[n] = new Int8Array(buffer, offset, size);
-      offset += size;
+
+    if (dbVersion === 1) {
+      // V1 format: full score tables
+      for (let n = 0; n < 9; n++) {
+        const size = view.getUint32(offset, true);
+        offset += 4;
+        if (size !== configs[n])
+          throw new Error(`Size mismatch for ${n} pieces`);
+        scores[n] = new Int8Array(buffer, offset, size);
+        offset += size;
+      }
+    } else if (dbVersion === 2) {
+      // V2 format: canonical positions with checkpoints
+      for (let n = 0; n < 9; n++) {
+        const canonCount = view.getUint32(offset, true);
+        offset += 4;
+        const numCheckpoints = view.getUint32(offset, true);
+        offset += 4;
+
+        // Read checkpoints
+        checkpoints[n] = new Int32Array(numCheckpoints);
+        for (let i = 0; i < numCheckpoints; i++) {
+          checkpoints[n][i] = view.getUint32(offset, true);
+          offset += 4;
+        }
+
+        // Read scores
+        canonicalScores[n] = new Int8Array(buffer, offset, canonCount);
+        offset += canonCount;
+      }
+    } else {
+      throw new Error(`Unsupported version: ${dbVersion}`);
     }
+
     dbLoaded = true;
     notify(1);
   })();
@@ -172,6 +304,14 @@ export function isForced(score: number): boolean {
   return score > HEURISTIC_MAX || score < -HEURISTIC_MAX;
 }
 
+// Get score for a position, handling both v1 and v2 formats
+function getScore(a: number, b: number, n: number): number {
+  if (dbVersion === 2) {
+    return lookupScoreV2(a, b, n);
+  }
+  return scores[n][goedel(a, b, n)];
+}
+
 export function generateMoves(board: Board): Move[] {
   if (!dbLoaded) return [];
   const { a, b, m } = board;
@@ -189,7 +329,7 @@ export function generateMoves(board: Board): Move[] {
         moves.push({
           from: sq,
           to: dest,
-          score: -scores[8][goedel(other, newMover | (1 << dest), 8)],
+          score: -getScore(other, newMover | (1 << dest), 8),
         });
       }
     }
@@ -198,7 +338,7 @@ export function generateMoves(board: Board): Move[] {
       if (ab & (1 << sq)) continue;
       moves.push({
         to: sq,
-        score: -scores[n + 1][goedel(other, mover | (1 << sq), n + 1)],
+        score: -getScore(other, mover | (1 << sq), n + 1),
       });
     }
   }
