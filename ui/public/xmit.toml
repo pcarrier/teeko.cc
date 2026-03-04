@@ -2,7 +2,7 @@ fallback = "index.html"
 
 [[headers]]
 name = "Cache-Control"
-value = "public, max-age=31536000"
+value = "public, max-age=31536000, immutable"
 on = "^/assets/"
 
 [[headers]]
