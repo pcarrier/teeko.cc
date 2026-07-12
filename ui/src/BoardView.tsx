@@ -29,6 +29,7 @@ import {
 } from "./sizing";
 import { Piece } from "./Piece";
 import { Move, formatScore } from "./bot";
+import { winShape } from "./winShape";
 
 const POS_ARRAY = Array.from(Array(SLOTS).keys());
 
@@ -109,6 +110,33 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
   const aWin = WINNING_POSITIONS.has(a);
   const bWin = WINNING_POSITIONS.has(b);
   const win = aWin || bWin;
+
+  // Stable piece identities across moves, so CSS can animate slides.
+  const pieceIds = useMemo(() => {
+    const ids = new Map<number, number>();
+    let next = 0;
+    for (const action of m) {
+      if (Array.isArray(action)) {
+        const id = ids.get(action[0]);
+        if (id !== undefined) {
+          ids.delete(action[0]);
+          ids.set(action[1], id);
+        }
+      } else {
+        ids.set(action, next++);
+      }
+    }
+    return ids;
+  }, [m]);
+
+  const winPositions = useMemo(() => {
+    const winner = aWin ? a : bWin ? b : 0;
+    if (!winner) return undefined;
+    for (const mask of WINNING_POSITIONS)
+      if ((winner & mask) === mask) return [...pieces(mask)];
+    return undefined;
+  }, [a, b, aWin, bWin]);
+  const shape = winPositions && winShape(winPositions);
 
   const ourPieces = !p || win ? new Set<number>() : t === 0 ? aPieces : bPieces;
 
@@ -424,11 +452,11 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
           ))}
         </g>
 
-        <g>
+        <g class={classnames("pieces", { winning: win })}>
           {[...aPieces, ...bPieces].map((pos) => {
             return (
               <Piece
-                key={`piece${pos}`}
+                key={`piece${pieceIds.get(pos) ?? `@${pos}`}`}
                 position={pos}
                 aspect={aspect}
                 dragStart={() => {
@@ -447,11 +475,31 @@ export const BoardView: FunctionComponent<BoardViewAttrs> = ({
                 player={aPieces.has(pos) ? Player.A : Player.B}
                 selected={selected === pos && ourPieces.has(selected)}
                 selectable={!placing && ourPieces.has(pos)}
+                winner={winPositions?.includes(pos)}
                 click={() => click(pos)}
               />
             );
           })}
         </g>
+        {shape &&
+          (shape.kind === "line" ? (
+            <line
+              class={classnames("winShape", { A: aWin, B: bWin })}
+              pathLength={1}
+              x1={x(shape.from)}
+              y1={y(shape.from)}
+              x2={x(shape.to)}
+              y2={y(shape.to)}
+            />
+          ) : (
+            <polygon
+              class={classnames("winShape", { A: aWin, B: bWin })}
+              pathLength={1}
+              points={shape.corners
+                .map((pos) => `${x(pos)},${y(pos)}`)
+                .join(" ")}
+            />
+          ))}
         <g>
           {dragState && selected && (
             <Piece

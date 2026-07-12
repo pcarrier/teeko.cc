@@ -4,9 +4,12 @@
   },
   "help": {
     "open": "Ĉiu ludanto havas 4 pecojn. Bluo komencas.",
-    "place": "Unue, metu ĉiuj pecoj, unu ĉiuturne.",
-    "move": "Tiam, ĉiuturne, movu unu peco al najbara kvadrato:",
-    "win": "Formu lineon de 4 aŭ malgrandan kvadraton gajni:",
+    "placeTitle": "Metu",
+    "place": "Unue, metu ĉiujn pecojn, unu ĉiuturne.",
+    "moveTitle": "Movu",
+    "move": "Poste, ĉiuturne, movu unu pecon al libera najbara loko, en iu ajn direkto.",
+    "winTitle": "Gajnu",
+    "win": "Formu linion de 4, rektan aŭ diagonalan, aŭ malgrandan kvadraton por gajni.",
     "credits": "Teeko de John Scarne. Solvo de Guy L. Steele.",
     "close": "Ludi"
   },

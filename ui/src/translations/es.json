@@ -4,9 +4,12 @@
   },
   "help": {
     "open": "Cada jugador tiene 4 piezas. Azul comienza.",
+    "placeTitle": "Colocar",
     "place": "Primero, coloca todas las piezas, una por turno.",
-    "move": "Luego mueva una pieza por turno a una posición vecina:",
-    "win": "Forma una línea de 4 o un pequeño cuadrado para ganar:",
+    "moveTitle": "Mover",
+    "move": "Luego, en cada turno, mueve una pieza a una casilla vecina libre, en cualquier dirección.",
+    "winTitle": "Ganar",
+    "win": "Forma una línea de 4, recta o diagonal, o un pequeño cuadrado para ganar.",
     "credits": "Teeko fue inventado por John Scarne. Solución de Guy L. Steele.",
     "close": "Jugar"
   },

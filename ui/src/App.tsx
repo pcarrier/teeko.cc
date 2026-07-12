@@ -556,7 +556,7 @@ export const App: FunctionComponent = () => {
           </section>
         )}
 
-        {route.type === "rules" && <Help />}
+        {route.type === "rules" && <Help onPlay={() => navigate("/play")} />}
 
         {roomPath && !nickname && (
           <section class="gameSection">

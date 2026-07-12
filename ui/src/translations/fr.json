@@ -4,9 +4,12 @@
   },
   "help": {
     "open": "Chaque joueuse·r a 4 pions. Bleu commence.",
+    "placeTitle": "Poser",
     "place": "D'abord, posez tous les pions, un par tour.",
-    "move": "Puis, à chaque tour, bougez un pion vers une case voisine :",
-    "win": "Formez une ligne de 4 ou un petit carré pour gagner :",
+    "moveTitle": "Bouger",
+    "move": "Puis, à chaque tour, glissez un pion vers une case voisine libre, dans n'importe quelle direction.",
+    "winTitle": "Gagner",
+    "win": "Formez une ligne de 4, droite ou diagonale, ou un petit carré pour gagner.",
     "credits": "Teeko par John Scarne. Solution par Guy L. Steele.",
     "close": "Jouer"
   },

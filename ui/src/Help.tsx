@@ -1,66 +1,50 @@
 import { FunctionComponent } from "preact";
 import { Text } from "preact-i18n";
-import { BoardView } from "./BoardView";
-import { emptyBoard, Player } from "teeko-cc-common/src/model.js";
+import { moveDemo, placeDemo, RuleDemo, winDemo } from "./RuleDemo";
 
-export const Help: FunctionComponent = () => (
+export const Help: FunctionComponent<{ onPlay?: () => void }> = ({
+  onPlay,
+}) => (
   <div class="help">
-    <p>
+    <p class="intro">
       <Text id="help.open" />
     </p>
-    <BoardView board={{ ...emptyBoard(), p: false }} klass="half" />
-    <p>
-      <Text id="help.place" />
-    </p>
-    <p>
-      <Text id="help.move" />
-    </p>
-    <BoardView
-      board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
-      klass="half"
-      arrows={[
-        { from: 6, to: 0, player: Player.A },
-        { from: 6, to: 1, player: Player.A },
-        { from: 6, to: 5, player: Player.A },
-        { from: 12, to: 8, player: Player.A },
-        { from: 13, to: 8, player: Player.A },
-        { from: 13, to: 9, player: Player.A },
-        { from: 13, to: 14, player: Player.A },
-        { from: 13, to: 19, player: Player.A },
-        { from: 17, to: 21, player: Player.A },
-        { from: 17, to: 22, player: Player.A },
-        { from: 17, to: 23, player: Player.A },
-      ]}
-    />
-    <BoardView
-      board={{ ...emptyBoard(), a: 143424, b: 329856, p: false }}
-      klass="half"
-      arrows={[
-        { from: 7, to: 1, player: Player.B },
-        { from: 7, to: 2, player: Player.B },
-        { from: 7, to: 3, player: Player.B },
-        { from: 7, to: 8, player: Player.B },
-        { from: 11, to: 5, player: Player.B },
-        { from: 11, to: 10, player: Player.B },
-        { from: 11, to: 15, player: Player.B },
-        { from: 16, to: 10, player: Player.B },
-        { from: 16, to: 15, player: Player.B },
-        { from: 16, to: 20, player: Player.B },
-        { from: 16, to: 21, player: Player.B },
-        { from: 16, to: 22, player: Player.B },
-        { from: 18, to: 14, player: Player.B },
-        { from: 18, to: 19, player: Player.B },
-        { from: 18, to: 22, player: Player.B },
-        { from: 18, to: 23, player: Player.B },
-        { from: 18, to: 24, player: Player.B },
-      ]}
-    />
-    <p>
-      <Text id="help.win" />
-    </p>
-    <BoardView board={{ ...emptyBoard(), a: 2236928, p: false }} klass="half" />
-    <BoardView board={{ ...emptyBoard(), b: 6336, p: false }} klass="half" />
-    <p>
+    <section class="rule">
+      <h2>
+        <span class="ruleNum">1</span>
+        <Text id="help.placeTitle" />
+      </h2>
+      <p>
+        <Text id="help.place" />
+      </p>
+      <RuleDemo frames={placeDemo} />
+    </section>
+    <section class="rule">
+      <h2>
+        <span class="ruleNum">2</span>
+        <Text id="help.moveTitle" />
+      </h2>
+      <p>
+        <Text id="help.move" />
+      </p>
+      <RuleDemo frames={moveDemo} />
+    </section>
+    <section class="rule">
+      <h2>
+        <span class="ruleNum">3</span>
+        <Text id="help.winTitle" />
+      </h2>
+      <p>
+        <Text id="help.win" />
+      </p>
+      <RuleDemo frames={winDemo} />
+    </section>
+    {onPlay && (
+      <button class="playCta" onClick={onPlay}>
+        <Text id="help.close" />
+      </button>
+    )}
+    <p class="credits">
       <Text id="help.credits" />
     </p>
   </div>

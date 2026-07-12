@@ -98,6 +98,19 @@ input {
   padding: 0.5em;
 }
 
+button,
+input,
+select,
+a {
+  transition: background-color 120ms ease-out, border-color 120ms ease-out,
+    color 120ms ease-out, opacity 150ms ease-out, visibility 150ms,
+    transform 100ms ease-out;
+}
+
+button:enabled:active {
+  transform: scale(0.96);
+}
+
 select {
   font-size: 100%;
   color: @strong;
@@ -327,12 +340,20 @@ menu {
   }
   &.win {
     font-weight: bold;
+    animation: statusPop 250ms ease-out;
     &.A {
       color: @aColor;
     }
     &.B {
       color: @bColor;
     }
+  }
+}
+
+@keyframes statusPop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
   }
 }
 
@@ -368,6 +389,8 @@ menu {
       cursor: pointer;
       text-align: left;
       color: @aColor;
+      animation: fadeIn 150ms ease-out;
+      transition: opacity 100ms ease-out;
 
       &:nth-child(even) {
         color: @bColor;
@@ -386,6 +409,193 @@ menu {
         opacity: 0.7;
       }
     }
+  }
+}
+
+.help {
+  padding: 0.75em;
+
+  .intro {
+    color: @strong;
+    margin: 0.25em 0 0.75em;
+  }
+
+  .rule {
+    background-color: tint(@bg, 4%);
+    border: 1px solid tint(@bg, 14%);
+    border-radius: 0.75em;
+    padding: 0.75em;
+    margin-bottom: 0.75em;
+    animation: ruleIn 300ms ease-out backwards;
+
+    &:nth-of-type(2) {
+      animation-delay: 80ms;
+    }
+    &:nth-of-type(3) {
+      animation-delay: 160ms;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+      margin: 0 0 0.3em;
+    }
+
+    .ruleNum {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.7em;
+      height: 1.7em;
+      font-size: 75%;
+      border: 1px solid @selectionColor;
+      border-radius: 50%;
+      color: @color;
+    }
+
+    p {
+      margin: 0 0 0.5em;
+    }
+  }
+
+  .demoWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .board.demo,
+  .demoControls {
+    width: 62%;
+    max-width: 75mm;
+  }
+
+  .playCta {
+    width: 100%;
+    margin: 0.25em 0;
+    font-size: 110%;
+    border-color: @selectionColor;
+  }
+
+  .credits {
+    color: @selectionColor;
+    font-size: 85%;
+    margin: 0.75em 0 0;
+  }
+}
+
+@keyframes ruleIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+}
+
+.demoControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 0.25em;
+
+  .demoProgress {
+    flex: 1;
+    height: 0.25em;
+    border-radius: 0.125em;
+    background-color: @boardColor;
+    overflow: hidden;
+  }
+
+  .demoProgressFill {
+    height: 100%;
+    background-color: @selectionColor;
+    transition-property: width;
+    transition-timing-function: linear;
+  }
+
+  button.demoRestart {
+    width: 2.2em;
+    height: 2.2em;
+    padding: 0;
+    margin: 0;
+    font-size: 80%;
+    border-radius: 50%;
+  }
+}
+
+.board.demo {
+  .demoPiece {
+    transition: transform 500ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+
+  circle.piece.pop {
+    animation: piecePop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  }
+
+  .demoPieces {
+    transition: opacity 500ms ease-out;
+
+    &.clearing {
+      opacity: 0;
+    }
+  }
+
+  .demoTarget {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: targetPulse 1s ease-in-out infinite;
+
+    &.A {
+      fill: shade(@aColor, 45%);
+    }
+    &.B {
+      fill: shade(@bColor, 45%);
+    }
+  }
+}
+
+@keyframes piecePop {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes winPulse {
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+@keyframes targetPulse {
+  50% {
+    transform: scale(1.4);
+  }
+}
+
+@keyframes winDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes crownIn {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .board .winShape {
+    stroke-dashoffset: 0 !important;
   }
 }
 
@@ -444,6 +654,15 @@ menu {
     }
   }
 
+  .pieceG {
+    transition: transform 220ms cubic-bezier(0.3, 0.7, 0.4, 1);
+
+    &.dragging,
+    &.dummy {
+      transition: none;
+    }
+  }
+
   .piece {
     &.A {
       fill: @aColor;
@@ -453,6 +672,49 @@ menu {
     }
     &.dummy {
       pointer-events: none;
+    }
+  }
+
+  circle.piece {
+    transform-box: fill-box;
+    transform-origin: center;
+
+    &:not(.dummy) {
+      animation: piecePop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    &.winner {
+      animation: winPulse 800ms ease-in-out infinite;
+    }
+  }
+
+  g.winning circle.piece:not(.winner) {
+    opacity: 0.4;
+    transition: opacity 400ms;
+  }
+
+  circle.selected,
+  circle.target {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: crownIn 160ms ease-out;
+  }
+
+  .winShape {
+    fill: none;
+    stroke-width: 0.12;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: winDraw 700ms 150ms ease-out forwards;
+    pointer-events: none;
+
+    &.A {
+      stroke: fade(@aColor, 80%);
+    }
+    &.B {
+      stroke: fade(@bColor, 80%);
     }
   }
 
@@ -521,6 +783,52 @@ menu {
 
 .invisible {
   visibility: hidden;
+  opacity: 0;
+}
+
+header,
+menu,
+.friends,
+.help,
+.gameSection,
+.botControls,
+.matchingOverlay {
+  animation: sectionIn 180ms ease-out;
+}
+
+menu li {
+  animation: sectionIn 200ms ease-out backwards;
+}
+menu li:nth-child(2) {
+  animation-delay: 25ms;
+}
+menu li:nth-child(3) {
+  animation-delay: 50ms;
+}
+menu li:nth-child(4) {
+  animation-delay: 75ms;
+}
+menu li:nth-child(5) {
+  animation-delay: 100ms;
+}
+menu li:nth-child(6) {
+  animation-delay: 125ms;
+}
+menu li:nth-child(7) {
+  animation-delay: 150ms;
+}
+
+@keyframes sectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
 }
 
 .botControls,

@@ -4,9 +4,12 @@
   },
   "help": {
     "open": "Each player has 4 pieces. Blue opens.",
+    "placeTitle": "Place",
     "place": "First, place all pieces, one each turn.",
-    "move": "Then, each turn, move one to a neighbor:",
-    "win": "Form a line of 4 or a small square to win:",
+    "moveTitle": "Move",
+    "move": "Then, each turn, slide one piece to an empty neighboring spot, in any direction.",
+    "winTitle": "Win",
+    "win": "Form a line of 4, straight or diagonal, or a small square to win.",
     "credits": "Teeko by John Scarne. Solution by Guy L. Steele.",
     "close": "Play"
   },

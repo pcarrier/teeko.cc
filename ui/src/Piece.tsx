@@ -14,6 +14,7 @@ type PieceAttrs = {
   player: Player;
   selected?: boolean;
   selectable?: boolean;
+  winner?: boolean;
   aspect?: Rect | null;
   dummy?: boolean;
   offset?: Position;
@@ -29,6 +30,7 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
   aspect,
   selectable,
   selected,
+  winner,
   dummy,
   offset,
 }: PieceAttrs) => {
@@ -69,27 +71,33 @@ export const Piece: FunctionComponent<PieceAttrs> = ({
     return Math.max(0, Math.min(n, SIZE - 1));
   }
 
+  const gx = limitToBoard(x + dxNorm + (offset?.x ?? 0));
+  const gy = limitToBoard(y + dyNorm + (offset?.y ?? 0));
+
   return (
-    <circle
-      key={`p${position}`}
-      onClick={onClick}
-      r={dummy ? LARGE_CROWN_RADIUS : PIECE_RADIUS}
-      cx={limitToBoard(x + dxNorm + (offset?.x ?? 0))}
-      cy={limitToBoard(y + dyNorm + (offset?.y ?? 0))}
-      class={classnames("piece", {
-        A: player === Player.A,
-        B: player === Player.B,
-        dragging: state.isDragging,
-        dummy,
-      })}
-      {...(selectable || selected
-        ? {
-            onPointerDown,
-            onPointerMove,
-            onPointerUp,
-            onPointerCancel,
-          }
-        : {})}
-    />
+    <g
+      class={classnames("pieceG", { dragging: state.isDragging, dummy })}
+      style={{ transform: `translate(${gx}px, ${gy}px)` }}
+    >
+      <circle
+        onClick={onClick}
+        r={dummy ? LARGE_CROWN_RADIUS : PIECE_RADIUS}
+        class={classnames("piece", {
+          A: player === Player.A,
+          B: player === Player.B,
+          dragging: state.isDragging,
+          winner,
+          dummy,
+        })}
+        {...(selectable || selected
+          ? {
+              onPointerDown,
+              onPointerMove,
+              onPointerUp,
+              onPointerCancel,
+            }
+          : {})}
+      />
+    </g>
   );
 };
